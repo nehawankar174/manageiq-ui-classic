@@ -431,9 +431,9 @@ class HostController < ApplicationController
     [
       %i(properties relationships),
       %i(
-        compliance security configuration diagnostics smart_management miq_custom_attributes
-        ems_custom_attributes authentications cloud_services openstack_hardware_status openstack_service_status
-      )
+         compliance security configuration diagnostics smart_management miq_custom_attributes
+         ems_custom_attributes authentications cloud_services openstack_hardware_status openstack_service_status
+       )
     ]
   end
   helper_method :textual_group_list
