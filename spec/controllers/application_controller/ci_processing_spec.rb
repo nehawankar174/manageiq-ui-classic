@@ -75,7 +75,7 @@ describe ApplicationController do
   end
 
   context "Verify proper methods are called for snapshot" do
-    before(:each) do
+    before do
       allow(subject).to receive(:vm_button_action).and_return(subject.method(:process_objects))
     end
 
@@ -654,7 +654,7 @@ describe ApplicationController do
 
     context "when a single is vm selected" do
       let(:supports_reconfigure_disks) { true }
-      before(:each) do
+      before do
         allow(vm).to receive(:supports_reconfigure_disks?).and_return(supports_reconfigure_disks)
         controller.instance_variable_set(:@reconfigitems, [vm])
       end
@@ -801,7 +801,7 @@ describe HostController do
   let(:zone) { FactoryGirl.create(:zone) }
 
   context "#show_association" do
-    before(:each) do
+    before do
       stub_user(:features => :all)
       EvmSpecHelper.create_guid_miq_server_zone
       @host = FactoryGirl.create(:host)
@@ -882,7 +882,7 @@ describe HostController do
   end
 
   context "#generic_button_operation" do
-    before(:each) do
+    before do
       allow(subject).to receive(:vm_button_action).and_return(subject.method(:process_objects))
       allow(controller).to receive(:render)
       EvmSpecHelper.create_guid_miq_server_zone
@@ -1058,6 +1058,27 @@ describe OrchestrationStackController do
       flash_messages = assigns(:flash_array)
       expect(flash_messages.first).to eq(:message => "Delete initiated for 1 Orchestration Stacks from the ManageIQ Database",
                                          :level   => :success)
+    end
+  end
+end
+
+describe EmsCloudController do
+  describe "#delete_flavor" do
+    let!(:flavor) { FactoryGirl.create(:flavor) }
+    before do
+      EvmSpecHelper.create_guid_miq_server_zone
+      stub_user(:features => :all)
+    end
+
+    context 'when pressed' do
+      it 'queues deletion of selected flavors' do
+        controller.instance_variable_set(
+          :@_params,
+          :miq_grid_checks => "#{flavor.id}")
+        expect(controller).to receive(:delete_flavors).and_call_original
+        expect_any_instance_of(Flavor).to receive(:delete_flavor_queue)
+        post :button, :params => {:pressed => 'flavor_delete', :miq_grid_checks => flavor.id}
+      end
     end
   end
 end

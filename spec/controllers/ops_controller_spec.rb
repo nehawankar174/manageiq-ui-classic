@@ -1,6 +1,6 @@
 describe OpsController do
   let(:user) { FactoryGirl.create(:user, :role => "super_administrator") }
-  before(:each) do
+  before do
     EvmSpecHelper.create_guid_miq_server_zone
     MiqRegion.seed
     login_as user
@@ -48,7 +48,6 @@ describe OpsController do
       end
 
       it 'rbac role add' do
-        MiqProductFeature.seed
         session[:sandboxes] = {"ops" => {:trees => {}}}
         allow(controller).to receive(:x_node).and_return('xx-ur')
         post :x_button, :params => {:pressed => 'rbac_role_add'}
@@ -165,12 +164,12 @@ describe OpsController do
       session[:settings] = {:default_search => ''}
 
       miq_schedule = FactoryGirl.create(:miq_schedule,
-                                        :name        => "test_db_schedule",
-                                        :description => "test_db_schedule_desc",
-                                        :towhat      => "DatabaseBackup",
-                                        :run_at      => {:start_time => "2015-04-19 00:00:00 UTC",
-                                                         :tz         => "UTC",
-                                                         :interval   => {:unit => "once", :value => ""}})
+                                        :name          => "test_db_schedule",
+                                        :description   => "test_db_schedule_desc",
+                                        :resource_type => "DatabaseBackup",
+                                        :run_at        => {:start_time => "2015-04-19 00:00:00 UTC",
+                                                           :tz         => "UTC",
+                                                           :interval   => {:unit => "once", :value => ""}})
       post :db_backup, :params => {
         :backup_schedule => miq_schedule.id,
         :uri             => "nfs://test_location",

@@ -21,7 +21,7 @@ describe EmsPhysicalInfraController do
 
   describe "#show" do
     render_views
-    before(:each) do
+    before do
       EvmSpecHelper.create_guid_miq_server_zone
       login_as FactoryGirl.create(:user, :features => "none")
       @ems = FactoryGirl.create(:ems_physical_infra)
@@ -33,7 +33,10 @@ describe EmsPhysicalInfraController do
 
     context "display=timeline" do
       let(:url_params) { {:display => 'timeline'} }
-      it { is_expected.to have_http_status 200 }
+      it do
+        bypass_rescue
+        is_expected.to have_http_status 200
+      end
     end
 
     context "render show dashboard partial" do
@@ -79,7 +82,7 @@ describe EmsPhysicalInfraController do
   end
 
   describe "#show_list" do
-    before(:each) do
+    before do
       stub_user(:features => :all)
       FactoryGirl.create(:ems_vmware)
       get :show_list
@@ -103,7 +106,7 @@ describe EmsPhysicalInfraController do
   end
 
   describe "#build_credentials" do
-    before(:each) do
+    before do
       @ems = FactoryGirl.create(:ems_physical_infra)
     end
     context "#build_credentials only contains credentials that it supports and has a username for in params" do

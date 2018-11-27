@@ -75,9 +75,19 @@ describe EmsCloudController do
     end
 
     it "validates credentials for a new record" do
-      stub_request(:post, "https://ec2.ap-southeast-1.amazonaws.com/")
-        .with(:body => /Action\=DescribeRegions/)
-        .to_return(:status => 200, :body => "", :headers => {})
+      expect(ManageIQ::Providers::Amazon::CloudManager).to receive(:validate_credentials_task).with(
+        match_array([
+          'foo',
+          'v2:{SRpWIJC0Y1AOrUrKC0KDiw==}',
+          :EC2,
+          'ap-southeast-1',
+          nil,
+          true,
+          instance_of(URI::Generic)
+        ]),
+        User.current_user.userid,
+        zone.name
+      )
 
       post :create, :params => {
         "button"           => "validate",
@@ -727,8 +737,12 @@ describe EmsCloudController do
     end
   end
 
-  %w(availability_zones cloud_tenants security_groups instances images
-     orchestration_stacks storage_managers).each do |custom_button_class|
+  nested_lists = %w(availability_zones cloud_tenants cloud_volumes security_groups instances images
+     orchestration_stacks storage_managers)
+
+  nested_lists.each do |custom_button_class|
     include_examples "relationship table screen with custom buttons", custom_button_class
   end
+
+  it_behaves_like "relationship table screen with GTL", nested_lists, :ems_amazon
 end

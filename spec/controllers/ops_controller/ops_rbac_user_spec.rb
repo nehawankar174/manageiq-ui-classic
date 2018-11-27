@@ -1,10 +1,9 @@
 describe OpsController do
   include Spec::Support::OpsUserHelper
 
-  before(:each) do
+  before do
     EvmSpecHelper.local_miq_server
     MiqRegion.seed
-    MiqProductFeature.seed
     stub_admin
 
     controller.instance_variable_set(:@sb, {})

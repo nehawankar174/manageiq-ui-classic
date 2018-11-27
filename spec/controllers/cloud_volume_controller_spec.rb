@@ -1,7 +1,7 @@
 describe CloudVolumeController do
   context "#tags_edit" do
     let!(:user) { stub_user(:features => :all) }
-    before(:each) do
+    before do
       EvmSpecHelper.create_guid_miq_server_zone
       @volume = FactoryGirl.create(:cloud_volume, :name => "cloud-volume-01")
       allow(@volume).to receive(:tagged_with).with(:cat => user.userid).and_return("my tags")
@@ -103,11 +103,34 @@ describe CloudVolumeController do
       login_as user
     end
 
-    it "raises exception wheh used have not privilege" do
+    it "raises an exception when the user does not have the privileges" do
       expect do
         bypass_rescue
         post :new, :params => {:button => "new", :format => :js}
       end.to raise_error(MiqException::RbacPrivilegeException)
+    end
+  end
+
+  describe '#new' do
+    render_views
+
+    let(:features) { MiqProductFeature.find_all_by_identifier(%w(cloud_volume_new cloud_tenant_show_list)) }
+    let(:role)    { FactoryGirl.create(:miq_user_role, :miq_product_features => features) }
+    let(:group)   { FactoryGirl.create(:miq_group, :miq_user_role => role) }
+    let(:user)    { FactoryGirl.create(:user, :miq_groups => [group]) }
+
+    before do
+      EvmSpecHelper.create_guid_miq_server_zone
+      EvmSpecHelper.seed_specific_product_features(%w(cloud_volume_new cloud_tenant_show_list))
+
+      login_as user
+    end
+
+    it "renders the correct template when the user has the privileges" do
+      post :new, :params => {:button => "new", :format => :js}
+      expect(assigns(:flash_array)).to be_nil
+      expect(response).to render_template('cloud_volume/_common_new_edit')
+      expect(response.status).to eq(200)
     end
   end
 
