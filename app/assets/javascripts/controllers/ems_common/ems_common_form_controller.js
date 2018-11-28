@@ -289,7 +289,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
     }
 
     if ($scope.emsCommonModel.virtualization_selection === 'disabled') {
-      angular.element('#virtualization_tab').hide();
+      angular.element('#kubevirt_tab').hide();
     }
   };
 
@@ -476,7 +476,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
   };
 
   $scope.virtualizationSelectionChanged = function() {
-    $scope.tabSelectionChanged('#virtualization_tab', $scope.emsCommonModel.virtualization_selection);
+    $scope.tabSelectionChanged('#kubevirt_tab', $scope.emsCommonModel.virtualization_selection);
   };
 
   $scope.providerTypeChanged = function() {
