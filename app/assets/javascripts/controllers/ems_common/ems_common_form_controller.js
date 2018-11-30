@@ -27,7 +27,6 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
       security_protocol: '',
       amqp_security_protocol: '',
       provider_region: '',
-      domain_name: '',
       project_name: '',
       default_userid: '',
       default_password: '',
@@ -147,7 +146,6 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
       $scope.emsCommonModel.metrics_security_protocol       = data.metrics_security_protocol;
       $scope.emsCommonModel.metrics_tls_ca_certs            = data.metrics_tls_ca_certs;
       $scope.emsCommonModel.provider_region                 = data.provider_region;
-      $scope.emsCommonModel.domain_name                     = data.domain_name;
       $scope.emsCommonModel.project_name                    = data.project_name;
       $scope.emsCommonModel.default_userid                  = data.default_userid;
       $scope.emsCommonModel.amqp_userid                     = data.amqp_userid;
@@ -374,7 +372,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
       return true;
     } else if ($scope.emsCommonModel.emstype === 'kubevirt') {
       return true;
-    }else if($scope.emsCommonModel.emstype == "telefonica" && $scope.emsCommonModel.domain_name != '' && $scope.emsCommonModel.project_name != '' &&
+    }else if($scope.emsCommonModel.emstype == "telefonica" && $scope.emsCommonModel.project_name != '' &&
       ($scope.currentTab == "default" )) {
       return true;
     } else {
@@ -495,7 +493,6 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
     }
     $scope.emsCommonModel.default_api_port = '';
     $scope.emsCommonModel.provider_region = '';
-    $scope.emsCommonModel.domain_name = "";
     $scope.emsCommonModel.project_name = "";
     $scope.emsCommonModel.default_security_protocol = '';
     $scope.emsCommonModel.default_tls_verify = true;
@@ -641,7 +638,6 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
         azure_tenant_id:           $scope.emsCommonModel.azure_tenant_id,
         subscription:              $scope.emsCommonModel.subscription,
         provider_region:           $scope.emsCommonModel.provider_region,
-        domain_name:               $scope.emsCommonModel.domain_name,
         project_name:              $scope.emsCommonModel.project_name
       };
     } else if (prefix === 'amqp') {

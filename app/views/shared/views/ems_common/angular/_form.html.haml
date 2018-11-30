@@ -208,18 +208,6 @@
                      "checkchange"                 => "",
                      "selectpicker-for-select-tag" => "")
 
-    .form-group{"ng-class" => "{'has-error': angularForm.domain_name.$invalid}", "ng-if" => "emsCommonModel.emstype == 'telefonica'"}
-      %label.col-md-2.control-label{"for" => "ems_domain_name"}
-        = _('Domain Name')
-      .col-md-4
-        %input.form-control{"type"        => "text",
-                            "id"          => "ems_domain_name",
-                            "name"        => "domain_name",
-                            "ng-model"    => "emsCommonModel.domain_name",
-                            "maxlength"   => "#{ViewHelper::MAX_NAME_LEN}",
-                            "required"    => "",
-                            "checkchange" => ""}
-
     .form-group{"ng-class" => "{'has-error': angularForm.project_name.$invalid}", "ng-if" => "emsCommonModel.emstype == 'telefonica'"}
       %label.col-md-2.control-label{"for" => "ems_project_name"}
         = _('Project Name')

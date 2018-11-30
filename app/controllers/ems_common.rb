@@ -537,7 +537,6 @@ module EmsCommon
     @ems_types = Array(model.supported_types_and_descriptions_hash.invert).sort_by(&:first)
 
     @provider_regions = retrieve_provider_regions
-    @domain_name = retrieve_domain_name
     @project_name = retrieve_project_name
     @openstack_infra_providers = retrieve_openstack_infra_providers
     @openstack_security_protocols = retrieve_openstack_security_protocols
@@ -570,16 +569,6 @@ module EmsCommon
     end
   end
 
-  def retrieve_domain_name
-    managers = model.supported_subclasses.select(&:supports_regions?)
-    managers.each_with_object({}) do |manager, domain_name|
-      regions = manager.parent::Regions.all.sort_by { |r| r[:description] }
-      domain_name[manager.ems_type] = regions.map do |region|
-        [region[:description], region[:name]]
-      end
-    end
-  end
-
   def retrieve_project_name
     managers = model.supported_subclasses.select(&:supports_regions?)
     managers.each_with_object({}) do |manager, project_name|
@@ -591,7 +580,6 @@ module EmsCommon
   end
 
   private :retrieve_provider_regions
-  private :retrieve_domain_name
   private :retrieve_project_name
 
 
