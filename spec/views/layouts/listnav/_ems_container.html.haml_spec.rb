@@ -1,8 +1,7 @@
 describe "layouts/listnav/_ems_container.html.haml" do
-  helper ImageEncodeHelper
   helper QuadiconHelper
 
-  before :each do
+  before do
     set_controller_for_view("ems_container")
     assign(:panels, "ems_prop" => true, "ems_rel" => true)
     allow(view).to receive(:truncate_length).and_return(10)
@@ -10,7 +9,7 @@ describe "layouts/listnav/_ems_container.html.haml" do
   end
 
   it "link to Capacity & Utilization uses restful path" do
-    @record = FactoryGirl.create(:ems_openshift)
+    @record = FactoryBot.create(:ems_openshift)
     allow(@record).to receive(:has_perf_data?).and_return(true)
     render
     expect(response)

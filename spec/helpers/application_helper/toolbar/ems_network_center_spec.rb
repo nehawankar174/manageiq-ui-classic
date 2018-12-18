@@ -6,9 +6,9 @@ describe ApplicationHelper::Toolbar::EmsNetworkCenter do
     let(:button_hash)   { ems_network_vmdb_choice[:items].detect { |b| b[:id] == 'ems_network_edit' } }
     let(:button_klass)  { button_hash[:klass] }
     let(:button)        { button_klass.new(nil, nil, {}, {}) }
-    let(:ems_nuage)     { FactoryGirl.create(:ems_nuage_network) }
-    let(:ems_openstack) { FactoryGirl.create(:ems_openstack) }
-    let(:ems_telefonica) { FactoryGirl.create(:ems_telefonica) }
+    let(:ems_nuage)     { FactoryBot.create(:ems_nuage_network) }
+    let(:ems_openstack) { FactoryBot.create(:ems_openstack) }
+    let(:ems_telefonica) { FactoryBot.create(:ems_telefonica) }
 
     it 'appropriate button class' do
       expect(button_klass).to eq(ApplicationHelper::Button::EmsNetwork)
@@ -23,7 +23,7 @@ describe ApplicationHelper::Toolbar::EmsNetworkCenter do
       button.instance_variable_set(:@record, ems_openstack)
       expect(button.visible?).to eq(false)
     end
-
+    
     it 'not visible for telefonica provider' do
       button.instance_variable_set(:@record, ems_telefonica)
       expect(button.visible?).to eq(false)

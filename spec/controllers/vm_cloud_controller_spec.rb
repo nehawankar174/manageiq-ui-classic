@@ -1,15 +1,15 @@
 describe VmCloudController do
   let(:vm_openstack) do
-    FactoryGirl.create(:vm_openstack,
-                       :ext_management_system => FactoryGirl.create(:ems_openstack))
+    FactoryBot.create(:vm_openstack,
+                       :ext_management_system => FactoryBot.create(:ems_openstack))
   end
   let(:vm_openstack_tmd) do
-    FactoryGirl.create(:vm_openstack,
-                       :ext_management_system => FactoryGirl.create(:ems_openstack, :tenant_mapping_enabled => false))
+    FactoryBot.create(:vm_openstack,
+                       :ext_management_system => FactoryBot.create(:ems_openstack, :tenant_mapping_enabled => false))
   end
   let(:vm_openstack_tme) do
-    FactoryGirl.create(:vm_openstack,
-                       :ext_management_system => FactoryGirl.create(:ems_openstack, :tenant_mapping_enabled => true))
+    FactoryBot.create(:vm_openstack,
+                       :ext_management_system => FactoryBot.create(:ems_openstack, :tenant_mapping_enabled => true))
   end
 
   before do
@@ -81,7 +81,7 @@ describe VmCloudController do
     end
 
     it 'can resize an instance' do
-      flavor = FactoryGirl.create(:flavor_openstack)
+      flavor = FactoryBot.create(:flavor_openstack)
       allow(controller).to receive(:load_edit).and_return(true)
       allow(controller).to receive(:previous_breadcrumb_url).and_return("/vm_cloud/explorer")
       expect(VmCloudReconfigureRequest).to receive(:make_request)
@@ -170,6 +170,22 @@ describe VmCloudController do
         }
       )
       post :x_button, :params => {:pressed => 'instance_ownership', "check_#{vm_openstack_tmd.id}" => "1", "check_#{vm_openstack_tme.id}" => "1"}
+      expect(response.status).to eq(200)
+    end
+
+    it 'renders gtl when open pre provision screen' do
+      expect_any_instance_of(GtlHelper).to receive(:render_gtl).with match_gtl_options(
+        :model_name                     => 'ManageIQ::Providers::CloudManager::Template',
+        :report_data_additional_options => {
+          :model         => 'ManageIQ::Providers::CloudManager::Template',
+          :report_name   => "ProvisionCloudTemplates.yaml",
+          :custom_action => {
+            :url  => "/miq_request/pre_prov/?sel_id=",
+            :type => "provisioning"
+          }
+        }
+      )
+      post :x_button, :params => {:pressed => 'instance_miq_request_new'}
       expect(response.status).to eq(200)
     end
 

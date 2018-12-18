@@ -1,5 +1,5 @@
 describe ApplicationController, "::Filter" do
-  before :each do
+  before do
     controller.instance_variable_set(:@sb, {})
   end
 
@@ -44,6 +44,23 @@ describe ApplicationController, "::Filter" do
       end
     end
 
+    it "resets exp_tag when discard button is pressed" do
+      exp = ApplicationController::Filter::Expression.new.tap do |e|
+        e.val1 = {}
+        e.val2 = {}
+        e.expression = {}
+        e.exp_tag = "managed-aws_reservation_statud"
+      end
+      edit = {:filter_expression => exp}
+      edit[:new] = {:filter_expression => {:test => "foo", :token => 1}}
+      session[:edit] = edit
+      controller.instance_variable_set(:@_params, :pressed => "discard")
+      controller.instance_variable_set(:@expkey, :filter_expression)
+      expect(controller).to receive(:render)
+      controller.send(:exp_button)
+      expect(assigns(:edit)[:filter_expression][:exp_tag]).to be_nil
+    end
+
     it "removes tokens if present" do
       exp = {'???' => '???'}
       edit = {:expression => expression, :edit_exp => exp}
@@ -61,9 +78,9 @@ describe ApplicationController, "::Filter" do
   end
 
   describe "#save_default_search" do
-    let(:user) { FactoryGirl.create(:user_with_group, :settings => {:default_search => {}}) }
+    let(:user) { FactoryBot.create(:user_with_group, :settings => {:default_search => {}}) }
     it "saves settings" do
-      search = FactoryGirl.create(:miq_search, :name => 'sds')
+      search = FactoryBot.create(:miq_search, :name => 'sds')
 
       login_as user
       controller.instance_variable_set(:@settings, {})
@@ -88,7 +105,7 @@ describe ApplicationController, "::Filter" do
        :qs_prev_x_node             => nil}
     end
 
-    before :each do
+    before do
       controller.instance_variable_set(:@expkey, :expression)
       controller.instance_variable_set(:@edit, edit)
       allow(controller).to receive(:render)

@@ -43,7 +43,6 @@ class ApplicationController < ActionController::Base
   helper ToolbarHelper
   helper JsHelper
   helper QuadiconHelper
-  helper ImageEncodeHelper
   helper ViewFormattingHelper
 
   helper CloudResourceQuotaHelper
@@ -301,9 +300,6 @@ class ApplicationController < ActionController::Base
     # do not build quadicon links
     @embedded = true
     @showlinks = false
-
-    # encode images and embed in HTML that is sent to Prince
-    @base64_encode_images = true
 
     @record = identify_record(params[:id], klass)
     yield if block_given?
@@ -1350,7 +1346,7 @@ class ApplicationController < ActionController::Base
     when "job", "miqtask"
       :job_task
     else
-      PERPAGE_TYPES[dbname]
+      PERPAGE_TYPES[@gtl_type]
     end
   end
 
@@ -1410,7 +1406,13 @@ class ApplicationController < ActionController::Base
     @gtl_type = get_view_calculate_gtl_type(db_sym) unless fetch_data
 
     # Get the view for this db or use the existing one in the session
-    view = refresh_view ? get_db_view(db.gsub('::', '_'), :association => association, :view_suffix => view_suffix) : session[:view]
+    view =
+      if options['report_name']
+        path_to_report = ManageIQ::UI::Classic::Engine.root.join("product", "views", options['report_name']).to_s
+        MiqReport.new(YAML.safe_load(File.open(path_to_report), [Symbol]))
+      else
+        refresh_view ? get_db_view(db.gsub('::', '_'), :association => association, :view_suffix => view_suffix) : session[:view]
+      end
 
     # Check for changed settings in params
     if params[:ppsetting] # User selected new per page value
@@ -1827,7 +1829,7 @@ class ApplicationController < ActionController::Base
     url = URI.parse(request.url).path
 
     # Do not include console popup windows urls. Only urls from the main UI are supported.
-    return if %w(launch_vmware_console launch_html5_console).any? { |i| url.include?(i) }
+    return if %w(launch_vmrc_console launch_html5_console).any? { |i| url.include?(i) }
 
     section.parent_path.each do |sid|
       session[:tab_url][sid] = url

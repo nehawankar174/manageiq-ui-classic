@@ -1,14 +1,14 @@
 describe MiqPolicyController do
-  before :each do
+  before do
     stub_user(:features => :all)
   end
   context "::Policies" do
     context "#policy_edit" do
       render_views
 
-      before :each do
-        FactoryGirl.create(:miq_event_definition, :name => "containergroup_compliance_check")
-        FactoryGirl.create(:miq_action, :name => "compliance_failed")
+      before do
+        FactoryBot.create(:miq_event_definition, :name => "containergroup_compliance_check")
+        FactoryBot.create(:miq_action, :name => "compliance_failed")
         allow(controller).to receive(:policy_get_node_info)
         allow(controller).to receive(:get_node_info)
       end

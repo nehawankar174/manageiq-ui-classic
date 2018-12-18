@@ -1,3 +1,4 @@
+import { isString, isPlainObject } from 'lodash';
 import { sendDataWithRx } from '../miq_observable';
 
 const { redirectLogin } = window;
@@ -34,7 +35,8 @@ function processOptions(options) {
   }
 
   if (o.csrf) {
-    o.headers['X-CSRF-Token'] = $('meta[name=csrf-token]').attr('content');
+    const elem = document.querySelector("meta[name=csrf-token]");
+    o.headers['X-CSRF-Token'] = elem ? elem.getAttribute('content') : '';
     delete o.csrf;
   }
 
@@ -46,11 +48,11 @@ function processOptions(options) {
 }
 
 function processData(o) {
-  if (!o || _.isString(o)) {
+  if (!o || isString(o)) {
     return o;
   }
 
-  if (_.isPlainObject(o)) {
+  if (isPlainObject(o)) {
     return JSON.stringify(o);
   }
 

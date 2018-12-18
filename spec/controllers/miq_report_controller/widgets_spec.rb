@@ -4,13 +4,13 @@ describe ReportController do
     stub_user(:features => :all)
   end
   describe "#widget_edit" do
-    let(:miq_schedule) { FactoryGirl.build(:miq_schedule, :run_at => {}, :sched_action => {}) }
+    let(:miq_schedule) { FactoryBot.build(:miq_schedule, :run_at => {}, :sched_action => {}) }
     let(:new_widget) { controller.instance_variable_get(:@widget) }
 
     # Configuration Management/Virtual Machines/VMs with Free Space > 50% by Department report
     let(:report_id) { 100_000_000_000_01 }
 
-    before :each do
+    before do
       @previous_count_of_widgets = MiqWidget.count
       allow(controller).to receive_messages(:load_edit => true)
       allow(controller).to receive(:widget_graph_menus)
@@ -20,12 +20,12 @@ describe ReportController do
     end
 
     context "add new widget" do
-      before :each do
+      before do
         controller.instance_variable_set(:@_params, :button => "add")
       end
 
       context "valid attributes" do
-        before :each do
+        before do
           timer = ReportHelper::Timer.new('Hourly', 1, 1, 1, 1, '11/13/2015', '00', '10')
           controller.instance_variable_set(:@edit,
                                            :schedule => miq_schedule, :new => {:title => "NewCustomWidget",
@@ -52,7 +52,7 @@ describe ReportController do
       end
 
       context "invalid attributes" do
-        before :each do
+        before do
           timer = ReportHelper::Timer.new('Hourly', 1, 1, 1, 1, '11/13/2015', '00', '10')
           controller.instance_variable_set(:@edit,
                                            :schedule => miq_schedule, :new => {:title => "",
@@ -112,7 +112,7 @@ describe ReportController do
         let(:default_row_count_value) { 5 }
 
         it 'can change type from external to internal' do
-          external_widget = FactoryGirl.create(:miq_widget, :content_type => 'rss')
+          external_widget = FactoryBot.create(:miq_widget, :content_type => 'rss')
           controller.instance_variable_set(:@edit, :schedule  => miq_schedule,
                                                    :widget_id => external_widget.id,
                                                    :new       => {})
