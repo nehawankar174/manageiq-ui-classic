@@ -15,6 +15,14 @@ describe "layouts/listnav/_ems_cloud.html.haml" do
     render
     expect(response).to include "ems_cloud/#{record.id}?display=flavors"
   end
+  
+  it "Flavors link for Telefonica cloud manager uses restful path" do
+    record = FactoryBot.create(:ems_telefonica)
+    assign(:record, record)
+    allow(record).to receive(:flavors).and_return(5)
+    render
+    expect(response).to include "ems_cloud/#{record.id}?display=flavors"
+  end
 
   it "Flavors link for Amazon cloud manager uses restful paths" do
     record = FactoryBot.create(:ems_amazon)
@@ -23,6 +31,7 @@ describe "layouts/listnav/_ems_cloud.html.haml" do
     render
     expect(response).to include "ems_cloud/#{record.id}?display=flavors"
   end
+  
   it "Availability Zones link uses restful paths" do
     record = FactoryBot.create(:ems_openstack)
     assign(:record, record)
@@ -30,6 +39,15 @@ describe "layouts/listnav/_ems_cloud.html.haml" do
     render
     expect(response).to include "ems_cloud/#{record.id}?display=availability_zones"
   end
+  
+  it "Availability Zones link uses restful paths for Telefonica" do
+    record = FactoryBot.create(:ems_telefonica)
+    assign(:record, record)
+    allow(record).to receive(:availability_zones).and_return(14)
+    render
+    expect(response).to include "ems_cloud/#{record.id}?display=availability_zones"
+  end
+  
   it "Cloud Tenants link uses restful paths" do
     record = FactoryBot.create(:ems_amazon)
     assign(:record, record)

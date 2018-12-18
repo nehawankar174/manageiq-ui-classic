@@ -2,7 +2,7 @@ shared_context :shared_storage_manager_context do |t|
   before do
     @ems_cloud = FactoryBot.create("ems_#{t}".to_sym,
                                     :name => "Test Cloud Manager")
-    if t == 'openstack'
+    if t == 'openstack' || t == 'telefonica'
       @swift_manager    = @cinder_manager = nil
       @storage_managers = @ems_cloud.storage_managers
       @storage_managers.each do |sm|

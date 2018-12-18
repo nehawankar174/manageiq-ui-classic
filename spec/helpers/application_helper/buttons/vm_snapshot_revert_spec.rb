@@ -26,6 +26,17 @@ describe ApplicationHelper::Button::VmSnapshotRevert do
       it { is_expected.to be_truthy }
     end
   end
+  
+  describe '#visible? for telefonica' do
+    subject { button.visible? }
+    context 'when record.kind_of?(ManageIQ::Providers::Telefonica::CloudManager::Vm)' do
+      let(:record) { FactoryBot.create(:vm_openstack) }
+      it { is_expected.to be_falsey }
+    end
+    context 'when !record.kind_of?(ManageIQ::Providers::Telefonica::CloudManager::Vm)' do
+      it { is_expected.to be_truthy }
+    end
+  end
 
   describe '#calculate_properties' do
     before { button.calculate_properties }

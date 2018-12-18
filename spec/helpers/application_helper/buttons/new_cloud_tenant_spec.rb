@@ -10,10 +10,10 @@ describe ApplicationHelper::Button::NewCloudTenant do
 
       it_behaves_like 'a disabled button'
     end
-
     context 'provider available' do
       before do
-        FactoryBot.create(:ems_openstack)
+        FactoryGirl.create(:ems_openstack)
+        FactoryGirl.create(:ems_telefonica)
         button.calculate_properties
       end
 
