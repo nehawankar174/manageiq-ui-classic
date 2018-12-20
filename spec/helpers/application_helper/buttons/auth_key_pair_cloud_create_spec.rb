@@ -40,41 +40,41 @@ describe ApplicationHelper::Button::AuthKeyPairCloudCreate do
       expect(button[:title]).to be nil
     end
 
-    it "when the create action is available then the button is not disabled for telefonica" do
+    it "when the create action is available then the button is not disabled for orange" do
       view_context = setup_view_context_with_sandbox({})
       button = described_class.new(view_context, {}, {}, {})
-      ems = object_double(ManageIQ::Providers::CloudManager.new, :class => ManageIQ::Providers::Telefonica::CloudManager)
-      allow(ManageIQ::Providers::Telefonica::CloudManager::AuthKeyPair).to receive(:is_available?).and_return(true)
+      ems = object_double(ManageIQ::Providers::CloudManager.new, :class => ManageIQ::Providers::Orange::CloudManager)
+      allow(ManageIQ::Providers::Orange::CloudManager::AuthKeyPair).to receive(:is_available?).and_return(true)
       allow(Rbac).to receive(:filtered).and_return([ems])
       expect(button.disabled?).to be false
     end
 
-    it "when the create action is unavailable then the button is disabled for telefonica" do
+    it "when the create action is unavailable then the button is disabled for orange" do
       view_context = setup_view_context_with_sandbox({})
       button = described_class.new(view_context, {}, {}, {})
-      ems = object_double(ManageIQ::Providers::CloudManager.new, :class => ManageIQ::Providers::Telefonica::CloudManager)
-      allow(ManageIQ::Providers::Telefonica::CloudManager::AuthKeyPair).to receive(:is_available?).and_return(false)
+      ems = object_double(ManageIQ::Providers::CloudManager.new, :class => ManageIQ::Providers::Orange::CloudManager)
+      allow(ManageIQ::Providers::Orange::CloudManager::AuthKeyPair).to receive(:is_available?).and_return(false)
       allow(Rbac).to receive(:filtered).and_return([ems])
       expect(button.disabled?).to be true
     end
   end
 
   describe '#calculate_properties' do
-    it "when the create action is unavailable the button has the error in the title for telefonica" do
+    it "when the create action is unavailable the button has the error in the title for orange" do
       view_context = setup_view_context_with_sandbox({})
       button = described_class.new(view_context, {}, {}, {})
-      ems = object_double(ManageIQ::Providers::CloudManager.new, :class => ManageIQ::Providers::Telefonica::CloudManager)
-      allow(ManageIQ::Providers::Telefonica::CloudManager::AuthKeyPair).to receive(:is_available?).and_return(false)
+      ems = object_double(ManageIQ::Providers::CloudManager.new, :class => ManageIQ::Providers::Orange::CloudManager)
+      allow(ManageIQ::Providers::Orange::CloudManager::AuthKeyPair).to receive(:is_available?).and_return(false)
       allow(Rbac).to receive(:filtered).and_return([ems])
       button.calculate_properties
       expect(button[:title]).to eq("No cloud providers support key pair import or creation.")
     end
 
-    it "when the create action is available, the button has no error in the title for telefonica" do
+    it "when the create action is available, the button has no error in the title for orange" do
       view_context = setup_view_context_with_sandbox({})
       button = described_class.new(view_context, {}, {}, {})
-      ems = object_double(ManageIQ::Providers::CloudManager.new, :class => ManageIQ::Providers::Telefonica::CloudManager)
-      allow(ManageIQ::Providers::Telefonica::CloudManager::AuthKeyPair).to receive(:is_available?).and_return(true)
+      ems = object_double(ManageIQ::Providers::CloudManager.new, :class => ManageIQ::Providers::Orange::CloudManager)
+      allow(ManageIQ::Providers::Orange::CloudManager::AuthKeyPair).to receive(:is_available?).and_return(true)
       allow(Rbac).to receive(:filtered).and_return([ems])
       button.calculate_properties
       expect(button[:title]).to be nil

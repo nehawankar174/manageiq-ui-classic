@@ -97,7 +97,7 @@ module EmsClusterHelper::TextualSummary
     end
   end
 
-  def textual_generate_telefonica_status
+  def textual_generate_orange_status
     @record.service_group_names.collect do |x|
       running_count = @record.host_ids_with_running_service_group(x.name).count
       failed_count  = @record.host_ids_with_failed_service_group(x.name).count

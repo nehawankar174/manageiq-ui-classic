@@ -16,8 +16,8 @@ describe "layouts/listnav/_ems_cloud.html.haml" do
     expect(response).to include "ems_cloud/#{record.id}?display=flavors"
   end
   
-  it "Flavors link for Telefonica cloud manager uses restful path" do
-    record = FactoryBot.create(:ems_telefonica)
+  it "Flavors link for Orange cloud manager uses restful path" do
+    record = FactoryBot.create(:ems_orange)
     assign(:record, record)
     allow(record).to receive(:flavors).and_return(5)
     render
@@ -40,8 +40,8 @@ describe "layouts/listnav/_ems_cloud.html.haml" do
     expect(response).to include "ems_cloud/#{record.id}?display=availability_zones"
   end
   
-  it "Availability Zones link uses restful paths for Telefonica" do
-    record = FactoryBot.create(:ems_telefonica)
+  it "Availability Zones link uses restful paths for Orange" do
+    record = FactoryBot.create(:ems_orange)
     assign(:record, record)
     allow(record).to receive(:availability_zones).and_return(14)
     render

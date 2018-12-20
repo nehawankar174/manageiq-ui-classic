@@ -8,7 +8,7 @@ describe ApplicationHelper::Toolbar::EmsNetworkCenter do
     let(:button)        { button_klass.new(nil, nil, {}, {}) }
     let(:ems_nuage)     { FactoryBot.create(:ems_nuage_network) }
     let(:ems_openstack) { FactoryBot.create(:ems_openstack) }
-    let(:ems_telefonica) { FactoryBot.create(:ems_telefonica) }
+    let(:ems_orange) { FactoryBot.create(:ems_orange) }
 
     it 'appropriate button class' do
       expect(button_klass).to eq(ApplicationHelper::Button::EmsNetwork)
@@ -24,8 +24,8 @@ describe ApplicationHelper::Toolbar::EmsNetworkCenter do
       expect(button.visible?).to eq(false)
     end
     
-    it 'not visible for telefonica provider' do
-      button.instance_variable_set(:@record, ems_telefonica)
+    it 'not visible for orange provider' do
+      button.instance_variable_set(:@record, ems_orange)
       expect(button.visible?).to eq(false)
     end
   end

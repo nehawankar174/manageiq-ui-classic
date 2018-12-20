@@ -178,10 +178,10 @@ describe ApplicationController do
       expect(assigns(:org_controller)).to eq("vm")
     end
 
-    let(:telefonica_ems) { FactoryBot.create(:ems_telefonica) }
+    let(:orange_ems) { FactoryBot.create(:ems_orange) }
 
     it "sets provisioning data and skips pre provisioning dialog" do
-      template = FactoryBot.create(:template_telefonica,
+      template = FactoryBot.create(:template_orange,
                                     :name                  => "template 1",
                                     :vendor                => "vmware",
                                     :location              => "template1.vmtx",

@@ -24,16 +24,16 @@ describe TextualSummaryHelper do
     end
 
     context "with a restfully-routed model" do
-      it "uses the restful path to retrieve the summary screen link for telefonica" do
-        ems = FactoryBot.create(:ems_telefonica)
-        ems.availability_zones << FactoryBot.create(:availability_zone_telefonica)
+      it "uses the restful path to retrieve the summary screen link for orange" do
+        ems = FactoryBot.create(:ems_orange)
+        ems.availability_zones << FactoryBot.create(:availability_zone_orange)
 
         result = helper.textual_link(ems.availability_zones)
         expect(result[:link]).to eq("/ems_cloud/#{ems.id}?display=availability_zones")
       end
 
       it "uses the restful path for the base show screen" do
-        ems = FactoryBot.create(:ems_telefonica)
+        ems = FactoryBot.create(:ems_orange)
 
         result = helper.textual_link(ems)
         expect(result[:link]).to eq("/ems_cloud/#{ems.id}")

@@ -540,9 +540,9 @@ module EmsCommon
     @project_name = retrieve_project_name
     @openstack_infra_providers = retrieve_openstack_infra_providers
     @openstack_security_protocols = retrieve_openstack_security_protocols
-    # Click2Cloud: Added telefonica infra providers, secruity protocol and api versions
-    @telefonica_security_protocols = retrieve_telefonica_security_protocols
-    @telefonica_api_versions = retrieve_telefonica_api_versions
+    # Click2Cloud: Added orange infra providers, secruity protocol and api versions
+    @orange_security_protocols = retrieve_orange_security_protocols
+    @orange_api_versions = retrieve_orange_api_versions
 
     @amqp_security_protocols = retrieve_amqp_security_protocols
     @nuage_security_protocols = retrieve_nuage_security_protocols
@@ -591,8 +591,8 @@ module EmsCommon
     [['Keystone v2', 'v2'], ['Keystone v3', 'v3']]
   end
 
-  # Click2Cloud: Added method to retrieve telefonica api versions
-  def retrieve_telefonica_api_versions
+  # Click2Cloud: Added method to retrieve orange api versions
+  def retrieve_orange_api_versions
     [['Keystone v2', 'v2'], ['Keystone v3', 'v3']]
   end
 
@@ -612,8 +612,8 @@ module EmsCommon
     retrieve_security_protocols
   end
 
-  # Click2Cloud: Added method to retrieve telefonica security protocol
-  def retrieve_telefonica_security_protocols
+  # Click2Cloud: Added method to retrieve orange security protocol
+  def retrieve_orange_security_protocols
     retrieve_security_protocols
   end
 

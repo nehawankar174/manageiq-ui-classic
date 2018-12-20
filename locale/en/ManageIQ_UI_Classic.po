@@ -1025,7 +1025,7 @@ msgstr ""
 msgid "* Disk space not supported for OpenStack providers"
 msgstr ""
 
-msgid "* Disk space not supported for Telefonica providers"
+msgid "* Disk space not supported for Orange providers"
 msgstr ""
 
 msgid "* Enter Policy Simulation options on the left and press Submit"
@@ -11088,7 +11088,7 @@ msgstr ""
 msgid "Note:"
 msgstr ""
 
-msgid "Note: Collect for All %{clusters} must be checked to be able to collect C & U data from Cloud Providers such as Red Hat OpenStack or Telefonica or Amazon EC2"
+msgid "Note: Collect for All %{clusters} must be checked to be able to collect C & U data from Cloud Providers such as Red Hat OpenStack or Orange or Amazon EC2"
 msgstr ""
 
 msgid "Note: Fields marked with * are required."
@@ -11371,10 +11371,10 @@ msgstr ""
 msgid "OpenStack Status"
 msgstr ""
 
-msgid "Telefonica Service Status"
+msgid "Orange Service Status"
 msgstr ""
 
-msgid "Telefonica Status"
+msgid "Orange Status"
 msgstr ""
 
 msgid "Opening a VM web-based VMRC console requires that VMRC is pre-configured to work in your browser.  Are you sure?"
@@ -11395,16 +11395,16 @@ msgstr ""
 msgid "Openstack Nova Scheduler"
 msgstr ""
 
-msgid "Telefonica Hardware"
+msgid "Orange Hardware"
 msgstr ""
 
-msgid "Telefonica Infra Provider"
+msgid "Orange Infra Provider"
 msgstr ""
 
-msgid "Telefonica Infra provider"
+msgid "Orange Infra provider"
 msgstr ""
 
-msgid "Telefonica Nova Scheduler"
+msgid "Orange Nova Scheduler"
 msgstr ""
 
 msgid "Operating System"
@@ -17768,7 +17768,7 @@ msgstr ""
 msgid "Used to authenticate with OpenStack AMQP Messaging Bus for event handling. Configure AMQP if eventing is not enabled on Ceilometer."
 msgstr ""
 
-msgid "Used to authenticate with Telefonica AMQP Messaging Bus for event handling. Configure AMQP if eventing is not enabled on Ceilometer."
+msgid "Used to authenticate with Orange AMQP Messaging Bus for event handling. Configure AMQP if eventing is not enabled on Ceilometer."
 msgstr ""
 
 msgid "Used to gather Capacity & Utilization metrics."

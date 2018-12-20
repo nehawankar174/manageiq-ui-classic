@@ -8,8 +8,8 @@ class ManageIQ::Providers::StorageManagerDecorator < MiqDecorator
   end
 
   def fileicon
-    if type.to_s.include?"Telefonica"
-      "svg/vendor-telefonica.svg"
+    if type.to_s.include?"Orange"
+      "svg/vendor-orange.svg"
     else
       "svg/vendor-#{image_name}.svg"
     end

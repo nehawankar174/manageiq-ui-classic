@@ -49,15 +49,15 @@ class TreeBuilderOrchestrationTemplates < TreeBuilder
     count_only_or_objects(count_only, nodes)
   end
 
-  # Click2Cloud: Added telefonica cloudmanager templates
+  # Click2Cloud: Added orange cloudmanager templates
   def x_get_tree_custom_kids(object, count_only, _options)
     classes = {
       "otcfn" => ManageIQ::Providers::Amazon::CloudManager::OrchestrationTemplate,
       "othot" => ManageIQ::Providers::Openstack::CloudManager::OrchestrationTemplate,
-      "otthot" => ManageIQ::Providers::Telefonica::CloudManager::OrchestrationTemplate,
+      "otthot" => ManageIQ::Providers::Orange::CloudManager::OrchestrationTemplate,
       "otazu" => ManageIQ::Providers::Azure::CloudManager::OrchestrationTemplate,
       "otvnf" => ManageIQ::Providers::Openstack::CloudManager::VnfdTemplate,
-      "ottvnf" => ManageIQ::Providers::Telefonica::CloudManager::VnfdTemplate,
+      "ottvnf" => ManageIQ::Providers::Orange::CloudManager::VnfdTemplate,
       "otvap" => ManageIQ::Providers::Vmware::CloudManager::OrchestrationTemplate
     }
     count_only_or_objects_filtered(count_only, classes[object[:id]].where(:orderable => true), "name")
