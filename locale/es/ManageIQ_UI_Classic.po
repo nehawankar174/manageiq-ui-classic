@@ -1039,6 +1039,9 @@ msgstr "* El espacio de disco no está soportado para proveedores de OpenStack "
 msgid "* Disk space not supported for Telefonica providers"
 msgstr "* El espacio de disco no está soportado para proveedores de Telefonica "
 
+msgid "* Disk space not supported for Orange providers"
+msgstr "* El espacio de disco no está soportado para proveedores de Orange "
+
 msgid "* Enter Policy Simulation options on the left and press Submit"
 msgstr "* Introduzca las opciones de simulación de políticas a la izquierda y presione Enviar"
 
@@ -11104,8 +11107,8 @@ msgstr ""
 msgid "Note:"
 msgstr "Nota:"
 
-msgid "Note: Collect for All %{clusters} must be checked to be able to collect C & U data from Cloud Providers such as Red Hat OpenStack or Telefonica or Amazon EC2"
-msgstr "Nota: Se debe seleccionar Recopilar para todos los %{clusters} para poder recopilar los datos sobre capacidad y utilización de los proveedores de nube, como Red Hat OpenStack o Telefonica o Amazon EC2"
+msgid "Note: Collect for All %{clusters} must be checked to be able to collect C & U data from Cloud Providers such as Red Hat OpenStack or Telefonica or Orange or Amazon EC2"
+msgstr "Nota: Se debe seleccionar Recopilar para todos los %{clusters} para poder recopilar los datos sobre capacidad y utilización de los proveedores de nube, como Red Hat OpenStack o Telefonica o Orange o Amazon EC2"
 
 msgid "Note: Fields marked with * are required."
 msgstr "Nota: Los campos marcados con * son necesarios."

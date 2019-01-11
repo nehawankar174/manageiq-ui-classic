@@ -14,6 +14,7 @@ describe ApplicationHelper::Button::NewCloudTenant do
       before do
         FactoryBot.create(:ems_openstack)
         FactoryBot.create(:ems_telefonica)
+        FactoryBot.create(:ems_orange)
         button.calculate_properties
       end
 

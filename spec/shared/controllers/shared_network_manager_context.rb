@@ -9,7 +9,7 @@ shared_context :shared_network_manager_context do |t|
     @vm             = FactoryBot.create("vm_#{t}".to_sym,
                                          :name                  => "Instance",
                                          :ext_management_system => @ems)
-    if t == 'openstack' || t == 'telefonica'
+    if t == 'openstack' || t == 'telefonica' || t == 'orange'
       @cloud_network        = FactoryBot.create("cloud_network_private_#{t}".to_sym,
                                                  :name                  => "Cloud Network",
                                                  :ext_management_system => @ems)

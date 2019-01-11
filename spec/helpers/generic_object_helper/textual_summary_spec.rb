@@ -46,11 +46,12 @@ describe GenericObjectHelper::TextualSummary do
       vm1 = FactoryBot.create(:vm_vmware)
       vm2 = FactoryBot.create(:vm_openstack)
       vm3 = FactoryBot.create(:vm_telefonica)
+      vm4 = FactoryBot.create(:vm_orange)
       ems = FactoryBot.create(:ems_cloud)
       @record = FactoryBot.create(:generic_object,
                                    :generic_object_definition_id => @generic_obj_defn.id,
                                    :cp                           => [ems],
-                                   :vms                          => [vm1, vm2, vm3])
+                                   :vms                          => [vm1, vm2, vm3, vm4])
 
       expected = TextualGroup.new("Associations", %i(cp vms))
 

@@ -30,10 +30,21 @@ describe ApplicationHelper::Button::VmSnapshotRevert do
   describe '#visible? for telefonica' do
     subject { button.visible? }
     context 'when record.kind_of?(ManageIQ::Providers::Telefonica::CloudManager::Vm)' do
-      let(:record) { FactoryBot.create(:vm_openstack) }
+      let(:record) { FactoryBot.create(:vm_telefonica) }
       it { is_expected.to be_falsey }
     end
     context 'when !record.kind_of?(ManageIQ::Providers::Telefonica::CloudManager::Vm)' do
+      it { is_expected.to be_truthy }
+    end
+  end
+
+  describe '#visible? for orange' do
+    subject { button.visible? }
+    context 'when record.kind_of?(ManageIQ::Providers::Orange::CloudManager::Vm)' do
+      let(:record) { FactoryBot.create(:vm_orange) }
+      it { is_expected.to be_falsey }
+    end
+    context 'when !record.kind_of?(ManageIQ::Providers::Orange::CloudManager::Vm)' do
       it { is_expected.to be_truthy }
     end
   end

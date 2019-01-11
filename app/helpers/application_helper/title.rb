@@ -125,7 +125,7 @@ module ApplicationHelper
       title_for_host(true)
     end
 
-    # Click2Cloud: Added telefonica condition for host title
+    # Click2Cloud: Added telefonica/orange condition for host title
     def title_for_host(plural = false)
       case Host.node_types
       when :non_openstack
@@ -133,6 +133,8 @@ module ApplicationHelper
       when :openstack
         plural ? _("Nodes") : _("Node")
       when :telefonica
+        plural ? _("Nodes") : _("Node")
+      when :orange
         plural ? _("Nodes") : _("Node")
       else
         plural ? _("Hosts / Nodes") : _("Host / Node")
@@ -143,7 +145,7 @@ module ApplicationHelper
       title_for_cluster(true)
     end
 
-    # Click2Cloud: Added telefonica condition for cluster title
+    # Click2Cloud: Added telefonica/orange condition for cluster title
     def title_for_cluster(plural = false)
       case EmsCluster.node_types
       when :non_openstack
@@ -151,6 +153,8 @@ module ApplicationHelper
       when :openstack
         plural ? _("Deployment Roles") : _("Deployment Role")
       when :telefonica
+        plural ? _("Deployment Roles") : _("Deployment Role")
+      when :orange
         plural ? _("Deployment Roles") : _("Deployment Role")
       else
         plural ? _("Clusters / Deployment Roles") : _("Cluster / Deployment Role")

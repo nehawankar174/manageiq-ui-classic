@@ -1028,6 +1028,9 @@ msgstr ""
 msgid "* Disk space not supported for Telefonica providers"
 msgstr ""
 
+msgid "* Disk space not supported for Orange providers"
+msgstr ""
+
 msgid "* Enter Policy Simulation options on the left and press Submit"
 msgstr ""
 
@@ -11088,7 +11091,7 @@ msgstr ""
 msgid "Note:"
 msgstr ""
 
-msgid "Note: Collect for All %{clusters} must be checked to be able to collect C & U data from Cloud Providers such as Red Hat OpenStack or Telefonica or Amazon EC2"
+msgid "Note: Collect for All %{clusters} must be checked to be able to collect C & U data from Cloud Providers such as Red Hat OpenStack or Telefonica or Orange or Amazon EC2"
 msgstr ""
 
 msgid "Note: Fields marked with * are required."
@@ -11377,6 +11380,12 @@ msgstr ""
 msgid "Telefonica Status"
 msgstr ""
 
+msgid "Orange Service Status"
+msgstr ""
+
+msgid "Orange Status"
+msgstr ""
+
 msgid "Opening a VM web-based VMRC console requires that VMRC is pre-configured to work in your browser.  Are you sure?"
 msgstr ""
 
@@ -11398,13 +11407,13 @@ msgstr ""
 msgid "Telefonica Hardware"
 msgstr ""
 
-msgid "Telefonica Infra Provider"
-msgstr ""
-
-msgid "Telefonica Infra provider"
+msgid "Orange Hardware"
 msgstr ""
 
 msgid "Telefonica Nova Scheduler"
+msgstr ""
+
+msgid "Orange Nova Scheduler"
 msgstr ""
 
 msgid "Operating System"
@@ -17769,6 +17778,9 @@ msgid "Used to authenticate with OpenStack AMQP Messaging Bus for event handling
 msgstr ""
 
 msgid "Used to authenticate with Telefonica AMQP Messaging Bus for event handling. Configure AMQP if eventing is not enabled on Ceilometer."
+msgstr ""
+
+msgid "Used to authenticate with Orange AMQP Messaging Bus for event handling. Configure AMQP if eventing is not enabled on Ceilometer."
 msgstr ""
 
 msgid "Used to gather Capacity & Utilization metrics."

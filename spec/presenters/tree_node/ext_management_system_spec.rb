@@ -26,6 +26,7 @@ describe TreeNode::ExtManagementSystem do
     :ems_google                       => { :tip_prefix => 'Ems Cloud' },
     :ems_openstack                    => { :tip_prefix => 'Ems Cloud' },
     :ems_telefonica                   => { :tip_prefix => 'Ems Cloud' },
+    :ems_orange                       => { :tip_prefix => 'Ems Cloud' },
     :ems_vmware_cloud                 => { :tip_prefix => 'Ems Cloud' },
     # Other remaining providers
     :automation_manager_ansible_tower => { :key_prefix => 'at-' },

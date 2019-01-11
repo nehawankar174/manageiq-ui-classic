@@ -4,6 +4,7 @@ describe "shared/views/ems_common/show" do
     TestSetup.new(:ems_openstack, EmsCloudHelper::TextualSummary),
     TestSetup.new(:ems_vmware,    EmsInfraHelper::TextualSummary),
     TestSetup.new(:ems_telefonica, EmsCloudHelper::TextualSummary),
+    TestSetup.new(:ems_orange, EmsCloudHelper::TextualSummary),
   ].each do |setup|
     let!(:server) { EvmSpecHelper.local_miq_server(:zone => zone) }
     let(:zone) { FactoryBot.create(:zone) }
