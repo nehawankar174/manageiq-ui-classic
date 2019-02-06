@@ -144,6 +144,7 @@ describe EmsCloudController do
     end
 
     it 'gets the ems cloud form fields on a get' do
+      Zone.seed
       post :create, :params => {
         "button"           => "add",
         "default_hostname" => "openstack.example.com",
@@ -459,7 +460,13 @@ describe EmsCloudController do
       subject { get :show, :params => { :id => @ems.id, :display => 'main' } }
       render_views
 
-      it do
+      it "correctly for summary page" do
+        is_expected.to have_http_status 200
+        is_expected.to render_template(:partial => "layouts/listnav/_ems_cloud")
+      end
+
+      it "correctly for timeline page" do
+        get :show, :params => {:id => @ems.id, :display => 'timeline'}
         is_expected.to have_http_status 200
         is_expected.to render_template(:partial => "layouts/listnav/_ems_cloud")
       end

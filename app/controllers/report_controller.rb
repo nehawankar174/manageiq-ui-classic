@@ -72,8 +72,11 @@ class ReportController < ApplicationController
     end
     if params[:upload] && params[:upload][:file] && params[:upload][:file].respond_to?(:read)
       @sb[:overwrite] = params[:overwrite].present?
+      @sb[:preserve_owner] = params[:preserve_owner].present?
       begin
-        _reps, mri = MiqReport.import(params[:upload][:file], :save => true, :overwrite => @sb[:overwrite], :userid => session[:userid])
+        _reps, mri = MiqReport.import(params[:upload][:file], :save => true, :overwrite => @sb[:overwrite],
+                                                            :userid => session[:userid],
+                                                            :preserve_owner => @sb[:preserve_owner])
       rescue => bang
         add_flash(_("Error during 'upload': %{message}") % {:message => bang.message}, :error)
         @sb[:flash_msg] = @flash_array
@@ -677,7 +680,7 @@ class ReportController < ApplicationController
           @right_cell_text = if @edit[:new][:dashboard_order]
                                _("Editing Dashboard sequence for \"%{name}\"") % {:name => @sb[:group_desc]}
                              else
-                               @db.id ? _("Editing Dashboard \"%{name}\"") % {:name => @db.name} : _("Adding a new dashboard")
+                               @dashboard.id ? _("Editing Dashboard \"%{name}\"") % {:name => @dashboard.name} : _("Adding a new dashboard")
                              end
           # URL to be used in miqDropComplete method
           presenter[:miq_widget_dd_url] = "report/db_widget_dd_done"

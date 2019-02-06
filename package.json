@@ -39,12 +39,12 @@
     "angular-ui-sortable": "~0.16.1",
     "angular.validators": "~4.4.3",
     "array-includes": "~3.0.3",
-    "base64-js": "~1.2.3",
     "bootstrap-filestyle": "~1.2.1",
     "bootstrap-switch": "~3.3.4",
     "classnames": "~2.2.6",
     "codemirror": "~5.19.0",
     "connected-react-router": "^4.3.0",
+    "create-react-context": "~0.2.3",
     "eonasdan-bootstrap-datetimepicker": "~4.17.47",
     "es6-shim": "~0.35.3",
     "graphiql": "^0.11.11",
@@ -78,7 +78,6 @@
     "spice-html5-bower": "~1.7.3",
     "spin.js": "~4.0.0",
     "sprintf-js": "~1.1.1",
-    "text-encoder-lite": "git://github.com/coolaj86/TextEncoderLite.git#e1e031b",
     "ui-select": "0.19.8",
     "whatwg-fetch": "~2.0.4",
     "xml_display": "~0.1.1"
@@ -156,6 +155,6 @@
   "engines": {
     "node": ">= 8.9.0",
     "npm": ">= 3.10.3",
-    "yarn": ">= 0.20.1"
+    "yarn": ">= 1.0.0"
   }
 }
