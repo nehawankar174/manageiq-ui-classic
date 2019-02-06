@@ -485,7 +485,7 @@ module ApplicationHelper
       :changed          => @changed,
       :condition        => @condition,
       :condition_policy => @condition_policy,
-      :db               => @db,
+      :dashboard        => @dashboard,
       :display          => @display,
       :edit             => @edit,
       :explorer         => @explorer,
@@ -1288,7 +1288,7 @@ module ApplicationHelper
     @report_data_additional_options.with_menu_click(params[:menu_click]) if params[:menu_click]
     @report_data_additional_options.with_sb_controller(params[:sb_controller]) if params[:sb_controller]
     @report_data_additional_options.with_model(curr_model) if curr_model
-    @report_data_additional_options.with_no_checkboxes(@no_checkboxes) if @no_checkboxes
+    @report_data_additional_options.with_no_checkboxes(@no_checkboxes || options[:no_checkboxes])
     # FIXME: we would like to freeze here, but the @gtl_type is calculated no sooner than in view templates.
     # So until that if fixed we cannot freeze.
     # @report_data_additional_options.freeze
@@ -1427,5 +1427,9 @@ module ApplicationHelper
 
   def unique_html_id(prefix = 'unknown')
     "#{prefix}-#{rand(36**8).to_s(36)}"
+  end
+
+  def miq_favicon_link_tag
+    Settings.server.custom_favicon ? favicon_link_tag('/upload/custom_favicon.ico') : favicon_link_tag
   end
 end

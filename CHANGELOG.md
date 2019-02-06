@@ -5,7 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 
-## Hammer-1
+## Hammer-2
+
+### Fixed
+- Fix usage of TreeBuilder.extract_node_model_and_id in OpcControler [(#5142)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5142)
+- Fix missing paging in provisioning template selection [(#5149)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5149)
+
+## Unreleased as of Sprint 103 ending 2019-01-21
+
+### Added
+- Add Status Attribute to Cloud Volume Detail screen [(#5160)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5160)
+- Extract the decorators into a separate repository [(#5158)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5158)
+
+### Fixed
+- Dashboard (under Reports) - fix broken accordion_select; use @dashboardnot @db [(#5162)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5162)
+- Properly handle non-existent hash key [(#5161)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5161)
+- Show breadcrumbs when redirected from another controller [(#5148)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5148)
+- Unify sorting in GOD page [(#5146)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5146)
+- Dont show gtl checkbox when display list from chart click [(#5144)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5144)
+- Send button_order via API [(#5143)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5143)
+- Rename WebsocketWorker to RemoteConsoleWorker [(#5136)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5136)
+- Added "Preserve owner?" checkbox on Import report screen  [(#5060)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5060)
+- Flavor add form converted to data-driven-forms [(#5055)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5055)
+- Fix labels for Scale Infrastructure Provider form [(#4896)](https://github.com/ManageIQ/manageiq-ui-classic/pull/4896)
+- Do not allow to embed a method into itself in automate [(#4753)](https://github.com/ManageIQ/manageiq-ui-classic/pull/4753)
+- Allow the suspension of cloud infra and physical infra providers [(#4269)](https://github.com/ManageIQ/manageiq-ui-classic/pull/4269)
+
+## Unreleased as of Sprint 102 ending 2019-01-07
+
+### Added
+- Authorise manage tenant quotas as tenant product feature in UI [(#5123)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5123)
+- Add missing gettext to zone dropdown in My Tasks screen [(#5122)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5122)
+- Add translatable labels to Host textual summary [(#5116)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5116)
+- Add missing gettext into ems_common/angular/ form.html.haml [(#5115)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5115)
+- Cluster textual summary: add translatable label [(#5114)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5114)
+
+### Fixed
+- Fixed regression on schedules screen due to bad towhat refactoring [(#5130)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5130)
+- Update misleading form label for new Cloud Tenant form [(#5127)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5127)
+- Add missing gettext into exp_editor.html.haml [(#5125)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5125)
+- Updated right cell header [(#5124)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5124)
+- Fixed saving of role/group visibility for a widget [(#5119)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5119)
+- Stop spinner after rednering flash message [(#5118)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5118)
+- set_ownership - use miq_template (not vm) for images [(#5113)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5113)
+- Clean out cache of MiqProductFeature at CUD tenant actions in UI process [(#5108)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5108)
+- Fix CatalogItem tree_select() [(#5096)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5096)
+- Region Replication - refresh code mirror after load [(#5095)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5095)
+
+### Removed
+- Remove logic for request screen dialogs [(#5126)](https://github.com/ManageIQ/manageiq-ui-classic/pull/5126)
+
+
+## Hammer-1 - Released 2019-01-15
 
 ### Added
 - Swift DB Backups [(#4684)](https://github.com/ManageIQ/manageiq-ui-classic/pull/4684)

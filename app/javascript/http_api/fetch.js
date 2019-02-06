@@ -30,14 +30,15 @@ function processOptions(options) {
     delete o.skipTokenRenewal;
   }
 
-  if (localStorage.miq_token) {
-    o.headers['X-Auth-Token'] = localStorage.miq_token;
-  }
+  if (o.cookieAndCsrf) {
+    o.credentials = 'include';
 
-  if (o.csrf) {
-    const elem = document.querySelector("meta[name=csrf-token]");
-    o.headers['X-CSRF-Token'] = elem ? elem.getAttribute('content') : '';
-    delete o.csrf;
+    const csrfElem = document.querySelector("meta[name=csrf-token]");
+    if (csrfElem) {
+      o.headers['X-CSRF-Token'] = csrfElem.getAttribute('content');
+    }
+
+    delete o.cookieAndCsrf;
   }
 
   if (Object.keys(o.headers).length) {

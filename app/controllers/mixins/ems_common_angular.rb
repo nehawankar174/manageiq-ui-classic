@@ -107,7 +107,11 @@ module Mixins
 
     def render_validation_result(result, details)
       if result
-        msg = _("Credential validation was successful")
+        msg = if details.blank?
+                _("Credential validation was successful")
+              else
+                _("Credential validation was successful: %{details}") % {:details => strip_tags(details)}
+              end
       else
         msg = _("Credential validation was not successful: %{details}") % {:details => strip_tags(details)}
         level = :error
@@ -392,6 +396,7 @@ module Mixins
         render :json => {:name                            => @ems.name,
                          :emstype                         => @ems.emstype,
                          :zone                            => zone,
+                         :zone_hidden                     => zone == MiqRegion.my_region.maintenance_zone.name,
                          :tenant_mapping_enabled          => @ems.tenant_mapping_enabled == true,
                          :provider_id                     => @ems.provider_id || "",
                          :hostname                        => @ems.hostname,
@@ -433,6 +438,7 @@ module Mixins
         render :json => { :name                          => @ems.name,
                           :emstype                       => @ems.emstype,
                           :zone                          => zone,
+                          :zone_hidden                   => zone == MiqRegion.my_region.maintenance_zone.name,
                           :provider_id                   => @ems.provider_id || "",
                           :default_hostname              => @ems.connection_configurations.default.endpoint.hostname,
                           :amqp_hostname                 => amqp_hostname,
@@ -478,6 +484,7 @@ module Mixins
         render :json => {:name                                => @ems.name,
                          :emstype                             => @ems.emstype,
                          :zone                                => zone,
+                         :zone_hidden                         => zone == MiqRegion.my_region.maintenance_zone.name,
                          :hostname                            => @ems.hostname,
                          :default_hostname                    => @ems.connection_configurations.default.endpoint.hostname,
                          :default_api_port                    => @ems.connection_configurations.default.endpoint.port,
