@@ -118,39 +118,6 @@ module HostHelper::TextualSummary
     end
   end
 
-  def textual_generate_orange_status
-    @record.host_service_group_openstacks.collect do |x|
-      running_count       = x.running_system_services.count
-      failed_count        = x.failed_system_services.count
-      all_count           = x.system_services.count
-      configuration_count = x.filesystems.count
-
-      running = {:title => _("Show list of running %{name}") % {:name => x.name},
-                 :value => _("Running (%{number})") % {:number => running_count},
-                 :icon  => failed_count.zero? && running_count.positive? ? 'pficon pficon-ok' : nil,
-                 :link  => running_count.positive? ? host_service_link(x, 'host_services', :running) : nil}
-
-      failed = {:title => _("Show list of failed %{name}") % {:name => x.name},
-                :value => _("Failed (%{number})") % {:number => failed_count},
-                :icon  => failed_count.positive? ? 'pficon pficon-error-circle-o' : nil,
-                :link  => failed_count.positive? ? host_service_link(x, 'host_services', :failed) : nil}
-
-      all = {:title => _("Show list of all %{name}") % {:name => x.name},
-             :value => _("All (%{number})") % {:number => all_count},
-             :icon  => 'pficon pficon-service',
-             :link  => all_count.positive? ? host_service_link(x, 'host_services', :all) : nil}
-
-      configuration = {:title => _("Show list of configuration files of %{name}") % {:name => x.name},
-                       :icon  => 'fa fa-file-o',
-                       :value => _("Configuration (%{number})") % {:number => configuration_count},
-                       :link  => configuration_count.positive? ? host_service_link(x, 'filesystems') : nil}
-
-      sub_items = [running, failed, all, configuration]
-
-      {:value => x.name, :sub_items => sub_items}
-    end
-  end
-
   def host_service_link(record, action, status = nil)
     args = {:controller         => controller.controller_name,
             :action             => action,
@@ -162,7 +129,7 @@ module HostHelper::TextualSummary
   end
 
   def textual_hostname
-    @record.hostname
+    {:label => _('Hostname'), :value => @record.hostname}
   end
 
   def textual_ipaddress
@@ -195,11 +162,11 @@ module HostHelper::TextualSummary
   end
 
   def textual_asset_tag
-    @record.asset_tag
+    {:label => _('Asset tag'), :value => @record.asset_tag}
   end
 
   def textual_service_tag
-    @record.service_tag
+    {:label => _('Service tag'), :value => @record.service_tag}
   end
 
   def textual_power_state
@@ -215,7 +182,7 @@ module HostHelper::TextualSummary
   end
 
   def textual_storage_adapters
-    return nil if @record.openstack_host? || @record.orange_host?
+    return nil if @record.openstack_host?
     num = @record.hardware.nil? ? 0 : @record.hardware.number_of(:storage_adapters)
     h = {:label => _("Storage Adapters"), :icon => "ff ff-network-card", :value => num}
     if num.positive?
@@ -226,7 +193,7 @@ module HostHelper::TextualSummary
   end
 
   def textual_network
-    return nil if @record.openstack_host? || @record.orange_host?
+    return nil if @record.openstack_host?
     num = @record.number_of(:switches)
     h = {:label => _("Network"), :icon => "pficon pficon-network", :value => (num.zero? ? _("N/A") : _("Available"))}
     if num.positive?
@@ -309,12 +276,12 @@ module HostHelper::TextualSummary
   end
 
   def textual_storages
-    return nil if @record.openstack_host? || @record.orange_host?
+    return nil if @record.openstack_host?
     textual_link(@record.storages)
   end
 
   def textual_resource_pools
-    return nil if @record.openstack_host? || @record.orange_host?
+    return nil if @record.openstack_host?
     textual_link(@record.resource_pools,
                  :as   => ResourcePool,
                  :link => url_for_only_path(:action => 'show', :id => @record, :display => 'resource_pools'))
@@ -333,7 +300,7 @@ module HostHelper::TextualSummary
   end
 
   def textual_availability_zone
-    return nil unless @record.openstack_host? || @record.orange_host?
+    return nil unless @record.openstack_host?
     availability_zone = @record.availability_zone
     h = {:label => _('Availability Zone'),
          :icon  => "pficon pficon-zone",
@@ -346,7 +313,7 @@ module HostHelper::TextualSummary
   end
 
   def textual_used_tenants
-    return nil unless @record.openstack_host? || @record.orange_host?
+    return nil unless @record.openstack_host?
     textual_link(@record.cloud_tenants,
                  :as   => CloudTenant,
                  :link => url_for_only_path(:action => 'show', :id => @record, :display => 'cloud_tenants'))
@@ -364,8 +331,8 @@ module HostHelper::TextualSummary
   end
 
   def textual_templates
-    return nil if @record.openstack_host? || @record.orange_host?
-    @record.miq_templates
+    return nil if @record.openstack_host?
+    textual_link(@record.miq_templates, :label => _('Templates'))
   end
 
   def textual_compliance_history
@@ -496,14 +463,6 @@ module HostHelper::TextualSummary
   end
 
   def openstack_nova_scheduler_value
-    return _("Not available. Did you assigned Cloud Provider and run SSA?") if @record.cloud_services.empty?
-    "%{enabled_cnt} Enabled / %{disabled_cnt} Disabled " % {
-      :enabled_cnt  => @record.cloud_services.where(:scheduling_disabled => false).count,
-      :disabled_cnt => @record.cloud_services.where(:scheduling_disabled => true).count
-    }
-  end
-
-  def orange_nova_scheduler_value
     return _("Not available. Did you assigned Cloud Provider and run SSA?") if @record.cloud_services.empty?
     "%{enabled_cnt} Enabled / %{disabled_cnt} Disabled " % {
       :enabled_cnt  => @record.cloud_services.where(:scheduling_disabled => false).count,
