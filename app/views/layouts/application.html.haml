@@ -9,7 +9,7 @@
     %meta{"http-equiv" => "cache-control", :content => "no-cache, no-store"}
     %meta{"http-equiv" => "X-UA-Compatible", :content => "IE=edge"}
 
-    = favicon_link_tag
+    = miq_favicon_link_tag
     = stylesheet_link_tag 'application'
     = stylesheet_link_tag '/custom.css'
     = render :partial => "stylesheets/template50"
@@ -24,7 +24,6 @@
       ManageIQ.charts.provider = "#{Charting.backend}";
       ManageIQ.browser = "#{j browser_info(:name_ui)}";
       ManageIQ.controller = "#{j controller_name}";
-      vanillaJsAPI.autorenew();
 
     - if ::Settings.server.asynchronous_notifications
       :javascript

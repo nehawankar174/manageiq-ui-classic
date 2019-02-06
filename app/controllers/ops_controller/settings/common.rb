@@ -7,6 +7,7 @@ module OpsController::Settings::Common
   @@logo_file = File.join(logo_dir, "custom_logo.png")
   @@login_logo_file = File.join(logo_dir, "custom_login_logo.png")
   @@login_brand_file = File.join(logo_dir, "custom_brand.png")
+  @@favicon_file = File.join(logo_dir, "custom_favicon.ico")
 
   # AJAX driven routine to check for changes in ANY field on the form
   def settings_form_field_changed
@@ -227,6 +228,7 @@ module OpsController::Settings::Common
   private
 
   def update_server_name(server)
+    return unless @sb[:active_tab] == 'settings_server'
     return if @edit[:new][:server][:name] == server.name # appliance name was modified
     begin
       server.name = @edit[:new][:server][:name]
@@ -440,8 +442,8 @@ module OpsController::Settings::Common
       set_worker_setting(@edit[:new], MiqWebServiceWorker, :count, w[:count].to_i)
       set_worker_setting(@edit[:new], MiqWebServiceWorker, :memory_threshold, w[:memory_threshold])
 
-      w = wb[:websocket_worker]
-      set_worker_setting(@edit[:new], MiqWebsocketWorker, :count, w[:count].to_i)
+      w = wb[:remote_console_worker]
+      set_worker_setting(@edit[:new], MiqRemoteConsoleWorker, :count, w[:count].to_i)
 
       @update = MiqServer.find(@sb[:selected_server_id]).settings
     when "settings_custom_logos" # Custom Logo tab
@@ -861,11 +863,12 @@ module OpsController::Settings::Common
       w[:count] = params[:web_service_worker_count].to_i if params[:web_service_worker_count]
       w[:memory_threshold] = params[:web_service_worker_threshold].to_i if params[:web_service_worker_threshold]
 
-      w = wb[:websocket_worker]
-      w[:count] = params[:websocket_worker_count].to_i if params[:websocket_worker_count]
+      w = wb[:remote_console_worker]
+      w[:count] = params[:remote_console_worker_count].to_i if params[:remote_console_worker_count]
     when "settings_custom_logos" # Custom Logo tab
       new[:server][:custom_logo] = (params[:server_uselogo] == "true") if params[:server_uselogo]
       new[:server][:custom_login_logo] = (params[:server_useloginlogo] == "true") if params[:server_useloginlogo]
+      new[:server][:custom_favicon] = (params[:server_usefavicon] == "true") if params[:server_usefavicon]
       new[:server][:custom_brand] = (params[:server_usebrand] == "true") if params[:server_usebrand]
       new[:server][:use_custom_login_text] = (params[:server_uselogintext] == "true") if params[:server_uselogintext]
       if params[:login_text]
@@ -989,12 +992,12 @@ module OpsController::Settings::Common
       @sb[:threshold] << [number_to_human_size(x, :significant => false), x]
     end
     (600.megabytes...1000.megabytes).step(100.megabytes) do |x|
-      # adding values in 100 MB increments from 600 to 1gb, dividing in two statements else it p     uts 1000MB instead of 1GB in pulldown
+      # adding values in 100 MB increments from 600 to 1gb, dividing in two statements else it puts 1000MB instead of 1GB in pulldown
       @sb[:threshold] << [number_to_human_size(x, :significant => false), x]
     end
     (1.gigabytes...1.5.gigabytes).step(100.megabytes) do |x|
       # adding values in 100 MB increments from 1gb to 1.5 gb
-      @sb[:threshold] << [number_to_human_size(x, :significant => false), x]
+      @sb[:threshold] << [number_to_human_size(x, :significant => false), x.to_i]
     end
 
     cwb = @edit[:current][:workers][:worker_base] ||= {}
@@ -1072,8 +1075,8 @@ module OpsController::Settings::Common
     @sb[:web_service_threshold] = []
     @sb[:web_service_threshold] = copy_array(@sb[:threshold])
 
-    w = (wb[:websocket_worker] ||= {})
-    w[:count] = get_worker_setting(@edit[:current], MiqWebsocketWorker, :count) || 2
+    w = (wb[:remote_console_worker] ||= {})
+    w[:count] = get_worker_setting(@edit[:current], MiqRemoteConsoleWorker, :count) || 2
 
     @edit[:new] = copy_hash(@edit[:current])
     session[:log_depot_default_verify_status] = true
@@ -1082,7 +1085,7 @@ module OpsController::Settings::Common
 
   private def get_worker_setting(config, klass, *setting)
     settings = klass.worker_settings(:config => config, :raw => true)
-    setting.empty? ? settings : settings.fetch_path(setting)
+    setting.empty? ? settings : settings.fetch_path(setting).to_i_with_method
   end
 
   def settings_set_form_vars_logos
@@ -1099,6 +1102,9 @@ module OpsController::Settings::Common
     if @edit[:current][:server][:custom_brand].nil?
       @edit[:current][:server][:custom_brand] = false # Set default custom_brand flag
     end
+    if @edit[:current][:server][:custom_favicon].nil?
+      @edit[:current][:server][:custom_favicon] = false # Set default custom_favicon flag
+    end
 
     if @edit[:current][:server][:use_custom_login_text].nil?
       @edit[:current][:server][:use_custom_login_text] = false # Set default custom_login_text flag
@@ -1106,6 +1112,7 @@ module OpsController::Settings::Common
     @logo_file = @@logo_file
     @login_logo_file = @@login_logo_file
     @login_brand_file = @@login_brand_file
+    @favicon_file = @@favicon_file
     @in_a_form = true
   end
 
@@ -1227,7 +1234,7 @@ module OpsController::Settings::Common
       case nodes[1]
       when "z"
         @right_cell_text = _("Settings Zones")
-        @zones = Zone.in_my_region
+        @zones = Zone.visible.in_my_region
       when "sis"
         @right_cell_text = _("Settings Analysis Profiles")
         aps_list
@@ -1279,7 +1286,7 @@ module OpsController::Settings::Common
     if @sb[:active_tab] == "settings_details"
       # Enterprise Details tab
       @scan_items = ScanItemSet.all
-      @zones = Zone.in_my_region
+      @zones = Zone.visible.in_my_region
       @miq_schedules = MiqSchedule.where("(prod_default != 'system' or prod_default is null) and adhoc IS NULL")
                                   .sort_by { |s| s.name.downcase }
     end
