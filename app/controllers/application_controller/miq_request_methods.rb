@@ -177,8 +177,6 @@ module ApplicationController::MiqRequestMethods
     end
     session[:changed] = false # Turn off the submit button
     @edit[:explorer] = true if @explorer
-    #Click2Cloud:Removed the unnecessary parameter for pagination window on Provision a vm
-    #@in_a_form = true
   end
 
   def get_template_kls
