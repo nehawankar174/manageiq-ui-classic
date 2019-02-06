@@ -1,6 +1,7 @@
 module EmsCloudHelper::TextualSummary
   include TextualMixins::TextualRefreshStatus
   include TextualMixins::TextualCustomButtonEvents
+  include TextualMixins::TextualZone
   #
   # Groups
   #
@@ -17,7 +18,7 @@ module EmsCloudHelper::TextualSummary
       _("Relationships"),
       %i(
         ems_infra network_manager availability_zones host_aggregates cloud_tenants flavors
-        security_groups instances images orchestration_stacks storage_managers custom_button_events
+        security_groups instances images cloud_volumes orchestration_stacks storage_managers custom_button_events
       )
     )
   end
@@ -97,6 +98,16 @@ module EmsCloudHelper::TextualSummary
     h
   end
 
+  def textual_cloud_volumes
+    num = @record.number_of(:cloud_volumes)
+    h = {:label => _('Cloud Volumes'), :icon => "pficon pficon-volume", :value => num}
+    if num.positive? && role_allows?(:feature => "cloud_volume_show_list")
+      h[:link] = ems_cloud_path(@record.id, :display => 'cloud_volumes')
+      h[:title] = _("Show Cloud Volumes")
+    end
+    h
+  end
+
   def textual_ems_infra
     textual_link(@record.try(:provider).try(:infra_ems))
   end
@@ -143,10 +154,6 @@ module EmsCloudHelper::TextualSummary
       h[:title] = _("Show all Security Groups")
     end
     h
-  end
-
-  def textual_zone
-    {:label => _("Managed by Zone"), :icon => "pficon pficon-zone", :value => @record.zone.name}
   end
 
   def textual_topology

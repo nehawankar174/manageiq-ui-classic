@@ -8,6 +8,25 @@ module OpsController::OpsRbac
     'Tenant'   => 'tenant'
   }.freeze
 
+  def role_allows?(**options)
+    if MiqProductFeature.my_root_tenant_identifier?(options[:feature]) && params.key?(:id)
+      if params[:id].to_s.include?('tn')
+        _, id, _ = TreeBuilder.extract_node_model_and_id(params[:id].to_s)
+      else
+        id = params[:id].to_s
+      end
+
+      options[:feature] = MiqProductFeature.tenant_identifier(options[:feature], id)
+    end
+
+    super(options)
+  end
+
+  def invalidate_miq_product_feature_caches
+    MiqProductFeature.invalidate_caches
+    render :json => {}
+  end
+
   # Edit user or group tags
   def rbac_tags_edit
     case params[:button]
@@ -298,7 +317,12 @@ module OpsController::OpsRbac
       parent_id = Tenant.find(params[:id]).parent.id
       self.x_node = "tn-#{parent_id}"
     end
-    process_tenants(tenants, "destroy") unless tenants.empty?
+
+    unless tenants.empty?
+      process_tenants(tenants, "destroy")
+      MiqProductFeature.invalidate_caches
+    end
+
     get_node_info(x_node)
     replace_right_cell(:nodetype => x_node, :replace_trees => [:rbac])
   end
@@ -497,7 +521,7 @@ module OpsController::OpsRbac
   # super administrator user with `userid` == "admin" can not be deleted
   # and user can not delete himself
   def rbac_user_delete_restriction?(user)
-    ["admin", session[:userid]].include?(user.userid)
+    user.super_admin_user? || User.current_user == user
   end
 
   def rbac_user_copy_restriction?(user)

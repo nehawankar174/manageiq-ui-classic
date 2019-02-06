@@ -8,6 +8,13 @@ describe OpsController do
       stub_user(:features => :all)
     end
 
+    it 'confirms existence of route and action with name invalidate_miq_product_feature_caches ' do
+      EvmSpecHelper.local_miq_server
+
+      post :invalidate_miq_product_feature_caches
+      expect(response.status).to eq(200)
+    end
+
     describe "rbac_edit_tags_reset" do
       let(:admin_user) { FactoryBot.create(:user, :role => "super_administrator") }
       let(:another_tenant) { FactoryBot.create(:tenant) }
@@ -104,6 +111,8 @@ describe OpsController do
 
       it "deletes a tenant record successfully" do
         expect(controller).to receive(:x_active_tree_replace_cell)
+        expect(MiqProductFeature).to receive(:invalidate_caches)
+
         controller.send(:rbac_tenant_delete)
 
         expect(response.status).to eq(200)
@@ -577,29 +586,22 @@ describe OpsController do
   end
 
   describe "#rbac_get_info" do
-    let!(:root_tenant) { FactoryBot.create(:tenant) } # creates first root Tenant in active region
-    let(:group) { FactoryBot.create(:miq_group) }
-    let(:inactive_region) { FactoryBot.create(:miq_region) }
-    let!(:root_tenant_in_inactive_region) do
-      root_tenant_in_inactive_region = Tenant.root_tenant.dup
-      root_tenant_in_inactive_region.id = Tenant.id_in_region(Tenant.count + 1_000_000, inactive_region.region)
-      root_tenant_in_inactive_region.save!(:validate => false) # skip validation to create second root Tenant
-      root_tenant_in_inactive_region
-    end
-    let!(:group_in_inactive_region) do
-      group_in_inactive_region = group.dup
-      group_in_inactive_region.id = MiqGroup.id_in_region(MiqGroup.count + 1_000_000, inactive_region.region)
-      group_in_inactive_region.save!
-      group_in_inactive_region
-    end
-    let(:admin_user) { FactoryBot.create(:user, :role => "super_administrator") }
-
     before do
       EvmSpecHelper.local_miq_server
       login_as admin_user
       MiqRegion.seed
     end
 
+    let!(:root_tenant) { Tenant.seed } # creates first root Tenant in active region
+    let(:group) { FactoryBot.create(:miq_group) }
+    let(:inactive_region) { FactoryBot.create(:miq_region) }
+    let!(:root_tenant_in_inactive_region) do
+      tenant = FactoryBot.create(:tenant, :in_other_region, :other_region => inactive_region)
+      tenant.update_attribute(:parent, nil) # rubocop:disable Rails/SkipsModelValidations
+      tenant
+    end
+    let!(:group_in_inactive_region) { FactoryBot.create(:miq_group, :in_other_region, :other_region => inactive_region) }
+    let(:admin_user) { FactoryBot.create(:user, :role => "super_administrator") }
     it 'counts only Tenants in active region' do
       allow(controller).to receive(:x_node).and_return('root')
       controller.send(:rbac_get_info)
@@ -612,6 +614,21 @@ describe OpsController do
       controller.send(:rbac_get_info)
       expect(controller.instance_variable_get(:@groups_count)).to eq(MiqGroup.non_tenant_groups_in_my_region.count)
       expect(controller.instance_variable_get(:@groups_count)).not_to eq(MiqGroup.count)
+    end
+  end
+
+  describe "#rbac_user_delete_restriction?" do
+    let(:admin_user) { FactoryBot.create(:user, :role => "super_administrator") }
+    let(:other_user) { FactoryBot.create(:user) }
+
+    it "returns true because user is super admin" do
+      expect(controller.send(:rbac_user_delete_restriction?, admin_user)).to be_truthy
+    end
+
+    it "returns true because user is current user" do
+      User.with_user(other_user) do
+        expect(controller.send(:rbac_user_delete_restriction?, other_user)).to be_truthy
+      end
     end
   end
 end

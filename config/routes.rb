@@ -2563,6 +2563,7 @@ Rails.application.routes.draw do
         forest_form_field_changed
         forest_select
         help_menu_form_field_changed
+        invalidate_miq_product_feature_caches
         label_tag_mapping_delete
         label_tag_mapping_edit
         label_tag_mapping_update
@@ -2619,6 +2620,7 @@ Rails.application.routes.draw do
         upload_login_brand
         upload_login_logo
         upload_logo
+        upload_favicon
         validate_replcation_worker
         wait_for_task
         x_button
