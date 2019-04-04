@@ -25,11 +25,15 @@ module VmHelper::TextualSummary
     TextualGroup.new(
       _("Properties"),
       %i(
-        name region server description hostname ipaddress mac_address custom_1 container host_platform
+        id name region server description hostname ipaddress mac_address custom_1 container host_platform
         tools_status load_balancer_health_check_state osinfo devices cpu_affinity snapshots
         advanced_settings resources guid storage_profile
       )
     )
+  end
+
+  def textual_id
+    { :label => _("ID"), :value => @record.id }
   end
 
   def textual_group_lifecycle
@@ -160,11 +164,11 @@ module VmHelper::TextualSummary
   end
 
   def textual_tools_status
-    {:label => _("Platform Tools"), :value => (@record.tools_status.nil? ? _("N/A") : @record.tools_status)}
+    {:label => _("Platform Tools"), :icon => "pficon pficon-maintenance", :value => (@record.tools_status.nil? ? _("N/A") : @record.tools_status)}
   end
 
   def textual_cpu_affinity
-    {:label => _("CPU Affinity"), :value => @record.cpu_affinity}
+    {:label => _("CPU Affinity"), :icon => "pficon pficon-cpu", :value => @record.cpu_affinity}
   end
 
   def textual_storage_profile

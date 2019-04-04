@@ -8,20 +8,20 @@ class TreeBuilderBelongsToHac < TreeBuilder
   def override(node, object, _pid, options)
     if [ExtManagementSystem, EmsCluster, Datacenter, EmsFolder, ResourcePool, Host].any? { |klass| object.kind_of?(klass) }
       node[:select] = if @assign_to
-                        options.key?(:selected) && options[:selected].include?("ResourcePool_#{object[:id]}")
+                        @selected_nodes&.include?("ResourcePool_#{object[:id]}")
                       else
-                        options.key?(:selected) && options[:selected].include?("#{object.class.name}_#{object[:id]}")
+                        @selected_nodes&.include?("#{object.class.name}_#{object[:id]}")
                       end
     end
     node[:hideCheckbox] = true if object.kind_of?(Host) && object.ems_cluster_id.present?
     node[:selectable] = false
-    node[:checkable] = options[:checkable_checkboxes] if options.key?(:checkable_checkboxes)
+    node[:checkable] = @edit.present? || @assign_to.present?
   end
 
-  def initialize(name, type, sandbox, build, params)
+  def initialize(name, type, sandbox, build, **params)
     @edit = params[:edit]
     @group = params[:group]
-    @selected = params[:selected]
+    @selected_nodes = params[:selected_nodes]
     @assign_to = params[:assign_to]
     # need to remove tree info
     TreeState.new(sandbox).remove_tree(name)
@@ -30,17 +30,7 @@ class TreeBuilderBelongsToHac < TreeBuilder
 
   private
 
-  def tree_init_options(_tree_name)
-    {:full_ids             => true,
-     :add_root             => false,
-     :lazy                 => false,
-     :checkable_checkboxes => @edit.present? || @assign_to.present?,
-     :selected             => @selected}
-  end
-
-  def set_locals_for_render
-    locals = super
-
+  def tree_init_options
     oncheck, check_url = if @assign_to
                            ["miqOnCheckGeneric", "/miq_policy/alert_profile_assign_changed/"]
                          elsif @edit
@@ -49,15 +39,12 @@ class TreeBuilderBelongsToHac < TreeBuilder
                            [nil, "/ops/rbac_group_field_changed/#{group_id}___"]
                          end
 
-    locals.merge!(:oncheck           => oncheck,
-                  :check_url         => check_url,
-                  :highlight_changes => @assign_to ? false : true,
-                  :checkboxes        => true,
-                  :onclick           => false)
-  end
-
-  def root_options
-    {}
+    {
+      :full_ids   => true,
+      :checkboxes => true,
+      :oncheck    => oncheck,
+      :check_url  => check_url
+    }
   end
 
   def x_get_tree_roots(count_only, _options)

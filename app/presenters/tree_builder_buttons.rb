@@ -1,11 +1,13 @@
 class TreeBuilderButtons < TreeBuilderAeCustomization
   include CustomButtonsMixin
+  include CustomButtonHelper
+
   has_kids_for CustomButtonSet, [:x_get_tree_aset_kids]
 
   private
 
-  def tree_init_options(_tree_name)
-    {:leaf => "CustomButton", :open_all => true, :full_ids => true}
+  def tree_init_options
+    {:open_all => true, :full_ids => true}
   end
 
   def root_options
@@ -17,26 +19,8 @@ class TreeBuilderButtons < TreeBuilderAeCustomization
 
   # Get root nodes count/array for explorer tree
   def x_get_tree_roots(_count_only, _options)
-    @sb[:target_classes] = {}
     buttons = CustomButton.button_classes.map do |klass|
-      name = case klass
-             when 'ContainerGroup'
-               _('Container Pod')
-             when 'ContainerNode'
-               _('Container Node')
-             when 'ContainerProject'
-               _('Container Project')
-             when 'MiqGroup'
-               _('Group')
-             when 'Switch'
-               _('Virtual Infra Switch')
-             when 'User'
-               _('User')
-             else
-               ui_lookup(:model => klass)
-             end
-      # FIXME: This is probably a session backed caching of a small hash and it should be removed
-      @sb[:target_classes][name] = klass
+      name = target_class_name(klass)
 
       {
         :id   => "ab_#{klass}",

@@ -6,6 +6,7 @@ class StorageController < ApplicationController
   include Mixins::MoreShowActions
   include Mixins::ExplorerPresenterMixin
   include Mixins::FindRecord
+  include Mixins::BreadcrumbsMixin
 
   before_action :check_privileges
   before_action :get_session_data
@@ -225,34 +226,6 @@ class StorageController < ApplicationController
     replace_right_cell(:nodetype => x_node)
   end
 
-  def tree_record
-    if x_active_tree == :storage_tree
-      storage_tree_rec
-    elsif x_active_tree == :storage_pod_tree
-      storage_pod_tree_rec
-    end
-  end
-
-  def storage_tree_rec
-    nodes = x_node.split('-')
-    case nodes.first
-    when "root" then find_record(Storage, params[:id])
-    when "ds" then find_record(Storage, params[:id])
-    when "xx" then
-      case nodes.second
-      when "ds" then find_record(Storage, params[:id])
-      end
-    end
-  end
-
-  def storage_pod_tree_rec
-    nodes = x_node.split('-')
-    case nodes.first
-    when "xx"  then @record = find_record(Storage, params[:id])
-    when "dsc" then @storage_record = find_record(EmsFolder, params[:id])
-    end
-  end
-
   def show_record(_id = nil)
     @display = params[:display] || "main" unless pagination_or_gtl_request?
     @lastaction = "show"
@@ -310,16 +283,20 @@ class StorageController < ApplicationController
   end
 
   def features
-    [{:role     => "storage",
-      :role_any => true,
-      :name     => :storage,
-      :title    => _("Datastores")},
-     {:role     => "storage_pod",
-      :role_any => true,
-      :name     => :storage_pod,
-      :title    => _("Datastore Clusters")}].map do |hsh|
-      ApplicationController::Feature.new_with_hash(hsh)
-    end
+    [
+      {
+        :role     => "storage",
+        :role_any => true,
+        :name     => :storage,
+        :title    => _("Datastores")
+      },
+      {
+        :role     => "storage_pod",
+        :role_any => true,
+        :name     => :storage_pod,
+        :title    => _("Datastore Clusters")
+      }
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   def get_node_info(node, _show_list = true)
@@ -387,6 +364,8 @@ class StorageController < ApplicationController
     presenter[:right_cell_text] = @right_cell_text
     presenter[:clear_gtl_list_grid] = @gtl_type && @gtl_type != 'list'
     presenter[:osf_node] = x_node # Open, select, and focus on this node
+
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
 
     render :json => presenter.for_render
   end
@@ -483,6 +462,7 @@ class StorageController < ApplicationController
     @explorer
   end
 
+  # called by explorer.rb x_button
   def storage_scan
     scanstorage
   end
@@ -511,6 +491,17 @@ class StorageController < ApplicationController
 
   def custom_toolbar_explorer
     @record.present? ? Mixins::CustomButtons::Result.new(:single) : Mixins::CustomButtons::Result.new(:list)
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs    => [
+        {:title => _("Compute")},
+        {:title => _("Infrastructure")},
+        {:title => _("Datastores"), :url => File.join(controller_url, 'explorer')},
+      ],
+      :include_record => true,
+    }
   end
 
   menu_section :inf

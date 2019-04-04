@@ -1,11 +1,12 @@
 describe OpsController do
   render_views
 
-  context "::Tenants" do
+  describe "::Tenants" do
     before do
       Tenant.seed
       MiqRegion.seed
       stub_user(:features => :all)
+      allow(controller).to receive(:data_for_breadcrumbs).and_return([{:title => "title", :action => "action", :key => "key"}])
     end
 
     it 'confirms existence of route and action with name invalidate_miq_product_feature_caches ' do
@@ -34,7 +35,7 @@ describe OpsController do
     end
     let(:four_terabytes) { 4096 * 1024 * 1024 * 1024 }
 
-    context "#tree_select" do
+    describe "#tree_select" do
       it "renders rbac_details tab when rbac_tree root node is selected" do
         session[:sandboxes] = {"ops" => {:active_tree => :rbac_tree}}
         post :tree_select, :params => { :id => 'root', :format => :js }
@@ -87,7 +88,7 @@ describe OpsController do
       end
     end
 
-    context "#rbac_tenant_get_details" do
+    describe "#rbac_tenant_get_details" do
       it "sets @tenant record" do
         t = FactoryBot.create(:tenant, :parent => Tenant.root_tenant, :subdomain => "foo")
         controller.send(:rbac_tenant_get_details, t.id)
@@ -95,7 +96,7 @@ describe OpsController do
       end
     end
 
-    context "#rbac_tenant_delete" do
+    describe "#rbac_tenant_delete" do
       before do
         allow(ApplicationHelper).to receive(:role_allows?).and_return(true)
         @t = FactoryBot.create(:tenant, :parent => Tenant.root_tenant)
@@ -151,7 +152,7 @@ describe OpsController do
       end
     end
 
-    context "#rbac_tenants_list" do
+    describe "#rbac_tenants_list" do
       it "gets the list of tenants by calling get_view with correct args" do
         controller.instance_variable_set(:@sb, {})
         controller.instance_variable_set(:@settings, {})
@@ -173,13 +174,13 @@ describe OpsController do
       end
     end
 
-    context "#rbac_tenant_manage_quotas" do
+    describe "#rbac_tenant_manage_quotas" do
       before do
         @tenant = FactoryBot.create(:tenant,
-                                     :name      => "OneTenant",
-                                     :parent    => Tenant.root_tenant,
-                                     :domain    => "test",
-                                     :subdomain => "test")
+                                    :name      => "OneTenant",
+                                    :parent    => Tenant.root_tenant,
+                                    :domain    => "test",
+                                    :subdomain => "test")
         sb_hash = {
           :trees       => {:rbac_tree => {:active_node => "tn-#{@tenant.id}"}},
           :active_tree => :rbac_tree,
@@ -188,6 +189,7 @@ describe OpsController do
         controller.instance_variable_set(:@sb, sb_hash)
         allow(ApplicationHelper).to receive(:role_allows?).and_return(true)
       end
+
       it "resets tenant manage quotas" do
         controller.instance_variable_set(:@_params, :id => @tenant.id, :button => "reset")
         expect(controller).to receive(:render)
@@ -232,10 +234,10 @@ describe OpsController do
       let!(:user) { stub_user(:features => :all) }
       before do
         @tenant = FactoryBot.create(:tenant,
-                                     :name      => "OneTenant",
-                                     :parent    => Tenant.root_tenant,
-                                     :domain    => "test",
-                                     :subdomain => "test")
+                                    :name      => "OneTenant",
+                                    :parent    => Tenant.root_tenant,
+                                    :domain    => "test",
+                                    :subdomain => "test")
         sb_hash = { :trees       => {:rbac_tree => {:active_node => "tn-#{@tenant.id}"}},
                     :active_tree => :rbac_tree,
                     :active_tab  => "rbac_details"}
@@ -244,11 +246,11 @@ describe OpsController do
         allow(@tenant).to receive(:tagged_with).with(:cat => user.userid).and_return("my tags")
         classification = FactoryBot.create(:classification, :name => "department", :description => "Department")
         @tag1 = FactoryBot.create(:classification_tag,
-                                   :name   => "tag1",
-                                   :parent => classification)
+                                  :name   => "tag1",
+                                  :parent => classification)
         @tag2 = FactoryBot.create(:classification_tag,
-                                   :name   => "tag2",
-                                   :parent => classification)
+                                  :name   => "tag2",
+                                  :parent => classification)
         allow(Classification).to receive(:find_assigned_entries).with(@tenant).and_return([@tag1, @tag2])
         controller.instance_variable_set(:@sb,
                                          :trees       => {:rbac_tree => {:active_node => "root"}},
@@ -264,18 +266,16 @@ describe OpsController do
         session[:edit] = edit
       end
 
-      after(:each) do
-        expect(response.status).to eq(200)
-      end
-
       it "builds tagging screen" do
         EvmSpecHelper.create_guid_miq_server_zone
 
+        allow(controller).to receive(:button_url).with("ops", @tenant.id, "save").and_return("save_url")
+        allow(controller).to receive(:button_url).with("ops", @tenant.id, "cancel").and_return("cancel_url")
         controller.instance_variable_set(:@sb, :action => "rbac_tenant_tags_edit")
         controller.instance_variable_set(:@_params, :miq_grid_checks => @tenant.id.to_s)
         controller.send(:rbac_tenant_tags_edit)
         expect(assigns(:flash_array)).to be_nil
-        expect(assigns(:entries)).not_to be_nil
+        expect(response.status).to eq(200)
       end
 
       it "cancels tags edit" do
@@ -283,25 +283,29 @@ describe OpsController do
         controller.send(:rbac_tenant_tags_edit)
         expect(assigns(:flash_array).first[:message]).to include("was cancelled")
         expect(assigns(:edit)).to be_nil
+        expect(response.status).to eq(200)
       end
 
       it "resets tags edit" do
+        allow(controller).to receive(:button_url).with("ops", @tenant.id, "save").and_return("save_url")
+        allow(controller).to receive(:button_url).with("ops", @tenant.id, "cancel").and_return("cancel_url")
         controller.instance_variable_set(:@_params, :button => "reset", :id => @tenant.id)
         controller.send(:rbac_tenant_tags_edit)
         expect(assigns(:flash_array).first[:message]).to include("All changes have been reset")
-        expect(assigns(:entries)).not_to be_nil
+        expect(response.status).to eq(200)
       end
 
       it "save tags" do
-        controller.instance_variable_set(:@_params, :button => "save", :id => @tenant.id)
+        controller.instance_variable_set(:@_params, :button => "save", :id => @tenant.id, 'data' => get_tags_json([@tag1, @tag2]))
         controller.send(:rbac_tenant_tags_edit)
         expect(assigns(:flash_array).first[:message]).to include("Tag edits were successfully saved")
         expect(assigns(:edit)).to be_nil
+        expect(response.status).to eq(200)
       end
     end
   end
 
-  context "::MiqGroup" do
+  describe "::MiqGroup" do
     before do
       MiqUserRole.seed
       MiqGroup.seed
@@ -436,9 +440,25 @@ describe OpsController do
       expect(controller.instance_variable_get(:@group).name).to eq(@group.name)
       expect(controller.instance_variable_get(:@tags_tree)).to_not be_nil
     end
+
+    context 'setting group record variables to new values' do
+      let!(:edit) do
+        controller.instance_variable_set(:@edit, :new => {:use_filter_expression => false,
+                                                          :description           => "Test",
+                                                          :role                  => @role.id,
+                                                          :filter_expression     => @exp.exp,
+                                                          :belongsto             => {},
+                                                          :filters               => {}})
+      end
+
+      it 'resets filter expression variable to default value' do
+        controller.send(:rbac_group_set_record_vars, @group)
+        expect(edit[:new][:filter_expression]).to eq({})
+      end
+    end
   end
 
-  context "rbac_role_edit" do
+  describe "#rbac_role_edit" do
     before do
       MiqUserRole.seed
       MiqGroup.seed
@@ -461,7 +481,7 @@ describe OpsController do
     end
   end
 
-  context "rbac_role_set_form_vars" do
+  describe "#rbac_role_set_form_vars" do
     before do
       MiqUserRole.seed
       MiqGroup.seed
@@ -493,7 +513,7 @@ describe OpsController do
 
   render_views
 
-  context "::MiqRegion" do
+  describe "::MiqRegion" do
     before do
       EvmSpecHelper.local_miq_server
       root_tenant = Tenant.seed
@@ -602,6 +622,7 @@ describe OpsController do
     end
     let!(:group_in_inactive_region) { FactoryBot.create(:miq_group, :in_other_region, :other_region => inactive_region) }
     let(:admin_user) { FactoryBot.create(:user, :role => "super_administrator") }
+
     it 'counts only Tenants in active region' do
       allow(controller).to receive(:x_node).and_return('root')
       controller.send(:rbac_get_info)

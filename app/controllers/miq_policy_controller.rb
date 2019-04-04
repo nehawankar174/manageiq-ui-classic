@@ -14,6 +14,7 @@ class MiqPolicyController < ApplicationController
   after_action :set_session_data
 
   include Mixins::GenericSessionMixin
+  include Mixins::BreadcrumbsMixin
 
   UI_FOLDERS = [Host, Vm, ContainerReplicator, ContainerGroup, ContainerNode, ContainerImage, ContainerProject, ExtManagementSystem, PhysicalServer].freeze
 
@@ -215,8 +216,7 @@ class MiqPolicyController < ApplicationController
     self.x_active_tree ||= 'policy_profile_tree'
     self.x_active_accord ||= 'policy_profile'
 
-    @trees = features.map { |feature| feature.build_tree(@sb) }
-    @accords = features.map(&:accord_hash)
+    build_accordions_and_trees
 
     if params[:profile].present? # If profile record id passed in, position on that node
       self.x_active_tree = 'policy_profile_tree'
@@ -687,6 +687,8 @@ class MiqPolicyController < ApplicationController
 
     presenter[:lock_sidebar] = (@edit || @assign) && params[:action] != "x_search_by_name"
 
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
+
     render :json => presenter.for_render
   end
 
@@ -1111,16 +1113,62 @@ class MiqPolicyController < ApplicationController
 
   def features
     [
-      {:name  => :policy_profile, :title => _("Policy Profiles")},
-      {:name  => :policy, :title => _("Policies")},
-      {:name  => :event, :title => _("Events")},
-      {:name  => :condition, :title => _("Conditions")},
-      {:name  => :action, :title => _("Actions")},
-      {:name  => :alert_profile, :title => _("Alert Profiles")},
-      {:name  => :alert, :title => _("Alerts")},
-    ].map do |hsh|
-      ApplicationController::Feature.new_with_hash(hsh)
-    end
+      {
+        :name     => :policy_profile,
+        :title    => _("Policy Profiles"),
+        :role     => "policy_profile",
+        :role_any => true
+      },
+      {
+        :name     => :policy,
+        :title    => _("Policies"),
+        :role     => "policy",
+        :role_any => true
+      },
+      {
+        :name     => :event,
+        :title    => _("Events"),
+        :role     => "event",
+        :role_any => true
+      },
+      {
+        :name     => :condition,
+        :title    => _("Conditions"),
+        :role     => "condition",
+        :role_any => true
+      },
+      {
+        :name     => :action,
+        :title    => _("Actions"),
+        :role     => "action",
+        :role_any => true
+      },
+      {
+        :name     => :alert_profile,
+        :title    => _("Alert Profiles"),
+        :role     => "alert_profile",
+        :role_any => true
+      },
+      {
+        :name     => :alert,
+        :title    => _("Alerts"),
+        :role     => "alert",
+        :role_any => true
+      },
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Control")},
+        action_name == "rsop" ? {:title => _("Simulation")} : {:title => _("Explorer")},
+      ].compact,
+    }
+  end
+
+  def build_tree
+    features.find { |f| f.tree_name == x_active_tree.to_s }.build_tree(@sb.deep_dup)
   end
 
   menu_section :con

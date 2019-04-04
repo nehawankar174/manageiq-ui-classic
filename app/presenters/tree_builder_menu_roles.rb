@@ -3,9 +3,9 @@ class TreeBuilderMenuRoles < TreeBuilder
 
   attr_reader :rpt_menu, :role_choice
 
-  def initialize(name, type, sandbox, build, role_choice:, rpt_menu: nil)
-    @rpt_menu    = rpt_menu || sandbox[:rpt_menu]
-    @role_choice = role_choice
+  def initialize(name, type, sandbox, build, **params)
+    @rpt_menu    = params[:rpt_menu] || sandbox[:rpt_menu]
+    @role_choice = params[:role_choice]
 
     super(name, type, sandbox, build)
   end
@@ -19,17 +19,8 @@ class TreeBuilderMenuRoles < TreeBuilder
 
   private
 
-  def set_locals_for_render
-    locals = {
-      :click_url => "/report/menu_editor/",
-      :onclick   => "miqOnCheckMenuRoles"
-    }
-
-    super.merge!(locals)
-  end
-
-  def tree_init_options(_tree_name)
-    { :lazy => false, :add_root => true }
+  def tree_init_options
+    {:click_url => "/report/menu_editor/", :onclick => "miqOnClickMenuRoles"}
   end
 
   def root_options

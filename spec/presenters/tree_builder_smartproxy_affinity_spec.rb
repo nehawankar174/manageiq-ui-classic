@@ -30,18 +30,24 @@ describe TreeBuilderSmartproxyAffinity do
                                                                     :smartproxy_affinity_tree,
                                                                     {},
                                                                     true,
-                                                                    @selected_zone)
+                                                                    :data => @selected_zone)
     end
 
     it 'set init options correctly' do
-      tree_options = @smartproxy_affinity_tree.send(:tree_init_options, :smartproxy_affinity)
-      expect(tree_options).to eq(:full_ids => false, :add_root => false, :lazy => false)
+      tree_options = @smartproxy_affinity_tree.send(:tree_init_options)
+      expect(tree_options).to eq(
+        :full_ids     => false,
+        :checkboxes   => true,
+        :three_checks => true,
+        :post_check   => true,
+        :check_url    => "/ops/smartproxy_affinity_field_changed/",
+        :oncheck      => "miqOnCheckGeneric"
+      )
     end
     it 'set locals for render correctly' do
       locals = @smartproxy_affinity_tree.send(:set_locals_for_render)
       expect(locals[:checkboxes]).to eq(true)
       expect(locals[:check_url]).to eq('/ops/smartproxy_affinity_field_changed/')
-      expect(locals[:onclick]).to eq(false)
       expect(locals[:oncheck]).to eq('miqOnCheckGeneric')
       expect(locals[:three_checks]).to eq(true)
     end

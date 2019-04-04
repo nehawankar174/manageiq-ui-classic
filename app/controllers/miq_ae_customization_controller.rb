@@ -6,6 +6,7 @@ class MiqAeCustomizationController < ApplicationController
 
   helper ApplicationHelper::ImportExportHelper
   include Mixins::GenericSessionMixin
+  include Mixins::BreadcrumbsMixin
 
   before_action :check_privileges
   before_action :get_session_data
@@ -171,31 +172,36 @@ class MiqAeCustomizationController < ApplicationController
   private
 
   def features
-    [{:role     => "old_dialogs_accord",
-      :role_any => true,
-      :name     => :old_dialogs,
-      :title    => _("Provisioning Dialogs")},
-
-     {:role     => "dialog_accord",
-      :role_any => true,
-      :name     => :dialogs,
-      :title    => _("Service Dialogs")},
-
-     {:role     => "ab_buttons_accord",
-      :role_any => true,
-      :name     => :ab,
-      :title    => _("Buttons")},
-
-     {:role  => "miq_ae_class_import_export",
-      :name  => :dialog_import_export,
-      :title => _("Import/Export")}].map do |hsh|
-      ApplicationController::Feature.new_with_hash(hsh)
-    end
+    [
+      {
+        :role     => "old_dialogs_accord",
+        :role_any => true,
+        :name     => :old_dialogs,
+        :title    => _("Provisioning Dialogs")
+      },
+      {
+        :role     => "dialog_accord",
+        :role_any => true,
+        :name     => :dialogs,
+        :title    => _("Service Dialogs")
+      },
+      {
+        :role     => "ab_buttons_accord",
+        :role_any => true,
+        :name     => :ab,
+        :title    => _("Buttons")
+      },
+      {
+        :role  => "miq_ae_class_import_export",
+        :name  => :dialog_import_export,
+        :title => _("Import/Export")
+      }
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   def set_active_elements(feature, _x_node_to_set = nil)
     if feature
-      self.x_active_tree ||= feature.tree_list_name
+      self.x_active_tree ||= feature.tree_name
       self.x_active_accord ||= feature.accord_name
     end
     get_node_info
@@ -223,6 +229,8 @@ class MiqAeCustomizationController < ApplicationController
     handle_bottom_cell(presenter)
     setup_dialog_sample_buttons(nodetype, presenter)
     set_miq_record_id(presenter)
+
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
 
     render :json => presenter.for_render
   end
@@ -428,4 +436,14 @@ class MiqAeCustomizationController < ApplicationController
   end
 
   menu_section :automate
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Automation")},
+        {:title => _("Automate")},
+        {:title => _("Customization")},
+      ],
+    }
+  end
 end

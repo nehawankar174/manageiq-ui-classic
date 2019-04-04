@@ -8,6 +8,9 @@ class AutomationManagerController < ApplicationController
   include Mixins::GenericSessionMixin
   include Mixins::ManagerControllerMixin
   include Mixins::ExplorerPresenterMixin
+  include Mixins::EmsCommon::Core
+  include Mixins::EmsCommon::PauseResume
+  include Mixins::BreadcrumbsMixin
 
   menu_section :at
 
@@ -166,6 +169,14 @@ class AutomationManagerController < ApplicationController
 
   private
 
+  def automation_manager_pause
+    pause_or_resume_emss(:pause => true)
+  end
+
+  def automation_manager_resume
+    pause_or_resume_emss(:resume => true)
+  end
+
   def template_record?
     @record.kind_of?(ManageIQ::Providers::AnsibleTower::AutomationManager::ConfigurationWorkflow) || @record.kind_of?(ConfigurationScript)
   end
@@ -182,25 +193,25 @@ class AutomationManagerController < ApplicationController
 
   def features
     [
-      ApplicationController::Feature.new_with_hash(
+      {
         :role     => "automation_manager_providers",
         :role_any => true,
         :name     => :automation_manager_providers,
         :title    => _("Providers")
-      ),
-      ApplicationController::Feature.new_with_hash(
+      },
+      {
         :role     => "automation_manager_configured_system",
         :role_any => true,
         :name     => :automation_manager_cs_filter,
         :title    => _("Configured Systems")
-      ),
-      ApplicationController::Feature.new_with_hash(
+      },
+      {
         :role     => "automation_manager_configuration_scripts_accord",
         :role_any => true,
         :name     => :configuration_scripts,
         :title    => _("Templates")
-      )
-    ]
+      }
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   def get_node_info(treenodeid, _show_list = true)
@@ -411,6 +422,7 @@ class AutomationManagerController < ApplicationController
     else
       presenter.update(:main_div, r[:partial => 'layouts/x_gtl'])
     end
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
     replace_search_box(presenter)
   end
 
@@ -495,5 +507,16 @@ class AutomationManagerController < ApplicationController
       @edit = @record = nil
       replace_right_cell
     end
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs  => [
+        {:title => _("Automation")},
+        {:title => _("Ansible Tower")},
+        {:title => _("Explorer")},
+      ],
+      :record_title => :hostname,
+    }
   end
 end

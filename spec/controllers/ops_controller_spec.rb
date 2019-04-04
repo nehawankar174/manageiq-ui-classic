@@ -284,6 +284,7 @@ describe OpsController do
     MiqRegion.seed
     EvmSpecHelper.local_miq_server
     login_as FactoryBot.create(:user, :features => "ops_rbac")
+    allow(controller).to receive(:data_for_breadcrumbs).and_return({})
   end
 
   context "#explorer" do
@@ -364,7 +365,7 @@ describe OpsController do
         allow(controller).to receive(:check_privileges).and_return(true)
         allow(controller).to receive(:assert_privileges).and_return(true)
         seed_session_trees('ops', :settings_tree, 'root')
-        expect(controller).to receive(:render_to_string).with(any_args).exactly(3).times
+        expect(controller).to receive(:render_to_string).with(any_args).exactly(4).times
         post :change_tab, :params => {:tab_id => tab, :parent_tab_id => 'settings_tags'}
       end
 
@@ -490,7 +491,7 @@ describe OpsController do
     let(:tenant_omega) { FactoryBot.create(:tenant, :parent => tenant_alpha) }
 
     let(:feature) { MiqProductFeature.find_all_by_identifier(["rbac_tenant_manage_quotas_tenant_#{tenant_omega.id}"]) }
-    let(:role_with_access_to_omega_rbac_tenant_manage_quota_permission) { FactoryGirl.create(:miq_user_role, :miq_product_features => feature) }
+    let(:role_with_access_to_omega_rbac_tenant_manage_quota_permission) { FactoryBot.create(:miq_user_role, :miq_product_features => feature) }
 
     let(:group_alpha) { FactoryBot.create(:miq_group, :tenant => tenant_alpha, :miq_user_role => role_with_access_to_omega_rbac_tenant_manage_quota_permission) }
     let(:user_alpha)  { FactoryBot.create(:user, :miq_groups => [group_alpha]) }

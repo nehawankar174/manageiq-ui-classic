@@ -620,9 +620,11 @@ describe CatalogController do
 
         controller.instance_variable_set(:@sb, :action => "ot_tags_edit")
         controller.instance_variable_set(:@_params, :miq_grid_checks => @ot.id.to_s)
+        allow(controller).to receive(:button_url).with("catalog", @ot.id, "save").and_return("save_url")
+        allow(controller).to receive(:button_url).with("catalog", @ot.id, "cancel").and_return("cancel_url")
+
         controller.send(:tags_edit, "OrchestrationTemplate")
         expect(assigns(:flash_array)).to be_nil
-        expect(assigns(:entries)).not_to be_nil
       end
 
       it "cancels tags edit" do
@@ -633,7 +635,7 @@ describe CatalogController do
       end
 
       it "save tags" do
-        controller.instance_variable_set(:@_params, :button => "save", :id => @ot.id)
+        controller.instance_variable_set(:@_params, :button => "save", :id => @ot.id, 'data' => get_tags_json([@tag1, @tag2]))
         controller.send(:tags_edit, "OrchestrationTemplate")
         expect(assigns(:flash_array).first[:message]).to include("Tag edits were successfully saved")
         expect(assigns(:edit)).to be_nil
@@ -852,6 +854,13 @@ describe CatalogController do
     describe "#get_available_resources" do
       it "list of available resources should not include Ansible Playbook Service Templates" do
         FactoryBot.create(:service_template, :type => "ServiceTemplateAnsiblePlaybook")
+        controller.instance_variable_set(:@edit, :new => {:selected_resources => []})
+        controller.send(:get_available_resources, "ServiceTemplate")
+        expect(assigns(:edit)[:new][:available_resources].count).to eq(2)
+      end
+
+      it "list of available resources should not include catalog bundles" do
+        FactoryBot.create(:service_template, :service_type => 'composite')
         controller.instance_variable_set(:@edit, :new => {:selected_resources => []})
         controller.send(:get_available_resources, "ServiceTemplate")
         expect(assigns(:edit)[:new][:available_resources].count).to eq(2)
@@ -1220,9 +1229,10 @@ describe CatalogController do
 
         controller.instance_variable_set(:@sb, :action => "catalogitem_tag")
         controller.instance_variable_set(:@_params, :miq_grid_checks => @st.id.to_s)
+        allow(controller).to receive(:button_url).with("catalog", @st.id, "save").and_return("save_url")
+        allow(controller).to receive(:button_url).with("catalog", @st.id, "cancel").and_return("cancel_url")
         controller.send(:st_tags_edit)
         expect(assigns(:flash_array)).to be_nil
-        expect(assigns(:entries)).not_to be_nil
       end
 
       it "cancels tags edit" do
@@ -1233,7 +1243,7 @@ describe CatalogController do
       end
 
       it "save tags" do
-        controller.instance_variable_set(:@_params, :button => "save", :id => @st.id)
+        controller.instance_variable_set(:@_params, :button => "save", :id => @st.id, 'data' => get_tags_json([@tag1, @tag2]))
         controller.send(:st_tags_edit)
         expect(assigns(:flash_array).first[:message]).to include("Tag edits were successfully saved")
         expect(assigns(:edit)).to be_nil
@@ -1243,7 +1253,7 @@ describe CatalogController do
 
   describe '#set_form_vars' do
     before do
-      allow(controller).to receive(:build_ae_tree)
+      allow(controller).to receive(:build_automate_tree)
       controller.instance_variable_set(:@edit, :new => {})
       controller.instance_variable_set(:@record, FactoryBot.create(:service_template))
     end
@@ -1298,7 +1308,7 @@ describe CatalogController do
 
   describe '#resource_delete' do
     before do
-      allow(controller).to receive(:build_ae_tree)
+      allow(controller).to receive(:build_automate_tree)
       allow(controller).to receive(:load_edit).and_return(true)
       allow(controller).to receive(:rearrange_groups_array)
       allow(controller).to receive(:render)

@@ -3,20 +3,8 @@ class TreeBuilderServices < TreeBuilder
 
   private
 
-  def tree_init_options(_tree_name)
-    {
-      :leaf     => "Service",
-      :add_root => false
-    }
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:autoload => true)
-  end
-
-  def root_options
-    {}
+  def tree_init_options
+    {:lazy => true, :allow_reselect => true}
   end
 
   def root_node(id, text, tip)
@@ -47,36 +35,26 @@ class TreeBuilderServices < TreeBuilder
     count_only_or_objects(count_only, objects)
   end
 
-  def x_get_tree_custom_kids(object, count_only, options)
-    case object[:id]
-    when 'my', 'global'
-      # Get My Filters and Global Filters
-      count_only_or_objects(count_only, x_get_search_results(object, options[:leaf]))
-    when 'asrv', 'rsrv'
-      retired = object[:id] != 'asrv'
-      services = Rbac.filtered(Service.where(:retired => retired, :display => true))
-      return sevices.size if count_only
-
-      MiqPreloader.preload(services.to_a, :picture)
-      Service.arrange_nodes(services.sort_by { |n| [n.ancestry.to_s, n.name.downcase] })
-    end
+  def x_get_tree_custom_kids(object, count_only, _options)
+    # Get My Filters and Global Filters
+    count_only_or_objects(count_only, x_get_search_results(object)) if %w(my global).include?(object[:id])
   end
 
-  def x_get_search_results(object, leaf)
+  def x_get_search_results(object)
     case object[:id]
     when "global" # Global filters
-      x_get_global_filter_search_results(leaf)
+      x_get_global_filter_search_results
     when "my"     # My filters
-      x_get_my_filter_search_results(leaf)
+      x_get_my_filter_search_results
     end
   end
 
-  def x_get_global_filter_search_results(leaf)
-    MiqSearch.where(:db => leaf).visible_to_all.sort_by { |a| a.description.downcase }
+  def x_get_global_filter_search_results
+    MiqSearch.where(:db => "Service").visible_to_all.sort_by { |a| a.description.downcase }
   end
 
-  def x_get_my_filter_search_results(leaf)
-    MiqSearch.where(:db => leaf, :search_type => "user", :search_key => User.current_user.userid)
+  def x_get_my_filter_search_results
+    MiqSearch.where(:db => "Service", :search_type => "user", :search_key => User.current_user.userid)
              .sort_by { |a| a.description.downcase }
   end
 end

@@ -1,7 +1,7 @@
 class TreeBuilder
   include TreeKids
 
-  attr_reader :name, :type, :tree_nodes
+  attr_reader :name, :type, :tree_nodes, :bs_tree
 
   def self.class_for_type(type)
     raise('Obsolete tree type.') if type == :filter
@@ -9,13 +9,13 @@ class TreeBuilder
     @x_tree_node_classes[type] ||= LEFT_TREE_CLASSES[type].constantize
   end
 
-  def initialize(name, type, sandbox, build = true)
+  def initialize(name, type, sandbox, build = true, **_params)
     @tree_state = TreeState.new(sandbox)
     @sb = sandbox # FIXME: some subclasses still access @sb
 
     @locals_for_render  = {}
     @name               = name.to_sym # includes _tree
-    @options            = tree_init_options(name.to_sym)
+    @options            = tree_init_options
     @tree_nodes         = {}.to_json
     # FIXME: remove @name or @tree, unify
     @type               = type.to_sym # *usually* same as @name but w/o _tree
@@ -54,7 +54,21 @@ class TreeBuilder
     end
   end
 
-  def tree_init_options(_tree_name)
+  # The possible options are
+  # * full_ids - whether to generate full node IDs or not
+  # * leaf - class of the leaf nodes
+  # * open_all - expand all expandable nodes
+  # * lazy - is the tree lazily-loadable
+  # * checkboxes - show checkboxes for the nodes
+  # * features - used by the RBAC features tree only
+  # * editable - used by the RBAC features tree only
+  # * node_id_prefix - used by the RBAC features tree only
+  # * allow_reselect - fire the onclick event if a selected node is reselected
+  # * highlight_changes - highlight the changes in checkboxes differing from initial
+  # * three_checks - hierarchically check the parent if all children are checked
+  # * post_check - some kind of post-processing hierarchical checks
+  # * silent_activate - whether to activate the active_node silently or not (by default for explorers)
+  def tree_init_options
     $log.warn("MIQ(#{self.class.name}) - TreeBuilder descendants should have their own tree_init_options")
     {}
   end
@@ -83,10 +97,6 @@ class TreeBuilder
       id = record_or_id.id
     end
     "#{prefix}-#{id}"
-  end
-
-  def self.hide_vms
-    !User.current_user.settings.fetch_path(:display, :display_vms) # default value is false
   end
 
   # return this nodes model and record id
@@ -151,7 +161,7 @@ class TreeBuilder
 
   def set_nodes(nodes)
     # Add the root node even if it is not set
-    add_root_node(nodes) if @options.fetch(:add_root, :true)
+    add_root_node(nodes) if respond_to?(:root_options, true)
     @bs_tree = self.class.convert_bs_tree(nodes).to_json
     @tree_nodes = nodes.to_json
     @locals_for_render = set_locals_for_render
@@ -160,14 +170,11 @@ class TreeBuilder
   def add_to_sandbox
     @tree_state.add_tree(
       @options.reverse_merge(
-        :tree                 => @name,
-        :type                 => type,
-        :klass_name           => self.class.name,
-        :leaf                 => @options[:leaf],
-        :add_root             => true,
-        :open_nodes           => [],
-        :lazy                 => true,
-        :checkable_checkboxes => false
+        :tree       => @name,
+        :type       => type,
+        :klass_name => self.class.name,
+        :leaf       => @options[:leaf],
+        :open_nodes => []
       )
     )
   end
@@ -187,12 +194,20 @@ class TreeBuilder
 
   def set_locals_for_render
     {
-      :tree_id    => "#{@name}box",
-      :tree_name  => @name.to_s,
-      :bs_tree    => @bs_tree,
-      :onclick    => "miqOnClickSelectTreeNode",
-      :checkboxes => false
-    }
+      :tree_id         => "#{@name}box",
+      :tree_name       => @name.to_s,
+      :bs_tree         => @bs_tree,
+      :checkboxes      => @options[:checkboxes],
+      :autoload        => @options[:lazy],
+      :allow_reselect  => @options[:allow_reselect],
+      :three_checks    => @options[:three_checks],
+      :post_check      => @options[:post_check],
+      :onclick         => @options[:onclick],
+      :oncheck         => @options[:oncheck],
+      :click_url       => @options[:click_url],
+      :check_url       => @options[:check_url],
+      :silent_activate => @options[:silent_activate]
+    }.compact
   end
 
   # Build an explorer tree, from scratch
@@ -200,7 +215,6 @@ class TreeBuilder
   # :type                   # Type of tree, i.e. :handc, :vandt, :filtered, etc
   # :leaf                   # Model name of leaf nodes, i.e. "Vm"
   # :open_nodes             # Tree node ids of currently open nodes
-  # :add_root               # If true, put a root node at the top
   # :full_ids               # stack parent id on top of each node id
   # :lazy                   # set if tree is lazy
   def x_build_tree(options)
@@ -212,7 +226,7 @@ class TreeBuilder
         x_build_node_tree(child, nil, options)
       end
     end
-    return nodes unless options[:add_root]
+    return nodes unless respond_to?(:root_options, true)
     [{:key => 'root', :nodes => nodes, :expand => true}]
   end
 
@@ -266,10 +280,7 @@ class TreeBuilder
                     !!options[:open_all]                                               ||
                     node[:expand]                                                      ||
                     @tree_state.x_tree(@name)[:active_node] == node[:key]
-    if ancestry_kids ||
-       load_children ||
-       node[:expand] ||
-       @options[:lazy] == false
+    if ancestry_kids || load_children || node[:expand] || !@options[:lazy]
 
       kids = (ancestry_kids || x_get_tree_objects(object, options, false, parents)).map do |o|
         x_build_node(o, node[:key], options)
@@ -331,10 +342,6 @@ class TreeBuilder
 
   def count_only_or_objects_filtered(count_only, objects, sort_by = nil, options = {}, &block)
     count_only_or_objects(count_only, Rbac.filtered(objects, options), sort_by, &block)
-  end
-
-  def assert_type(actual, expected)
-    raise "#{self.class}: expected #{expected.inspect}, got #{actual.inspect}" unless actual == expected
   end
 
   def open_node(id)

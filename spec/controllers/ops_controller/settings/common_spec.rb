@@ -234,8 +234,8 @@ describe OpsController do
           controller.send(:pglogical_save_subscriptions)
           queue_item = MiqQueue.find_by(:method_name => "save_global_region")
           queued_password = queue_item.args[0][0].password
-          expect(MiqPassword.encrypted?(queued_password)).to be(true)
-          expect(MiqPassword.decrypt(queued_password)).to eq(password)
+          expect(ManageIQ::Password.encrypted?(queued_password)).to be(true)
+          expect(ManageIQ::Password.decrypt(queued_password)).to eq(password)
         end
       end
 
@@ -278,7 +278,7 @@ describe OpsController do
       context 'get advanced config settings' do
         it 'for selected server' do
           miq_server = FactoryBot.create(:miq_server)
-          enc_pass = MiqPassword.encrypt('pa$$word')
+          enc_pass = ManageIQ::Password.encrypt('pa$$word')
           Vmdb::Settings.save!(
             miq_server,
             :http_proxy => {
@@ -303,7 +303,7 @@ describe OpsController do
 
         it 'for selected zone' do
           zone = FactoryBot.create(:zone)
-          enc_pass = MiqPassword.encrypt('pa$$word')
+          enc_pass = ManageIQ::Password.encrypt('pa$$word')
           Vmdb::Settings.save!(
             zone,
             :http_proxy => {
@@ -450,6 +450,7 @@ describe OpsController do
     end
 
     describe '#settings_set_form_vars_workers' do
+      include ActionView::Helpers::NumberHelper
       context "set worker settings for selected server" do
         before do
           @miq_server = FactoryBot.create(:miq_server)
@@ -482,6 +483,13 @@ describe OpsController do
           ui_worker_count = controller.send(:get_worker_setting, assigns(:edit)[:current], MiqUiWorker, :count)
           expect(ui_worker_threshold).to eq(600.megabytes)
           expect(ui_worker_count).to eq(2)
+        end
+
+        it "gets worker setting and makes sure it exists in threshold array so correct value can be selected in drop down" do
+          controller.send(:settings_set_form_vars_workers)
+          proxy_worker_threshold = controller.send(:get_worker_setting, assigns(:edit)[:current], MiqSmartProxyWorker, :memory_threshold)
+          proxy_worker_threshold_human_size = number_to_human_size(proxy_worker_threshold, :significant => false)
+          expect(assigns(:sb)[:smart_proxy_threshold]).to include([proxy_worker_threshold_human_size, proxy_worker_threshold])
         end
       end
     end

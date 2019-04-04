@@ -672,7 +672,6 @@ module ApplicationHelper
       ops
       pxe
       report
-      rss
       server_build
     )
     return false if hide_layouts.include?(@layout)
@@ -1263,7 +1262,6 @@ module ApplicationHelper
   CONTENT_TYPE_ID = {
     "report" => "r",
     "menu"   => "m",
-    "rss"    => "rf",
     "chart"  => "c"
   }.freeze
 
@@ -1431,5 +1429,17 @@ module ApplicationHelper
 
   def miq_favicon_link_tag
     Settings.server.custom_favicon ? favicon_link_tag('/upload/custom_favicon.ico') : favicon_link_tag
+  end
+
+  def provider_paused?(record)
+    provider = if record.kind_of?(ExtManagementSystem)
+                 record
+               elsif record.respond_to?(:ext_management_system)
+                 record.ext_management_system
+               elsif record.respond_to?(:manager)
+                 record.manager
+               end
+
+    provider.try(:enabled?) == false
   end
 end

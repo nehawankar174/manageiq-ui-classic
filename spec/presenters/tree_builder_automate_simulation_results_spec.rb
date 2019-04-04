@@ -2,12 +2,11 @@ describe TreeBuilderAutomateSimulationResults do
   context 'TreeBuilderAutomateSimulationResults' do
     before do
       @data = "<MiqAeWorkspace>\\n<MiqAeObject namespace='ManageIQ/SYSTEM' class='PROCESS' instance='Automation'>\\n</MiqAeObject>\\n</MiqAeWorkspace>\\n"
-      @ae_simulation_tree = TreeBuilderAutomateSimulationResults.new(:ae_simulation_tree, :ae_simulation, {}, true, @data)
+      @ae_simulation_tree = TreeBuilderAutomateSimulationResults.new(:ae_simulation_tree, :ae_simulation, {}, true, :root => @data)
     end
 
     it 'no root is set' do
-      root_options = @ae_simulation_tree.send(:root_options)
-      expect(root_options).to eq({})
+      expect { @ae_simulation_tree.send(:root_options) }.to raise_error(NoMethodError)
     end
 
     it 'sets attribute nodes correctly' do

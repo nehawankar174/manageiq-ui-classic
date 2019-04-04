@@ -5,25 +5,13 @@ class TreeBuilderSnapshots < TreeBuilder
 
   def initialize(name, type, sandbox, build = true, **params)
     @record = params[:root]
-    @selected_node = params.key?(:selected_node) ? id(params[:selected_node]) : nil
     super(name, type, sandbox, build)
   end
 
   private
 
-  def override(node, object, _pid, options)
-    if (options[:selected_node].present? && node[:key] == options[:selected_node]) || object.children.empty?
-      node[:highlighted] = true
-    end
-  end
-
-  def tree_init_options(_tree_name)
-    {:full_ids => true, :selected_node => @selected_node}
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:autoload => true, :onclick => 'miqOnClickSnapshots',)
+  def tree_init_options
+    {:full_ids => true, :lazy => true, :onclick => 'miqOnClickSnapshots', :silent_activate => true}
   end
 
   def root_options
@@ -33,6 +21,20 @@ class TreeBuilderSnapshots < TreeBuilder
       :icon       => 'pficon pficon-virtual-machine',
       :selectable => false
     }
+  end
+
+  # The tree name is the same for any snapshot tree, so it doesn't make sense to
+  # load the selected node from the session. This method always selects the last
+  # node in the tree.
+  def active_node_set(tree_nodes)
+    # Find the last node
+    stack = [tree_nodes.last]
+    while stack.any?
+      node = stack.pop
+      stack.push(node[:nodes].last) if node[:nodes].try(:any?)
+    end
+    # Set it as the active node in the tree state
+    @tree_state.x_node_set(node[:key], @name)
   end
 
   def x_get_tree_roots(count_only = false, _options = {})
@@ -60,8 +62,6 @@ class TreeBuilderSnapshots < TreeBuilder
       id = id(kids.first.id)
       open_node(id)
     end
-    # select last node if no node was selected
-    @selected_node = id(parent.id) if @selected_node.nil? && kids.empty?
     count_only_or_objects(count_only, kids)
   end
 end

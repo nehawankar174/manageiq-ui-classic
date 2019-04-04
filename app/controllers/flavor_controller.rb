@@ -7,7 +7,8 @@ class FlavorController < ApplicationController
   include Mixins::GenericListMixin
   include Mixins::GenericShowMixin
   include Mixins::GenericSessionMixin
-  include EmsCommon
+  include Mixins::EmsCommon
+  include Mixins::BreadcrumbsMixin
 
   def self.display_methods
     %w(instances)
@@ -48,6 +49,17 @@ class FlavorController < ApplicationController
     super
     session[:flash_msgs] = @flash_array
     javascript_redirect(:action => 'show_list')
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Compute")},
+        {:title => _("Clouds")},
+        {:title => _("Flavors"), :url => controller_url},
+      ],
+      :record_info => @flavor,
+    }.compact
   end
 
   menu_section :clo

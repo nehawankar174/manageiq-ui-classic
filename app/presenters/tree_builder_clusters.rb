@@ -1,31 +1,22 @@
 class TreeBuilderClusters < TreeBuilder
   has_kids_for Hash, [:x_get_tree_hash_kids]
 
-  def initialize(name, type, sandbox, build = true, root = nil)
-    @root = root
+  def initialize(name, type, sandbox, build = true, **params)
+    @root = params[:root]
     @data = EmsCluster.get_perf_collection_object_list
     super(name, type, sandbox, build)
   end
 
   private
 
-  def tree_init_options(_tree_name)
-    {:full_ids => false,
-     :add_root => false,
-     :lazy     => false}
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:checkboxes        => true,
-                  :onselect          => "miqOnCheckCUFilters",
-                  :highlight_changes => true,
-                  :three_checks      => true,
-                  :check_url         => "/ops/cu_collection_field_changed/")
-  end
-
-  def root_options
-    {}
+  def tree_init_options
+    {
+      :full_ids     => false,
+      :checkboxes   => true,
+      :three_checks => true,
+      :oncheck      => "miqOnCheckCUFilters",
+      :check_url    => "/ops/cu_collection_field_changed/"
+    }
   end
 
   def non_cluster_selected

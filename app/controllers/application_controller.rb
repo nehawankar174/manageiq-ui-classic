@@ -1,6 +1,5 @@
 # rubocop:disable Metrics/LineLength, Lint/EmptyWhen
 require 'open-uri'
-require 'simple-rss'
 
 # Need to make sure models are autoloaded
 MiqCompare
@@ -194,8 +193,7 @@ class ApplicationController < ActionController::Base
       :taskbartext   => true,             # Show button text on taskbar
       :vmcompare     => "Compressed",     # Start VM compare and drift in compressed mode
       :hostcompare   => "Compressed",     # Start Host compare in compressed mode
-      :timezone      => nil,              # This will be set when the user logs in
-      :display_vms   => false # don't display vms by default
+      :timezone      => nil               # This will be set when the user logs in
     },
   }.freeze
 
@@ -491,6 +489,7 @@ class ApplicationController < ActionController::Base
     session[:rpt_task_id]      = nil    # Clear out report task id, using a saved report
 
     @report   = rr.report
+    @report_title = rr.friendly_title
     @html     = report_build_html_table(rr.report_results, rr.html_rows.join)
     @ght_type = params[:type] || (@report.graph.blank? ? 'tabular' : 'hybrid')
     @render_chart = (@ght_type == 'hybrid')
@@ -610,39 +609,6 @@ class ApplicationController < ActionController::Base
       @edit[:new][sort_fields.to_sym].sort! # Sort the selected fields array
       @refresh_div = "column_lists"
       @refresh_partial = "column_lists"
-    end
-  end
-
-  # Build a Catalog Items explorer tree
-  def build_ae_tree(type = :ae, name = :ae_tree)
-    # build the ae tree to show the tree select box for entry point
-    if x_active_tree == :automate_tree && @edit && @edit[:new][:fqname]
-      nodes = @edit[:new][:fqname].split("/")
-      @open_nodes = []
-      # if there are more than one nested namespaces
-      nodes.each_with_index do |_node, i|
-        if i == nodes.length - 1
-          # check if @cls is there, to make sure the class/instance still exists in Automate db
-          inst = @cls ? MiqAeInstance.find_by(:class_id => @cls.id, :name => nodes[i]) : nil
-          # show this as selected/expanded node when tree loads
-          if inst
-            @open_nodes.push("aei-#{inst.id}")
-            @active_node = "aei-#{inst.id}"
-          end
-        elsif i == nodes.length - 2
-          @cls = MiqAeClass.find_by(:namespace_id => @ns.id, :name => nodes[i])
-          @open_nodes.push("aec-#{@cls.id}") if @cls
-        else
-          @ns = MiqAeNamespace.find_by(:name => nodes[i])
-          @open_nodes.push("aen-#{@ns.id}") if @ns
-        end
-      end
-    end
-
-    if name == :ae_tree
-      TreeBuilderAeClass.new(name, type, @sb)
-    else
-      @automate_tree = TreeBuilderAutomate.new(name, type, @sb)
     end
   end
 
@@ -1328,15 +1294,27 @@ class ApplicationController < ActionController::Base
                "%#{stxt}%"
              end
 
-      return (
-        if ::Settings.server.case_sensitive_name_search
-          ["#{view.db_class.table_name}.#{view.col_order.first} like ? escape '`'", stxt]
-        else
-          ["lower(#{view.db_class.table_name}.#{view.col_order.first}) like ? escape '`'", stxt.downcase]
-        end
-      )
+      id = @search_text if @search_text =~ /^\d+$/
+      condition = [[]]
+      if id
+        add_to_search_condition(condition, "#{view.db_class.table_name}.id = ?", id)
+      end
+
+      if ::Settings.server.case_sensitive_name_search
+        add_to_search_condition(condition, "#{view.db_class.table_name}.#{view.col_order.first} like ? escape '`'", stxt)
+      else
+        add_to_search_condition(condition, "lower(#{view.db_class.table_name}.#{view.col_order.first}) like ? escape '`'", stxt.downcase)
+      end
+      condition[0] = condition[0].join(" OR ")
+      return condition.flatten
     end
     nil
+  end
+
+  def add_to_search_condition(condition, query, values)
+    condition[0] << query unless query.nil?
+    condition << values unless values.nil?
+    condition
   end
 
   def perpage_key(dbname)
@@ -2010,7 +1988,7 @@ class ApplicationController < ActionController::Base
 
     # Clearing out session objects that are no longer needed
     session[:hac_tree] = session[:vat_tree] = nil if controller_name != "ops"
-    session[:ch_tree] = nil if !["compliance_history"].include?(params[:display]) && params[:action] != "squash_toggle"
+    session[:ch_tree] = nil if !["compliance_history"].include?(params[:display])
     session[:vm_tree] = nil unless ["vmtree_info"].include?(params[:display])
     session[:policy_tree] = nil if params[:action] != "policies" && params[:pressed] != "vm_protect"
     session[:resolve] = session[:resolve_object] = nil unless %w(catalog miq_ae_customization miq_ae_tools).include?(request.parameters[:controller])
@@ -2182,7 +2160,7 @@ class ApplicationController < ActionController::Base
   #
   def set_active_elements(feature, x_node_to_set = nil)
     if feature
-      self.x_active_tree ||= feature.tree_list_name
+      self.x_active_tree ||= feature.tree_name
       self.x_active_accord ||= feature.accord_name
     end
 

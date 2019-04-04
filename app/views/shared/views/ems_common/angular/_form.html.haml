@@ -106,11 +106,15 @@
                             "name"                    => "subscription",
                             "ng-model"                => "emsCommonModel.subscription",
                             "checkchange"             => "",
+                            "required"                => "",
                             "prefix"                  => "default",
+                            "ng-readonly"             => @ems.id ? true : false,
                             "is-uuid"                 => 4,
                             "reset-validation-status" => "default_auth_status"}
         %span.help-block{"ng-show" => "angularForm.subscription.$error.isUuid"}
           = _("Invalid input format, please enter a GUID")
+        %span.help-block{"ng-show" => "angularForm.subscription.$error.required"}
+          = _("Required")
 
     .form-group{"ng-class" => "{'has-error': angularForm.api_version.$invalid}", "ng-if" => "emsCommonModel.emstype == 'openstack' || emsCommonModel.emstype == 'openstack_infra'"}
       %label.col-md-2.control-label{"for" => "ems_api_version"}
@@ -244,6 +248,8 @@
     %div{"ng-if" => "emsCommonModel.emstype != '' && emsCommonModel.emstype == 'azure'"}
       %h3
         = _("Credentials")
+      = render :partial => "layouts/angular-bootstrap/endpoints_for_url",
+                               :locals => {:prefix => "default", :ng_model => "emsCommonModel"}
       = render :partial => "/layouts/angular-bootstrap/auth_credentials_angular_bootstrap",
                :locals  => {:record                 => @ems,
                             :ng_model               => "emsCommonModel",

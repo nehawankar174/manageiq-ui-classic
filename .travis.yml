@@ -1,13 +1,14 @@
+dist: xenial
 language: ruby
 rvm:
 - 2.4.5
-- 2.3.8
+- 2.5.3
 cache:
   bundler: true
   yarn: true
   timeout: 600
 addons:
-  postgresql: '9.5'
+  postgresql: '10'
 env:
   matrix:
   - TEST_SUITE=spec

@@ -31,19 +31,12 @@ describe TreeBuilderRolesByServer do
       parent = MiqRegion.my_region
       @sb[:selected_server_id] = parent.id
       @sb[:selected_typ] = "miq_region"
-      @server_tree = TreeBuilderRolesByServer.new(:roles_by_server_tree, :roles_by_server, @sb, true, parent)
+      @server_tree = TreeBuilderRolesByServer.new(:roles_by_server_tree, :roles_by_server, @sb, true, :root => parent)
     end
 
     it "is not lazy" do
-      tree_options = @server_tree.send(:tree_init_options, :roles_by_server)
-      expect(tree_options[:lazy]).to eq(false)
-    end
-
-    it 'has no root' do
-      tree_options = @server_tree.send(:tree_init_options, :roles_by_server)
-      root = @server_tree.send(:root_options)
-      expect(tree_options[:add_root]).to eq(false)
-      expect(root).to eq({})
+      tree_options = @server_tree.send(:tree_init_options)
+      expect(tree_options[:lazy]).not_to be_truthy
     end
 
     it 'returns server nodes as root kids' do
@@ -71,7 +64,7 @@ describe TreeBuilderRolesByServer do
                                   'state'          => {'expanded' => true},
                                   'selectable'     => true,
                                   'class'          => ''},],
-                'state'      => {'expanded' => true, 'selected' => true},
+                'state'      => {'expanded' => true},
                 'class'      => ''}]
       expect(JSON.parse(@server_tree.locals_for_render[:bs_tree])).to eq(nodes)
     end

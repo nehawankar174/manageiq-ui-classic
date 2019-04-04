@@ -403,16 +403,19 @@ function miqUpdateButtons(obj, button_div) {
   miqSetButtons(count, button_div);
 }
 
+function miqSetToolbarCount(count) {
+  sendDataWithRx({
+    eventType: 'updateToolbarCount',
+    countSelected: count,
+  });
+}
+
 // Set the buttons in a div based on the count of checked items passed in
 function miqSetButtons(count, button_div) {
   if (button_div.match('_tb$') && count === 0) {
     // FIXME: this should be happening regardless of `count === 0`
     // ..but that needs more refactoring around miqUpdateAllCheckboxes, miqUpdateButtons, etc.
-    sendDataWithRx({
-      eventType: 'updateToolbarCount',
-      countSelected: count,
-    });
-
+    miqSetToolbarCount(count);
     return;
   }
 
@@ -1413,6 +1416,8 @@ function miqToolbarOnClick(_e) {
     'download_choice__render_report_csv',
     'download_choice__render_report_pdf',
     'download_choice__render_report_txt',
+    'custom_button_vmdb_choice__ab_button_simulate',
+    'catalogitem_button_vmdb_choice__ab_button_simulate',
   ], button.attr('name')) || button.attr('name').match(/_console$/);
 
   var options = {
@@ -1472,7 +1477,7 @@ function miqWidgetToolbarClick(_e) {
 }
 
 function miqInitAccordions() {
-  var height = $('#left_div').height() - $('#toolbar').outerHeight();
+  var height = $('#left_div').height() - $('#toolbar').outerHeight() - $('#breadcrumbs').outerHeight();
   var panel = $('#left_div .panel-heading').outerHeight();
   var count = $('#accordion:visible > .panel .panel-body').length;
   $('#accordion:visible > .panel .panel-body').each(function(_k, v) {
@@ -1490,6 +1495,7 @@ function miqInitAccordions() {
 // Function to resize the main content for best fit between the toolbar & footer
 function miqInitMainContent() {
   var toolbar = $('#toolbar');
+  var breadcrumbs = $('#breadcrumbs');
   var footer = $('#paging_div');
   var buttons = $('#form_buttons_div');
   var height = 0;
@@ -1501,6 +1507,7 @@ function miqInitMainContent() {
   if (toolbar.find('*:visible').length > 0) {
     height += toolbar.outerHeight();
   }
+  height += breadcrumbs.outerHeight();
 
   $('#main-content').css('height', 'calc(100% - ' + height + 'px)');
 }

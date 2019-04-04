@@ -2,6 +2,7 @@ require 'miq_bulk_import'
 class ConfigurationController < ApplicationController
   include StartUrl
   include Mixins::GenericSessionMixin
+  include Mixins::BreadcrumbsMixin
 
   logo_dir = File.expand_path(Rails.root.join('public', 'upload'))
   Dir.mkdir(logo_dir) unless File.exist?(logo_dir)
@@ -109,7 +110,6 @@ class ConfigurationController < ApplicationController
     # ui2 form
     return unless load_edit("config_edit__ui2", "configuration")
     @edit[:new][:views][VIEW_RESOURCES[params[:resource]]] = params[:view] # Capture the new view setting
-    @edit[:new][:display][:display_vms] = params[:display_vms] == 'true' if params.key?(:display_vms)
     session[:changed] = (@edit[:new] != @edit[:current])
     @changed = session[:changed]
     render :update do |page|
@@ -472,8 +472,6 @@ class ConfigurationController < ApplicationController
         value.merge!(user_settings[key]) unless user_settings[key].nil?
       end
     end
-    # Override nil settings since we only expect 2 settings: true/false later on
-    settings[:display][:display_vms] = false if settings[:display][:display_vms].nil?
     settings
   end
 
@@ -511,7 +509,7 @@ class ConfigurationController < ApplicationController
         :set_filters => true,
         :current     => current,
       }
-      @df_tree = TreeBuilderDefaultFilters.new(:df_tree, :df, @sb, true, filters)
+      @df_tree = TreeBuilderDefaultFilters.new(:df_tree, :df, @sb, true, :data => filters)
       self.x_active_tree = :df_tree
     when 'ui_4'
       @edit = {
@@ -565,7 +563,6 @@ class ConfigurationController < ApplicationController
     when "ui_2" # Visual Settings tab
       @edit[:new][:display][:compare] = params[:display][:compare] if !params[:display].nil? && !params[:display][:compare].nil?
       @edit[:new][:display][:drift] = params[:display][:drift] if !params[:display].nil? && !params[:display][:drift].nil?
-      @edit[:new][:display][:display_vms] = params[:display_vms] unless params.fetch_path(:display_vms)
     when "ui_3" # Visual Settings tab
       @edit[:new][:display][:compare] = params[:display][:compare] if !params[:display].nil? && !params[:display][:compare].nil?
       @edit[:new][:display][:drift] = params[:display][:drift] if !params[:display].nil? && !params[:display][:drift].nil?
@@ -609,6 +606,14 @@ class ConfigurationController < ApplicationController
     s[:views].delete(:dashboards)           # :dashboards is obsolete now
 
     s
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("My Settings")},
+      ],
+    }
   end
 
   menu_section :set

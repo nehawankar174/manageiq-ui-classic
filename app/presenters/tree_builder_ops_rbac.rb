@@ -3,17 +3,8 @@ class TreeBuilderOpsRbac < TreeBuilder
 
   private
 
-  def tree_init_options(_tree_name)
-    {
-      :open_all => false,
-      :leaf     => "Access Control",
-      :expand   => false
-    }
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:autoload => true)
+  def tree_init_options
+    {:open_all => false, :lazy => true}
   end
 
   def root_options

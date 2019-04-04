@@ -1,4 +1,6 @@
 class PlanningController < ApplicationController
+  include Mixins::BreadcrumbsMixin
+
   before_action :check_privileges
   before_action :get_session_data
 
@@ -8,7 +10,6 @@ class PlanningController < ApplicationController
 
   def index
     @explorer = true
-    @accords = [{:name => "planning", :title => _("Planning Options"), :container => "planning_options_accord"}]
 
     self.x_active_tree = nil
     @sb[:active_tab] = "summary"
@@ -20,7 +21,6 @@ class PlanningController < ApplicationController
 
   def plan
     @explorer = true
-    @accords = [{:name => "planning", :title => _("Planning Options"), :container => "planning_options_accord"}]
 
     self.x_active_tree = nil
     @sb[:active_tab] = "summary"
@@ -151,7 +151,6 @@ class PlanningController < ApplicationController
 
   def reset
     @explorer = true
-    @accords = [{:name => "planning", :title => _("Planning Options"), :container => "planning_options_accord"}]
 
     self.x_active_tree = nil
     @sb[:active_tab] = "summary"
@@ -283,5 +282,14 @@ class PlanningController < ApplicationController
                                     end
 
     render :json => presenter.for_render
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Optimize")},
+        {:title => _("Planning")},
+      ],
+    }
   end
 end

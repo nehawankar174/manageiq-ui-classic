@@ -10,30 +10,22 @@ class TreeBuilderMiqActionCategory < TreeBuilder
     node
   end
 
-  def initialize(name, type, sandbox, build = true, tenant_name = nil)
-    @tenant_name = tenant_name
+  def initialize(name, type, sandbox, build = true, **params)
+    @root = params[:root]
     super(name, type, sandbox, build)
   end
 
-  def tree_init_options(_tree_name)
+  def tree_init_options
     {
-      :expand => true,
-      :lazy   => false
-    }
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(
       :click_url => "/miq_policy/action_tag_pressed/",
       :onclick   => "miqOnClickGeneric"
-    )
+    }
   end
 
   def root_options
     {
-      :text    => @tenant_name,
-      :tooltip => @tenant_name,
+      :text    => @root,
+      :tooltip => @root,
       :icon    => "fa fa-tag"
     }
   end

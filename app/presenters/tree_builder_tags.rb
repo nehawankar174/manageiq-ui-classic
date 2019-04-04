@@ -1,7 +1,7 @@
 class TreeBuilderTags < TreeBuilder
   has_kids_for Classification, [:x_get_classification_kids]
 
-  def initialize(name, type, sandbox, build, params)
+  def initialize(name, type, sandbox, build, **params)
     @edit = params[:edit]
     @filters = params[:filters]
     @group = params[:group]
@@ -15,10 +15,13 @@ class TreeBuilderTags < TreeBuilder
 
   private
 
-  def tree_init_options(_tree_name)
-    {:full_ids => true,
-     :add_root => false,
-     :lazy     => false}
+  def tree_init_options
+    {
+      :full_ids   => true,
+      :checkboxes => true,
+      :check_url  => "/ops/rbac_group_field_changed/#{group_id}___",
+      :oncheck    => @edit.nil? ? nil : "miqOnCheckUserFilters"
+    }
   end
 
   def contain_selected_kid(category)
@@ -30,20 +33,6 @@ class TreeBuilderTags < TreeBuilder
     return false unless @edit || @filters
     path = "#{category.name}-#{entry.name}"
     (@edit&.fetch_path(:new, :filters, path)) || (@filters&.key?(path))
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:check_url         => "/ops/rbac_group_field_changed/#{group_id}___",
-                  :oncheck           => @edit.nil? ? nil : "miqOnCheckUserFilters",
-                  :checkboxes        => true,
-                  :highlight_changes => true,
-                  :selectable        => false,
-                  :onclick           => false)
-  end
-
-  def root_options
-    {}
   end
 
   def x_get_tree_roots(count_only, _options)

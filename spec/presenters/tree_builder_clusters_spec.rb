@@ -14,18 +14,24 @@ describe TreeBuilderClusters do
                                                                                               :ho_disabled => @ho_disabled})
       @non_cluster_hosts = [{:id => 2, :name => 'Non Cluster Host', :capture => true}]
       @cluster = {:clusters => [{:id => 1, :name => 'Name', :capture => 'unsure'}], :non_cl_hosts => @non_cluster_hosts}
-      @cluster_tree = TreeBuilderClusters.new(:cluster, :cluster_tree, {}, true, @cluster)
+      @cluster_tree = TreeBuilderClusters.new(:cluster, :cluster_tree, {}, true, :root => @cluster)
     end
 
     it 'sets tree to have full ids, not lazy and no root' do
-      root_options = @cluster_tree.send(:tree_init_options, nil)
-      expect(root_options).to eq(:full_ids => false, :add_root => false, :lazy => false)
+      root_options = @cluster_tree.send(:tree_init_options)
+      expect(root_options).to eq(
+        :full_ids     => false,
+        :checkboxes   => true,
+        :three_checks => true,
+        :oncheck      => "miqOnCheckCUFilters",
+        :check_url    => "/ops/cu_collection_field_changed/"
+      )
     end
 
     it 'sets tree to have full ids, not lazy and no root' do
       locals = @cluster_tree.send(:set_locals_for_render)
       expect(locals[:checkboxes]).to eq(true)
-      expect(locals[:onselect]).to eq("miqOnCheckCUFilters")
+      expect(locals[:oncheck]).to eq("miqOnCheckCUFilters")
       expect(locals[:check_url]).to eq("/ops/cu_collection_field_changed/")
     end
 

@@ -18,17 +18,11 @@ describe TreeBuilderComplianceHistory do
       empty_compliance = FactoryBot.create(:compliance)
       compliance = FactoryBot.create(:compliance, :compliance_details => compliance_details)
       root = FactoryBot.create(:host, :compliances => [empty_compliance, compliance])
-      @ch_tree = TreeBuilderComplianceHistory.new(:ch_tree, :ch, {}, true, root)
+      @ch_tree = TreeBuilderComplianceHistory.new(:ch_tree, :ch, {}, true, :root => root)
     end
     it 'is not lazy' do
-      tree_options = @ch_tree.send(:tree_init_options, :ch)
-      expect(tree_options[:lazy]).to eq(false)
-    end
-    it 'has no root' do
-      tree_options = @ch_tree.send(:tree_init_options, :ch)
-      root = @ch_tree.send(:root_options)
-      expect(tree_options[:add_root]).to eq(false)
-      expect(root).to eq({})
+      tree_options = @ch_tree.send(:tree_init_options)
+      expect(tree_options[:lazy]).not_to be_truthy
     end
     it 'returns Compliance as root kids' do
       kids = @ch_tree.send(:x_get_tree_roots, false)

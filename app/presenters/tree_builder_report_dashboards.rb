@@ -3,16 +3,8 @@ class TreeBuilderReportDashboards < TreeBuilder
 
   private
 
-  def tree_init_options(_tree_name)
-    {
-      :leaf     => 'Dashboards',
-      :full_ids => true
-    }
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:autoload => true)
+  def tree_init_options
+    {:full_ids => true, :lazy => true}
   end
 
   def root_options
@@ -33,7 +25,6 @@ class TreeBuilderReportDashboards < TreeBuilder
   end
 
   def x_get_tree_custom_kids(object, count_only, options)
-    assert_type(options[:type], :db)
     objects = []
     if object[:id].split('-').first == "g"
       objects = Rbac.filtered(MiqGroup.non_tenant_groups)

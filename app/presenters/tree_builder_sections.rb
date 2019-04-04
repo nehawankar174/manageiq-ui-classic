@@ -1,30 +1,24 @@
 class TreeBuilderSections < TreeBuilder
   has_kids_for Hash, [:x_get_tree_hash_kids]
 
-  def initialize(name, type, sandbox, build, data, controller_name, current_tenant)
-    @data = data
-    @controller_name = controller_name
-    @current_tenant = current_tenant
+  def initialize(name, type, sandbox, build, **params)
+    @data = params[:data]
+    @controller_name = params[:controller_name]
+    @current_tenant = params[:current_tenant]
     @sandbox = sandbox
     super(name, type, sandbox, build)
   end
 
   private
 
-  def tree_init_options(_tree_name)
-    {:full_ids => true, :add_root => false, :lazy => false}
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:checkboxes   => true,
-                  :three_checks => true,
-                  :onselect     => "miqOnCheckSections",
-                  :check_url    => "/#{@controller_name}/sections_field_changed/")
-  end
-
-  def root_options
-    {}
+  def tree_init_options
+    {
+      :full_ids     => true,
+      :checkboxes   => true,
+      :three_checks => true,
+      :oncheck      => "miqOnCheckSections",
+      :check_url    => "/#{@controller_name}/sections_field_changed/"
+    }
   end
 
   def x_get_tree_roots(count_only = false, _options)

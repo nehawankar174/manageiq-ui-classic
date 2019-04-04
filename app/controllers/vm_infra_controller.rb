@@ -2,6 +2,7 @@ class VmInfraController < ApplicationController
   include VmCommon # common methods for vm controllers
   include VmRemote # methods for VM remote access
   include VmShowMixin
+  include Mixins::BreadcrumbsMixin
 
   before_action :check_privileges
   before_action :get_session_data
@@ -17,24 +18,22 @@ class VmInfraController < ApplicationController
 
   def features
     [
-      ApplicationController::Feature.new_with_hash(
+      {
         :role  => "vandt_accord",
         :name  => :vandt,
         :title => _("VMs & Templates")
-      ),
-
-      ApplicationController::Feature.new_with_hash(
+      },
+      {
         :role  => "vms_filter_accord",
         :name  => :vms_filter,
         :title => _("VMs")
-      ),
-
-      ApplicationController::Feature.new_with_hash(
+      },
+      {
         :role  => "templates_filter_accord",
         :name  => :templates_filter,
         :title => _("Templates")
-      ),
-    ]
+      },
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   def prefix_by_nodetype(nodetype)
@@ -72,6 +71,17 @@ class VmInfraController < ApplicationController
 
   def skip_breadcrumb?
     breadcrumb_prohibited_for_action?
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs    => [
+        {:title => _("Compute")},
+        {:title => _("Infrastructure")},
+        {:title => _("Virtual Machines")},
+      ],
+      :include_record => true,
+    }
   end
 
   menu_section :inf

@@ -1,4 +1,6 @@
 class BottlenecksController < ApplicationController
+  include Mixins::BreadcrumbsMixin
+
   before_action :check_privileges
   before_action :get_session_data
 
@@ -76,13 +78,13 @@ class BottlenecksController < ApplicationController
 
   def features
     [
-      {:role     => "bottlenecks",
-       :role_any => true,
-       :name     => :utilization,
-       :title    => _("Bottlenecks")}
-    ].map do |hsh|
-      ApplicationController::Feature.new_with_hash(hsh)
-    end
+      {
+        :role     => "bottlenecks",
+        :role_any => true,
+        :name     => :utilization,
+        :title    => _("Bottlenecks")
+      }
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   def get_session_data
@@ -100,6 +102,7 @@ class BottlenecksController < ApplicationController
       presenter.replace(:bottlenecks_summary_div, r[:partial => 'bottlenecks_summary'])
     else
       presenter.update(:main_div, r[:partial => 'bottlenecks_tabs'])
+      presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
     end
     presenter[:build_calendar] = true
     presenter[:right_cell_text] = @right_cell_text
@@ -213,5 +216,13 @@ class BottlenecksController < ApplicationController
       session[:tl_position] = format_timezone(@sb[:report].extras[:tl_position], tz, "tl")
       #         END of TIMELINE TIMEZONE Code
     end
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Optimize")},
+      ],
+    }
   end
 end
