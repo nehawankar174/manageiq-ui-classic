@@ -8,6 +8,7 @@ class HostController < ApplicationController
   include Mixins::GenericListMixin
   include Mixins::GenericShowMixin
   include Mixins::MoreShowActions
+  include Mixins::BreadcrumbsMixin
 
   def self.display_methods
     %w(
@@ -34,10 +35,10 @@ class HostController < ApplicationController
   def display_tree_resources
     @showtype = "config"
     title, tree = if @display == "network"
-                    @network_tree = TreeBuilderNetwork.new(:network_tree, :network, @sb, true, @record)
+                    @network_tree = TreeBuilderNetwork.new(:network_tree, :network, @sb, true, :root => @record)
                     [_("Network"), :network_tree]
                   else
-                    @sa_tree = TreeBuilderStorageAdapters.new(:sa_tree, :sa, @sb, true, @record)
+                    @sa_tree = TreeBuilderStorageAdapters.new(:sa_tree, :sa, @sb, true, :root => @record)
                     [_("Storage Adapters"), :sa_tree]
                   end
     drop_breadcrumb(:name => "#{@record.name} (#{title})",
@@ -514,6 +515,17 @@ class HostController < ApplicationController
     super
     session[:miq_compressed]  = @compressed  unless @compressed.nil?
     session[:miq_exists_mode] = @exists_mode unless @exists_mode.nil?
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Compute")},
+        {:title => _("Infrastructure")},
+        {:title => _("Hosts / Nodes"), :url => controller_url},
+      ],
+      :record_info => @host,
+    }.compact
   end
 
   menu_section :inf

@@ -15,9 +15,7 @@ describe InfraNetworkingController do
   describe 'render_views' do
     render_views
 
-    before do
-      EvmSpecHelper.create_guid_miq_server_zone
-    end
+    before { EvmSpecHelper.create_guid_miq_server_zone }
 
     describe '#explorer' do
       before do
@@ -100,10 +98,30 @@ describe InfraNetworkingController do
     end
 
     it "save tags" do
-      post :tagging_edit, :params => { :button => "save", :format => :js, :id => switch.id }
+      post :tagging_edit, :params => { :button => "save", :format => :js, :id => switch.id, :data => get_tags_json([tag1, tag2]) }
       expect(assigns(:flash_array).first[:message]).to include("Tag edits were successfully saved")
       expect(assigns(:edit)).to be_nil
       expect(response.status).to eq(200)
+    end
+  end
+
+  describe '#rebuild_toolbars' do
+    let(:presenter) { instance_double("ExplorerPresenter") }
+
+    before do
+      allow(ExplorerPresenter).to receive(:new).and_return(presenter)
+      allow(presenter).to receive(:hide)
+      allow(presenter).to receive(:reload_toolbars)
+      allow(presenter).to receive(:set_visibility)
+      allow(presenter).to receive(:[]=)
+      controller.instance_variable_set(:@nodetype, 'sw')
+      controller.instance_variable_set(:@record, switch)
+      controller.instance_variable_set(:@sb, {})
+    end
+
+    it 'does not display Search in Switch summary screen' do
+      expect(controller).to receive(:display_adv_searchbox).and_return(false)
+      controller.send(:rebuild_toolbars, true, presenter)
     end
   end
 end

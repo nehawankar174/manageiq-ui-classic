@@ -3,18 +3,13 @@ class TreeBuilderReportWidgets < TreeBuilder
   WIDGET_TYPES = {
     "r"  => N_('Reports'),
     "c"  => N_('Charts'),
-    "rf" => N_('RSS Feeds'),
     "m"  => N_('Menus')
   }.freeze
 
   private
 
-  def tree_init_options(_tree_name)
-    {:leaf => 'Widgets', :full_ids => true}
-  end
-
-  def set_locals_for_render
-    super.merge!(:autoload => true)
+  def tree_init_options
+    {:full_ids => true, :lazy => true}
   end
 
   def root_options

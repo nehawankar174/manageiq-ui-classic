@@ -1,13 +1,8 @@
 class TreeBuilderStoragePod < TreeBuilder
   private
 
-  def tree_init_options(_tree_name)
-    {:leaf => "Storage"}
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:autoload => true)
+  def tree_init_options
+    {:lazy => true}
   end
 
   def root_options

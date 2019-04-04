@@ -124,17 +124,6 @@ Rails.application.routes.draw do
   )
 
   controller_routes = {
-    :alert                    => {
-      :get  => %w(
-        index
-        rss
-        show_list
-      ),
-      :post => %w(
-        role_selected
-      ),
-    },
-
     :auth_key_pair_cloud      => {
       :get  => %w(
         download_data
@@ -735,7 +724,6 @@ Rails.application.routes.draw do
         tagging_edit
         tag_edit_form_field_changed
         protect
-        squash_toggle
       ) +
                adv_search_post +
                exp_post +
@@ -775,7 +763,6 @@ Rails.application.routes.draw do
         tagging_edit
         tag_edit_form_field_changed
         protect
-        squash_toggle
         launch_cockpit
         launch_external_logging
       ) +
@@ -816,7 +803,6 @@ Rails.application.routes.draw do
         tagging_edit
         tag_edit_form_field_changed
         protect
-        squash_toggle
       ) +
                adv_search_post +
                exp_post +
@@ -857,7 +843,6 @@ Rails.application.routes.draw do
         guest_applications
         openscap_rule_results
         protect
-        squash_toggle
       ) + adv_search_post + exp_post + save_post + dialog_runner_post
     },
 
@@ -1178,7 +1163,6 @@ Rails.application.routes.draw do
         widget_chart_data
         widget_menu_data
         widget_report_data
-        widget_rss_data
       ),
       :post => %w(
         dialog_definition
@@ -1238,7 +1222,6 @@ Rails.application.routes.draw do
         tl_chooser
         update
         wait_for_task
-        squash_toggle
       ) +
                adv_search_post +
                compare_post +
@@ -1333,7 +1316,6 @@ Rails.application.routes.draw do
         x_show
         scaling
         scaledown
-        squash_toggle
         open_admin_ui
         open_admin_ui_done
       ) +
@@ -1375,7 +1357,6 @@ Rails.application.routes.draw do
         quick_search
         show
         show_list
-        squash_toggle
         tag_edit_form_field_changed
         tagging_edit
         tl_chooser
@@ -1563,7 +1544,6 @@ Rails.application.routes.draw do
         wait_for_task
         tagging_edit
         tag_edit_form_field_changed
-        squash_toggle
         launch_external_logging
       ) +
                adv_search_post +
@@ -1924,7 +1904,6 @@ Rails.application.routes.draw do
         sections_field_changed
         show
         show_list
-        squash_toggle
         tag_edit_form_field_changed
         tagging_edit
         tl_chooser
@@ -2988,6 +2967,7 @@ Rails.application.routes.draw do
         name_changed
         policy_sim
         policy_sim_add
+        policy_sim_cancel
         policy_sim_remove
         provision
         reconfigure
@@ -3029,6 +3009,7 @@ Rails.application.routes.draw do
         perf_chart_chooser
         protect
         retire
+        right_size_print
         show
         tagging_edit
         resize
@@ -3093,7 +3074,6 @@ Rails.application.routes.draw do
         cloud_networks
         cloud_volumes
         show
-        squash_toggle
         tagging_edit
         tag_edit_form_field_changed
         tl_chooser
@@ -3136,6 +3116,7 @@ Rails.application.routes.draw do
         filesystem_download
         retirement_info
         reconfigure_form_fields
+        right_size_print
         launch_html5_console
         launch_vmrc_console
         perf_chart_chooser
@@ -3189,7 +3170,6 @@ Rails.application.routes.draw do
         sort_vc_grid
         sort_template_grid
         sort_vm_grid
-        squash_toggle
         tagging_edit
         tag_edit_form_field_changed
         tl_chooser
@@ -3290,7 +3270,6 @@ Rails.application.routes.draw do
         sort_host_grid
         sort_iso_img_grid
         sort_vc_grid
-        squash_toggle
         tagging_edit
         tag_edit_form_field_changed
         tl_chooser

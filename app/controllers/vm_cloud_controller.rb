@@ -2,6 +2,7 @@ class VmCloudController < ApplicationController
   include VmCommon # common methods for vm controllers
   include VmRemote # methods for VM remote access
   include VmShowMixin
+  include Mixins::BreadcrumbsMixin
 
   before_action :check_privileges
   before_action :get_session_data
@@ -175,30 +176,27 @@ class VmCloudController < ApplicationController
 
   def features
     [
-      ApplicationController::Feature.new_with_hash(
+      {
         :role  => "instances_accord",
         :name  => :instances,
         :title => _("Instances by Provider")
-      ),
-
-      ApplicationController::Feature.new_with_hash(
+      },
+      {
         :role  => "images_accord",
         :name  => :images,
         :title => _("Images by Provider")
-      ),
-
-      ApplicationController::Feature.new_with_hash(
+      },
+      {
         :role  => "instances_filter_accord",
         :name  => :instances_filter,
         :title => _("Instances")
-      ),
-
-      ApplicationController::Feature.new_with_hash(
+      },
+      {
         :role  => "images_filter_accord",
         :name  => :images_filter,
         :title => _("Images")
-      )
-    ]
+      }
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   # redefine get_filters from VmShow
@@ -243,6 +241,16 @@ class VmCloudController < ApplicationController
 
   def skip_breadcrumb?
     breadcrumb_prohibited_for_action?
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Compute")},
+        {:title => _("Cloud")},
+        {:title => _("Instances")},
+      ],
+    }
   end
 
   menu_section :clo

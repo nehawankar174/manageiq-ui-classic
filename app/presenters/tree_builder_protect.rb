@@ -1,27 +1,20 @@
 class TreeBuilderProtect < TreeBuilder
   has_kids_for Hash, [:x_get_tree_hash_kids]
 
-  def initialize(name, type, sandbox, build = true, data)
-    @data = data
+  def initialize(name, type, sandbox, build = true, **params)
+    @data = params[:data]
     super(name, type, sandbox, build)
   end
 
   private
 
-  def tree_init_options(_tree_name)
-    {:full_ids => false, :add_root => false, :lazy => false}
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:checkboxes        => true,
-                  :oncheck           => "miqOnCheckProtect",
-                  :highlight_changes => true,
-                  :check_url         => "/#{@data[:controller_name]}/protect/")
-  end
-
-  def root_options
-    {}
+  def tree_init_options
+    {
+      :full_ids   => false,
+      :checkboxes => true,
+      :oncheck    => "miqOnCheckProtect",
+      :check_url  => "/#{@data[:controller_name]}/protect/"
+    }
   end
 
   def x_get_tree_roots(count_only = false, _options)

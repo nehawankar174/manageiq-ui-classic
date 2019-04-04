@@ -1,10 +1,11 @@
 class EmsCloudController < ApplicationController
   include Mixins::GenericListMixin
   include Mixins::GenericShowMixin
-  include EmsCommon # common methods for EmsInfra/Cloud controllers
-  include Mixins::EmsCommonAngular
+  include Mixins::EmsCommon # common methods for EmsInfra/Cloud controllers
+  include Mixins::EmsCommon::Angular
   include Mixins::GenericSessionMixin
   include Mixins::DashboardViewMixin
+  include Mixins::BreadcrumbsMixin
 
   before_action :check_privileges
   before_action :get_session_data
@@ -106,5 +107,17 @@ class EmsCloudController < ApplicationController
                        :admin_roles          => admin_roles,
                        :member_roles         => member_roles,
                        :ems                  => ems})
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Compute")},
+        {:title => _("Clouds")},
+        {:title => _("Providers")},
+        {:url   => controller_url, :title => _("Cloud Providers")},
+      ],
+      :record_info => @ems,
+    }.compact
   end
 end

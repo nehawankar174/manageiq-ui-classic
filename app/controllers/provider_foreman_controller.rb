@@ -8,6 +8,9 @@ class ProviderForemanController < ApplicationController
   include Mixins::GenericSessionMixin
   include Mixins::ManagerControllerMixin
   include Mixins::ExplorerPresenterMixin
+  include Mixins::EmsCommon::Core
+  include Mixins::EmsCommon::PauseResume
+  include Mixins::BreadcrumbsMixin
 
   def self.model
     ManageIQ::Providers::ConfigurationManager
@@ -189,6 +192,14 @@ class ProviderForemanController < ApplicationController
 
   private
 
+  def provider_foreman_pause
+    pause_or_resume_emss(:pause => true)
+  end
+
+  def provider_foreman_resume
+    pause_or_resume_emss(:resume => true)
+  end
+
   def textual_group_list
     [%i(properties environment os), %i(tenancy tags)]
   end
@@ -200,19 +211,19 @@ class ProviderForemanController < ApplicationController
 
   def features
     [
-      ApplicationController::Feature.new_with_hash(
+      {
         :role     => "providers_accord",
         :role_any => true,
         :name     => :configuration_manager_providers,
         :title    => _("Providers")
-      ),
-      ApplicationController::Feature.new_with_hash(
+      },
+      {
         :role     => "configured_systems_filter_accord",
         :role_any => true,
         :name     => :configuration_manager_cs_filter,
         :title    => _("Configured Systems")
-      ),
-    ]
+      }
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   def build_configuration_manager_providers_tree(_type)
@@ -369,6 +380,7 @@ class ProviderForemanController < ApplicationController
   end
 
   def update_partials(record_showing, presenter)
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
     if record_showing && valid_configured_system_record?(@configured_system_record)
       get_tagdata(@record)
       presenter.hide(:form_buttons_div)
@@ -498,6 +510,16 @@ class ProviderForemanController < ApplicationController
     options.merge!(update_options(options))
     process_show_list_options(options)
     super
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs  => [
+        {:title => _("Configuration")},
+        {:title => _("Management")},
+      ],
+      :record_title => :hostname,
+    }
   end
 
   menu_section :conf

@@ -6,6 +6,7 @@ class ChargebackController < ApplicationController
 
   include Mixins::SavedReportPaging
   include Mixins::GenericSessionMixin
+  include Mixins::BreadcrumbsMixin
 
   CB_X_BUTTON_ALLOWED_ACTIONS = {
     'chargeback_rates_copy'   => :cb_rate_edit,
@@ -309,19 +310,23 @@ class ChargebackController < ApplicationController
   private ############################
 
   def features
-    [{:role  => "chargeback_reports",
-      :name  => :cb_reports,
-      :title => _("Reports")},
-
-     {:role  => "chargeback_rates",
-      :name  => :cb_rates,
-      :title => _("Rates")},
-
-     {:role  => "chargeback_assignments",
-      :name  => :cb_assignments,
-      :title => _("Assignments")}].map do |hsh|
-      ApplicationController::Feature.new_with_hash(hsh)
-    end
+    [
+      {
+        :role  => "chargeback_reports",
+        :name  => :cb_reports,
+        :title => _("Reports")
+      },
+      {
+        :role  => "chargeback_rates",
+        :name  => :cb_rates,
+        :title => _("Rates")
+      },
+      {
+        :role  => "chargeback_assignments",
+        :name  => :cb_assignments,
+        :title => _("Assignments")
+      }
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   # Build a Chargeback Reports explorer tree
@@ -930,6 +935,8 @@ class ChargebackController < ApplicationController
       presenter[:lock_sidebar] = @in_a_form && @edit
     end
 
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
+
     render :json => presenter.for_render
   end
 
@@ -962,6 +969,15 @@ class ChargebackController < ApplicationController
                        :locals  => locals)
       page << javascript_for_miq_button_visibility(true)
     end
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Cloud Intel")},
+        {:title => _("Chargebacks")},
+      ],
+    }
   end
 
   menu_section :vi

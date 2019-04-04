@@ -1,14 +1,12 @@
 class TreeBuilderVandt < TreeBuilder
   include TreeBuilderArchived
 
-  def tree_init_options(_tree_name)
-    {:leaf => 'ManageIQ::Providers::InfraManager::VmOrTemplate'}
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:autoload       => true,
-                  :allow_reselect => TreeBuilder.hide_vms)
+  def tree_init_options
+    {
+      :leaf           => 'ManageIQ::Providers::InfraManager::VmOrTemplate',
+      :lazy           => true,
+      :allow_reselect => true
+    }
   end
 
   def root_options

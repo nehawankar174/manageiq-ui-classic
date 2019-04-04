@@ -1,16 +1,8 @@
 class TreeBuilderReportRoles < TreeBuilder
   private
 
-  def tree_init_options(_tree_name)
-    {
-      :leaf     => 'Roles',
-      :full_ids => true
-    }
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:autoload => true)
+  def tree_init_options
+    {:full_ids => true, :lazy => true}
   end
 
   def root_options

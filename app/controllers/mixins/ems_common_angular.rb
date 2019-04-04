@@ -107,11 +107,7 @@ module Mixins
 
     def render_validation_result(result, details)
       if result
-        msg = if details.blank?
-                _("Credential validation was successful")
-              else
-                _("Credential validation was successful: %{details}") % {:details => strip_tags(details)}
-              end
+        msg = _("Credential validation was successful")
       else
         msg = _("Credential validation was not successful: %{details}") % {:details => strip_tags(details)}
         level = :error
@@ -133,29 +129,30 @@ module Mixins
     # Click2Cloud: Added telefonica cloudmanager changes
     # Click2Cloud: Added orange cloudmanager changes
     def get_task_args(ems)
-      user, password = params[:default_userid], MiqPassword.encrypt(params[:default_password])
+      user, password = params[:default_userid], ManageIQ::Password.encrypt(params[:default_password])
       case ems.to_s
       when 'ManageIQ::Providers::Openstack::CloudManager', 'ManageIQ::Providers::Openstack::InfraManager'
         case params[:cred_type]
         when 'default'
           [password, params.to_hash.symbolize_keys.slice(*OPENSTACK_PARAMS)]
         when 'amqp'
-          [MiqPassword.encrypt(params[:amqp_password]), params.to_hash.symbolize_keys.slice(*OPENSTACK_AMQP_PARAMS)]
+          [ManageIQ::Password.encrypt(params[:amqp_password]), params.to_hash.symbolize_keys.slice(*OPENSTACK_AMQP_PARAMS)]
         end
       when 'ManageIQ::Providers::Amazon::CloudManager'
         uri = URI.parse(WEBrick::HTTPUtils.escape(params[:default_url]))
         [user, password, :EC2, params[:provider_region], ems.http_proxy_uri, true, uri]
       when 'ManageIQ::Providers::Azure::CloudManager'
-        [user, password, params[:azure_tenant_id], params[:subscription], ems.http_proxy_uri, params[:provider_region]]
+        uri = URI.parse(WEBrick::HTTPUtils.escape(params[:default_url]))
+        [user, password, params[:azure_tenant_id], params[:subscription], ems.http_proxy_uri, params[:provider_region], uri]
       when 'ManageIQ::Providers::Vmware::CloudManager'
         case params[:cred_type]
         when 'amqp'
-          [params[:amqp_hostname], params[:amqp_api_port], params[:amqp_userid], MiqPassword.encrypt(params[:amqp_password]), params[:api_version], true]
+          [params[:amqp_hostname], params[:amqp_api_port], params[:amqp_userid], ManageIQ::Password.encrypt(params[:amqp_password]), params[:api_version], true]
         when 'default'
           [params[:default_hostname], params[:default_api_port], user, password, params[:api_version], true]
         end
       when 'ManageIQ::Providers::Google::CloudManager'
-        [params[:project], MiqPassword.encrypt(params[:service_account]), {:service => "compute"}, ems.http_proxy_uri, true]
+        [params[:project], ManageIQ::Password.encrypt(params[:service_account]), {:service => "compute"}, ems.http_proxy_uri, true]
       when 'ManageIQ::Providers::Microsoft::InfraManager'
         connect_opts = {
           :hostname          => params[:default_hostname],
@@ -168,7 +165,7 @@ module Mixins
 
         [ems.build_connect_params(connect_opts), true]
       when 'ManageIQ::Providers::Redhat::InfraManager'
-        metrics_user, metrics_password = params[:metrics_userid], MiqPassword.encrypt(params[:metrics_password])
+        metrics_user, metrics_password = params[:metrics_userid], ManageIQ::Password.encrypt(params[:metrics_password])
         [{
           :username         => user,
           :password         => password,
@@ -193,7 +190,7 @@ module Mixins
       when 'ManageIQ::Providers::Vmware::InfraManager'
         case params[:cred_type]
         when 'console'
-          [{:pass => MiqPassword.encrypt(params[:console_password]), :user => params[:console_userid], :ip => params[:default_hostname], :use_broker => false}]
+          [{:pass => ManageIQ::Password.encrypt(params[:console_password]), :user => params[:console_userid], :ip => params[:default_hostname], :use_broker => false}]
         when 'default'
           [{:pass => password, :user => user, :ip => params[:default_hostname], :use_broker => false}]
         end
@@ -396,7 +393,6 @@ module Mixins
         render :json => {:name                            => @ems.name,
                          :emstype                         => @ems.emstype,
                          :zone                            => zone,
-                         :zone_hidden                     => zone == MiqRegion.my_region.maintenance_zone.name,
                          :tenant_mapping_enabled          => @ems.tenant_mapping_enabled == true,
                          :provider_id                     => @ems.provider_id || "",
                          :hostname                        => @ems.hostname,
@@ -428,7 +424,6 @@ module Mixins
                          :amqp_auth_status                => amqp_auth_status,
                          :ssh_keypair_auth_status         => ssh_keypair_auth_status.nil? ? true : ssh_keypair_auth_status,
                          :service_account_auth_status     => service_account_auth_status,
-                         :non_default_current_tab         => @ems.emstype == "gce" ? "service_account" : nil,
                          :amqp_fallback_hostname1         => amqp_fallback_hostname1 ? amqp_fallback_hostname1 : "",
                          :amqp_fallback_hostname2         => amqp_fallback_hostname2 ? amqp_fallback_hostname2 : "",
                          :default_url                     => @ems.endpoints.first.url}
@@ -438,7 +433,6 @@ module Mixins
         render :json => { :name                          => @ems.name,
                           :emstype                       => @ems.emstype,
                           :zone                          => zone,
-                          :zone_hidden                   => zone == MiqRegion.my_region.maintenance_zone.name,
                           :provider_id                   => @ems.provider_id || "",
                           :default_hostname              => @ems.connection_configurations.default.endpoint.hostname,
                           :amqp_hostname                 => amqp_hostname,
@@ -484,7 +478,6 @@ module Mixins
         render :json => {:name                                => @ems.name,
                          :emstype                             => @ems.emstype,
                          :zone                                => zone,
-                         :zone_hidden                         => zone == MiqRegion.my_region.maintenance_zone.name,
                          :hostname                            => @ems.hostname,
                          :default_hostname                    => @ems.connection_configurations.default.endpoint.hostname,
                          :default_api_port                    => @ems.connection_configurations.default.endpoint.port,
@@ -674,6 +667,8 @@ module Mixins
       if ems.kind_of?(ManageIQ::Providers::Azure::CloudManager)
         ems.azure_tenant_id = params[:azure_tenant_id]
         ems.subscription    = params[:subscription] if params[:subscription].present?
+        uri = URI.parse(WEBrick::HTTPUtils.escape(params[:default_url]))
+        default_endpoint = {:role => :default, :hostname => uri.host, :port => uri.port, :path => uri.path, :url => params[:default_url]}
       end
 
       if ems.kind_of?(ManageIQ::Providers::ContainerManager)

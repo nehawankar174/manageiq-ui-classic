@@ -6,9 +6,9 @@ class TreeBuilderComplianceHistory < TreeBuilder
     node[:selectable] = false
   end
 
-  def initialize(name, type, sandbox, build = true, root = nil)
-    sandbox[:ch_root] = TreeBuilder.build_node_id(root) if root
-    @root = root
+  def initialize(name, type, sandbox, build = true, **params)
+    sandbox[:ch_root] = TreeBuilder.build_node_id(params[:root]) if params[:root]
+    @root = params[:root]
     unless @root
       model, id = TreeBuilder.extract_node_model_and_id(sandbox[:ch_root])
       @root = model.constantize.find_by(:id => id)
@@ -18,14 +18,8 @@ class TreeBuilderComplianceHistory < TreeBuilder
 
   private
 
-  def tree_init_options(_tree_name)
-    {:full_ids => true,
-     :add_root => false,
-     :lazy     => false}
-  end
-
-  def root_options
-    {}
+  def tree_init_options
+    {:full_ids => true}
   end
 
   def x_get_tree_roots(count_only = false, _options = {})

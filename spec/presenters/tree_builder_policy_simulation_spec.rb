@@ -40,8 +40,8 @@ describe TreeBuilderPolicySimulation do
     end
 
     it 'sets tree as not lazy' do
-      tree_options = @policy_simulation_tree.send(:tree_init_options, :policy_simulation)
-      expect(tree_options[:lazy]).to eq(false)
+      tree_options = @policy_simulation_tree.send(:tree_init_options)
+      expect(tree_options[:lazy]).not_to be_truthy
     end
 
     it 'sets root correctly' do

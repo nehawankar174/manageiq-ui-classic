@@ -1,6 +1,7 @@
 class ServiceController < ApplicationController
   include Mixins::GenericSessionMixin
   include Mixins::GenericShowMixin
+  include Mixins::BreadcrumbsMixin
 
   before_action :check_privileges
   before_action :get_session_data
@@ -243,10 +244,14 @@ class ServiceController < ApplicationController
   helper_method :textual_tower_job_group_list
 
   def features
-    [ApplicationController::Feature.new_with_hash(:role     => "service",
-                                                  :role_any => true,
-                                                  :name     => :svcs,
-                                                  :title    => _("Services"))]
+    [
+      {
+        :role     => "service",
+        :role_any => true,
+        :name     => :svcs,
+        :title    => _("Services")
+      }
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   def service_ownership
@@ -484,6 +489,8 @@ class ServiceController < ApplicationController
     # unset variable that was set in form_field_changed to prompt for changes when leaving the screen
     presenter.reset_changes
 
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
+
     render :json => presenter.for_render
   end
 
@@ -524,6 +531,15 @@ class ServiceController < ApplicationController
   def set_session_data
     super
     session[:prov_options] = @options if @options
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Services")},
+        {:title => _("My services")},
+      ],
+    }
   end
 
   menu_section :svc

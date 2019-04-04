@@ -3,6 +3,7 @@ class MiqAeClassController < ApplicationController
   include MiqAeClassHelper
   include AutomateTreeHelper
   include Mixins::GenericSessionMixin
+  include Mixins::BreadcrumbsMixin
 
   before_action :check_privileges
   before_action :get_session_data
@@ -257,6 +258,10 @@ class MiqAeClassController < ApplicationController
     existing_node
   end
 
+  def build_ae_tree
+    TreeBuilderAeClass.new(:ae, :ae_tree, @sb)
+  end
+
   def replace_right_cell(options = {})
     @explorer = true
     replace_trees = options[:replace_trees]
@@ -282,7 +287,8 @@ class MiqAeClassController < ApplicationController
       :add_nodes       => add_nodes,
     )
 
-    reload_trees_by_presenter(presenter, [build_ae_tree]) if replace_trees.present?
+    trees = build_replaced_trees(replace_trees, %i(ae))
+    reload_trees_by_presenter(presenter, trees)
 
     if @sb[:action] == "miq_ae_field_seq"
       presenter.update(:class_fields_div, r[:partial => "fields_seq_form"])
@@ -343,6 +349,8 @@ class MiqAeClassController < ApplicationController
     presenter[:record_id] = determine_record_id_for_presenter
     presenter[:osf_node] = x_node
     presenter.show_miq_buttons if @changed
+
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
 
     render :json => presenter.for_render
   end
@@ -559,7 +567,7 @@ class MiqAeClassController < ApplicationController
     @changed = (@edit[:new] != @edit[:current])
     case params[:button]
     when "cancel"
-      session[:edit] = nil # clean out the saved info
+      @sb[:action] = session[:edit] = nil # clean out the saved info
       add_flash(_("Edit of Automate Instance \"%{name}\" was cancelled by the user") % {:name => @ae_inst.name})
       @in_a_form = false
       replace_right_cell
@@ -586,7 +594,7 @@ class MiqAeClassController < ApplicationController
         javascript_flash
       else
         AuditEvent.success(build_saved_audit(@ae_class, @edit))
-        session[:edit] = nil # clean out the saved info
+        @sb[:action] = session[:edit] = nil # clean out the saved info
         @in_a_form = false
         add_flash(_("Automate Instance \"%{name}\" was saved") % {:name => @ae_inst.name})
         replace_right_cell(:replace_trees => [:ae])
@@ -605,7 +613,7 @@ class MiqAeClassController < ApplicationController
     assert_privileges("miq_ae_instance_new")
     case params[:button]
     when "cancel"
-      session[:edit] = nil # clean out the saved info
+      @sb[:action] = session[:edit] = nil # clean out the saved info
       add_flash(_("Add of new Automate Instance was cancelled by the user"))
       @in_a_form = false
       replace_right_cell
@@ -1011,7 +1019,7 @@ class MiqAeClassController < ApplicationController
     @changed = (@edit[:new] != @edit[:current])
     case params[:button]
     when "cancel"
-      session[:edit] = nil # clean out the saved info
+      @sb[:action] = session[:edit] = nil # clean out the saved info
       add_flash(_("Edit of Automate Class \"%{name}\" was cancelled by the user") % {:name => @ae_class.name})
       @in_a_form = false
       replace_right_cell
@@ -1030,7 +1038,7 @@ class MiqAeClassController < ApplicationController
       else
         add_flash(_("Automate Class \"%{name}\" was saved") % {:name => ae_class.fqname})
         AuditEvent.success(build_saved_audit(ae_class, @edit))
-        session[:edit] = nil # clean out the saved info
+        @sb[:action] = session[:edit] = nil # clean out the saved info
         @in_a_form = false
         replace_right_cell(:replace_trees => [:ae])
         return
@@ -1053,7 +1061,7 @@ class MiqAeClassController < ApplicationController
     @changed = (@edit[:new] != @edit[:current])
     case params[:button]
     when "cancel"
-      session[:edit] = nil # clean out the saved info
+      @sb[:action] = session[:edit] = nil # clean out the saved info
       add_flash(_("Edit of schema for Automate Class \"%{name}\" was cancelled by the user") % {:name => @ae_class.name})
       @in_a_form = false
       replace_right_cell
@@ -1073,7 +1081,7 @@ class MiqAeClassController < ApplicationController
       else
         add_flash(_("Schema for Automate Class \"%{name}\" was saved") % {:name => ae_class.name})
         AuditEvent.success(build_saved_audit(ae_class, @edit))
-        session[:edit] = nil # clean out the saved info
+        @sb[:action] = session[:edit] = nil # clean out the saved info
         @in_a_form = false
         replace_right_cell(:replace_trees => [:ae])
         return
@@ -1105,7 +1113,7 @@ class MiqAeClassController < ApplicationController
     else
       add_flash(_("%{model} \"%{name}\" was saved") % {:model => ui_lookup(:model => @edit[:typ]), :name => get_record_display_name(ae_ns)})
       AuditEvent.success(build_saved_audit_hash_angular(old_namespace_attributes, ae_ns, false))
-      session[:edit] = nil # clean out the saved info
+      @sb[:action] = session[:edit] = nil # clean out the saved info
       @in_a_form = false
       replace_right_cell(:replace_trees => [:ae])
     end
@@ -1158,7 +1166,7 @@ class MiqAeClassController < ApplicationController
     @changed = (@edit[:new] != @edit[:current])
     case params[:button]
     when "cancel"
-      session[:edit] = nil # clean out the saved info
+      @sb[:action] = session[:edit] = nil # clean out the saved info
       add_flash(_("Edit of Automate Method \"%{name}\" was cancelled by the user") % {:name => @ae_method.name})
       @sb[:form_vars_set] = false
       @in_a_form = false
@@ -1186,7 +1194,7 @@ class MiqAeClassController < ApplicationController
       else
         add_flash(_("Automate Method \"%{name}\" was saved") % {:name => ae_method.name})
         AuditEvent.success(build_saved_audit(ae_method, @edit))
-        session[:edit] = nil # clean out the saved info
+        @sb[:action] = session[:edit] = nil # clean out the saved info
         @sb[:form_vars_set] = false
         @in_a_form = false
         replace_right_cell(:replace_trees => [:ae])
@@ -1614,7 +1622,7 @@ class MiqAeClassController < ApplicationController
   def form_copy_objects_field_changed
     return unless load_edit("copy_objects__#{params[:id]}", "replace_cell__explorer")
     copy_objects_get_form_vars
-    build_ae_tree(:automate, :automate_tree)
+    build_automate_tree(:automate, :automate_tree)
     @changed = (@edit[:new] != @edit[:current])
     @changed = @edit[:new][:override_source] if @edit[:new][:namespace].nil?
     render :update do |page|
@@ -1753,11 +1761,14 @@ class MiqAeClassController < ApplicationController
   end
 
   def features
-    [ApplicationController::Feature.new_with_hash(:role        => "miq_ae_class_explorer",
-                                                  :role_any    => true,
-                                                  :name        => :ae,
-                                                  :accord_name => "datastores",
-                                                  :title       => _("Datastore"))]
+    [
+      {
+        :role     => "miq_ae_class_explorer",
+        :role_any => true,
+        :name     => :ae,
+        :title    => _("Datastore")
+      }
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   def initial_setup_for_instances_form_vars(ae_inst_id)
@@ -1842,7 +1853,7 @@ class MiqAeClassController < ApplicationController
     if params[:button] == "reset"
       add_flash(_("All changes have been reset"), :warning)
     end
-    build_ae_tree(:automate, :automate_tree)
+    build_automate_tree(:automate, :automate_tree)
     replace_right_cell
   end
 
@@ -2756,5 +2767,23 @@ class MiqAeClassController < ApplicationController
       add_flash(_("%{model} \"%{name}\": Error during delete: %{error_msg}") %
                {:model => model_name, :name => record_name, :error_msg => bang.message}, :error)
     end
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Automation")},
+        {:title => _("Automate")},
+        {:title => _("Explorer")},
+      ],
+    }
+  end
+
+  def accord_name
+    features.find { |f| f.accord_name == x_active_accord.to_s }.try(:title)
+  end
+
+  def accord_container
+    features.find { |f| f.accord_name == x_active_accord.to_s }.try(:container)
   end
 end

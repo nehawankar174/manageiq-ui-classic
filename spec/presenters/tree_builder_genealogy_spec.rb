@@ -14,22 +14,30 @@ describe TreeBuilderGenealogy do
   end
 
   subject do
-    described_class.new(:genealogy_tree, :genealogy, {}, true, record)
+    described_class.new(:genealogy_tree, :genealogy, {}, true, :root => record)
   end
 
   describe '#tree_init_options' do
     it 'sets tree options correctly' do
-      expect(subject.send(:tree_init_options, :genealogy)).to eq(:full_ids => true, :lazy => false)
+      expect(subject.send(:tree_init_options)).to eq(
+        :full_ids        => true,
+        :checkboxes      => true,
+        :open_all        => true,
+        :silent_activate => true,
+        :click_url       => "/vm/genealogy_tree_selected/",
+        :onclick         => "miqOnClickGeneric",
+        :oncheck         => "miqOnCheckGenealogy",
+        :check_url       => "/vm/set_checked_items/"
+      )
     end
   end
 
   describe '#set_locals_for_render' do
     it 'sets locals for render correctly' do
-      expect(subject.send(:set_locals_for_render)).to include(:click_url  => "/vm/genealogy_tree_selected/",
-                                                              :onclick    => "miqOnClickGeneric",
-                                                              :checkboxes => true,
-                                                              :oncheck    => "miqOnCheckGenealogy",
-                                                              :check_url  => "/vm/set_checked_items/")
+      expect(subject.send(:set_locals_for_render)).to include(:click_url => "/vm/genealogy_tree_selected/",
+                                                              :onclick   => "miqOnClickGeneric",
+                                                              :oncheck   => "miqOnCheckGenealogy",
+                                                              :check_url => "/vm/set_checked_items/")
     end
   end
 

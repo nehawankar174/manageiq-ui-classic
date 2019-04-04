@@ -12,6 +12,7 @@ class ReportController < ApplicationController
   include ReportHelper
   include Mixins::GenericSessionMixin
   include Mixins::SavedReportPaging
+  include Mixins::BreadcrumbsMixin
 
   before_action :check_privileges
   before_action :get_session_data
@@ -278,45 +279,53 @@ class ReportController < ApplicationController
 
   def set_active_elements(feature, _x_node_to_set = nil)
     if feature
-      self.x_active_tree ||= feature.tree_list_name
+      self.x_active_tree ||= feature.tree_name
       self.x_active_accord ||= feature.accord_name
     end
     get_node_info
   end
 
   def features
-    [{:role     => "miq_report_saved_reports",
-      :role_any => true,
-      :name     => :savedreports,
-      :title    => _("Saved Reports")},
-
-     {:role     => "miq_report_reports",
-      :role_any => true,
-      :name     => :reports,
-      :title    => _("Reports")},
-
-     {:role     => "miq_report_schedules",
-      :role_any => true,
-      :name     => :schedules,
-      :title    => _("Schedules")},
-
-     {:role  => "miq_report_dashboard_editor",
-      :name  => :db,
-      :title => _("Dashboards")},
-
-     {:role  => "miq_report_widget_editor",
-      :name  => :widgets,
-      :title => _("Dashboard Widgets")},
-
-     {:role  => "miq_report_menu_editor",
-      :name  => :roles,
-      :title => _("Edit Report Menus")},
-
-     {:role  => "miq_report_export",
-      :name  => :export,
-      :title => _("Import/Export")}].map do |hsh|
-      ApplicationController::Feature.new_with_hash(hsh)
-    end
+    [
+      {
+        :role     => "miq_report_saved_reports",
+        :role_any => true,
+        :name     => :savedreports,
+        :title    => _("Saved Reports")
+      },
+      {
+        :role     => "miq_report_reports",
+        :role_any => true,
+        :name     => :reports,
+        :title    => _("Reports")
+      },
+      {
+        :role     => "miq_report_schedules",
+        :role_any => true,
+        :name     => :schedules,
+        :title    => _("Schedules")
+      },
+      {
+        :role  => "miq_report_dashboard_editor",
+        :name  => :db,
+        :title => _("Dashboards")
+      },
+      {
+        :role  => "miq_report_widget_editor",
+        :name  => :widgets,
+        :title => _("Dashboard Widgets")
+      },
+      {
+        :role  => "miq_report_menu_editor",
+        :name  => :roles,
+        :title => _("Edit Report Menus")
+      },
+      {
+        :role  => "miq_report_export",
+        :name  => :export,
+        :title => _("Import/Export")
+      }
+    ].map { |hsh| ApplicationController::Feature.new_with_hash(hsh) }
   end
 
   def report_selection_menus
@@ -858,6 +867,8 @@ class ReportController < ApplicationController
     # Lock current tree if in edit or assign, else unlock all trees
     presenter[:lock_sidebar] = @edit && @edit[:current]
 
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
+
     render :json => presenter.for_render
   end
 
@@ -889,6 +900,15 @@ class ReportController < ApplicationController
 
   def widget_import_service
     @widget_import_service ||= WidgetImportService.new
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Cloud Intel")},
+        {:title => _("Reports")},
+      ],
+    }
   end
 
   menu_section :vi

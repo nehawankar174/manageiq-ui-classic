@@ -3,9 +3,9 @@ class TreeBuilderOpsRbacFeatures < TreeBuilder
   has_kids_for Menu::Item,        [:x_get_tree_item_kids]
   has_kids_for MiqProductFeature, [:x_get_tree_feature_kids]
 
-  def initialize(name, type, sandbox, build, role:, editable: false)
-    @role     = role
-    @editable = editable
+  def initialize(name, type, sandbox, build, **params)
+    @role     = params[:role]
+    @editable = params[:editable]
     @features = @role.miq_product_features.map(&:identifier)
 
     @root_counter = []
@@ -17,20 +17,6 @@ class TreeBuilderOpsRbacFeatures < TreeBuilder
   end
 
   private
-
-  def set_locals_for_render
-    locals = {
-      :checkboxes   => true,
-      :three_checks => true,
-      :check_url    => "/ops/rbac_role_field_changed/",
-      :onclick      => nil,
-      :post_check   => true
-    }
-
-    locals[:oncheck] = "miqOnCheckGeneric" if @editable
-
-    super.merge!(locals)
-  end
 
   def x_get_tree_roots(count_only = false, _options)
     top_nodes = Menu::Manager.map do |section|
@@ -69,14 +55,17 @@ class TreeBuilderOpsRbacFeatures < TreeBuilder
     count_only_or_objects(count_only, kids)
   end
 
-  def tree_init_options(_tree_name)
+  def tree_init_options
     {
-      :lazy           => false,
-      :add_root       => true,
       :role           => @role,
       :features       => @features,
       :editable       => @editable,
-      :node_id_prefix => node_id_prefix
+      :node_id_prefix => node_id_prefix,
+      :checkboxes     => true,
+      :three_checks   => true,
+      :post_check     => true,
+      :check_url      => "/ops/rbac_role_field_changed/",
+      :oncheck        => @editable ? "miqOnCheckGeneric" : false
     }
   end
 

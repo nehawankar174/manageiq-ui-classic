@@ -27,29 +27,20 @@ class TreeBuilderDefaultFilters < TreeBuilder
     end
   end
 
-  def initialize(name, type, sandbox, build = true, data = nil)
-    @data = prepare_data(data)
+  def initialize(name, type, sandbox, build = true, **params)
+    @data = prepare_data(params[:data])
     super(name, type, sandbox, build)
   end
 
   private
 
-  def tree_init_options(_tree_name)
-    {:full_ids => true,
-     :add_root => false,
-     :lazy     => false}
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:check_url         => "/configuration/filters_field_changed/",
-                  :oncheck           => "miqOnCheckGeneric",
-                  :checkboxes        => true,
-                  :highlight_changes => true)
-  end
-
-  def root_options
-    {}
+  def tree_init_options
+    {
+      :full_ids   => true,
+      :checkboxes => true,
+      :check_url  => "/configuration/filters_field_changed/",
+      :oncheck    => "miqOnCheckGeneric"
+    }
   end
 
   def x_get_tree_roots(count_only = false, _options)

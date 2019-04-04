@@ -33,19 +33,12 @@ describe TreeBuilderServersByRole do
       parent = zone
       @sb[:selected_server_id] = parent.id
       @sb[:selected_typ] = "miq_region"
-      @server_tree = TreeBuilderServersByRole.new(:servers_by_role_tree, :servers_by_role, @sb, true, parent)
+      @server_tree = TreeBuilderServersByRole.new(:servers_by_role_tree, :servers_by_role, @sb, true, :root => parent)
     end
 
     it "is not lazy" do
-      tree_options = @server_tree.send(:tree_init_options, :servers_by_role)
-      expect(tree_options[:lazy]).to eq(false)
-    end
-
-    it 'has no root' do
-      tree_options = @server_tree.send(:tree_init_options, :servers_by_role)
-      root = @server_tree.send(:root_options)
-      expect(tree_options[:add_root]).to eq(false)
-      expect(root).to eq({})
+      tree_options = @server_tree.send(:tree_init_options)
+      expect(tree_options[:lazy]).not_to be_truthy
     end
 
     it 'returns server nodes as root kids' do
@@ -55,9 +48,9 @@ describe TreeBuilderServersByRole do
 
     it 'returns Servers by Roles' do
       nodes = [{'key'        => "role-#{@server_role.id}",
-                'tooltip'    => "Role: SmartProxy (stopped)",
+                'tooltip'    => "Role: SmartProxy (active)",
                 "icon"       => "ff ff-user-role",
-                'text'       => "Role: SmartProxy (stopped)",
+                'text'       => "Role: SmartProxy (active)",
                 'selectable' => true,
                 'nodes'      => [{'key'            => "asr-#{@assigned_server_role1.id}",
                                   'icon'           => 'pficon pficon-asleep',
@@ -73,7 +66,7 @@ describe TreeBuilderServersByRole do
                                   'state'          => { 'expanded' => true },
                                   'selectable'     => true,
                                   'class'          => ''}],
-                'state'      => { 'expanded' => true },
+                'state'      => { 'expanded' => true},
                 'class'      => '' }]
       expect(JSON.parse(@server_tree.locals_for_render[:bs_tree])).to eq(nodes)
     end

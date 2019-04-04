@@ -78,7 +78,7 @@ module VmCommon
 
   # to reload currently displayed summary screen in explorer
   def reload
-    @_params[:id] = if hide_vms && x_node.split('-')[1] != params[:id] && params[:id].present?
+    @_params[:id] = if x_node.split('-')[1] != params[:id] && params[:id].present?
                       'v-' + params[:id]
                     else
                       x_node
@@ -107,10 +107,6 @@ module VmCommon
   alias_method :instance_timeline, :show_timeline
   alias_method :vm_timeline, :show_timeline
   alias_method :miq_template_timeline, :show_timeline
-
-  def hide_vms
-    !User.current_user.settings.fetch_path(:display, :display_vms) # default value is false
-  end
 
   def x_show
     @vm = @record = identify_record(params[:id], VmOrTemplate)
@@ -199,8 +195,9 @@ module VmCommon
       session[:snap_selected] = nil if Snapshot.find_by(:id => session[:snap_selected]).nil?
       @sb[@sb[:active_accord]] = TreeBuilder.build_node_id(@record)
       @snapshot_tree = TreeBuilderSnapshots.new(:snapshot_tree, :snapshot, @sb, true, :root => @record)
-      @active = if @snapshot_tree.selected_node
-                  snap_selected = Snapshot.find(@snapshot_tree.selected_node.split('-').last)
+      selected_snapshot_node = x_node(@snapshot_tree.name)
+      @active = if selected_snapshot_node && selected_snapshot_node != 'root'
+                  snap_selected = Snapshot.find(selected_snapshot_node.split('-').last)
                   session[:snap_selected] = snap_selected.id
                   snap_selected.current?
                 else
@@ -224,12 +221,12 @@ module VmCommon
         javascript_flash(:spinner_off => true)
         return
       else
-        @genealogy_tree = TreeBuilderGenealogy.new(:genealogy_tree, :genealogy, @sb, true, @record)
-        session[:genealogy_tree_root_id] = @genealogy_tree.root_id
+        @genealogy_tree = TreeBuilderGenealogy.new(:genealogy_tree, :genealogy, @sb, true, :root => @record)
+        session[:genealogy_tree_root_id] = @record.parent.presence.try(:id) || @record.id
       end
     elsif @display == "compliance_history"
       count = params[:count] ? params[:count].to_i : 10
-      @ch_tree = TreeBuilderComplianceHistory.new(:ch_tree, :ch, @sb, true, @record)
+      @ch_tree = TreeBuilderComplianceHistory.new(:ch_tree, :ch, @sb, true, :root => @record)
       session[:ch_tree] = @ch_tree.tree_nodes
       session[:tree_name] = "ch_tree"
       session[:squash_open] = (count == 1)
@@ -535,6 +532,21 @@ module VmCommon
     end
   end
 
+  def right_size_print
+    @record = find_record_with_rbac(Vm, params[:id])
+    @display = "download_pdf"
+    disable_client_cache
+
+    @options = {
+      :page_layout => "portrait",
+      :page_size   => "us-letter",
+      :title       => "\"#{@record.name}\"".html_safe,
+      :quadicon    => false
+    }
+
+    render :template => 'vm_common/_right_size', :layout => '/layouts/print'
+  end
+
   def evm_relationship
     @record = find_record_with_rbac(VmOrTemplate, params[:id]) # Set the VM object
     @edit = {}
@@ -564,16 +576,6 @@ module VmCommon
     @edit[:new][:server] = @record.miq_server ? @record.miq_server.id.to_s : nil # Set to first category, if not already set
   end
 
-  def evm_relationship_field_changed
-    return unless load_edit("evm_relationship_edit__new")
-    evm_relationship_get_form_vars
-    changed = (@edit[:new] != @edit[:current])
-    render :update do |page|
-      page << javascript_prologue
-      page << javascript_for_miq_button_visibility(changed)
-    end
-  end
-
   def evm_relationship_get_form_vars
     @record = VmOrTemplate.find_by(:id => @edit[:vm_id])
     @edit[:new][:server] = params[:server_id] == "" ? nil : params[:server_id] if params[:server_id]
@@ -593,9 +595,6 @@ module VmCommon
         javascript_redirect(:action => 'show', :id => @record.id)
       end
     when "save"
-      svr = @edit[:new][:server] && @edit[:new][:server] != "" ? MiqServer.find(@edit[:new][:server]) : nil
-      @record.miq_server = svr
-      @record.save
       add_flash(_("Management Engine Relationship saved"))
       if @edit[:explorer]
         @sb[:action] = nil
@@ -603,17 +602,6 @@ module VmCommon
       else
         flash_to_session
         javascript_redirect(:action => 'show', :id => @record.id)
-      end
-    when "reset"
-      @in_a_form = true
-      if @edit[:explorer]
-        @explorer = true
-        evm_relationship
-        add_flash(_("All changes have been reset"), :warning)
-        replace_right_cell
-      else
-        flash_to_session(_("All changes have been reset"), :warning)
-        javascript_redirect(:action => 'evm_relationship', :id => @record.id, :escape => true)
       end
     end
   end
@@ -920,7 +908,7 @@ module VmCommon
       javascript_flash(:spinner_off => true, :activate_node => {:tree => x_active_tree.to_s, :node => x_node})
     end
 
-    self.x_node = (@record.present? && hide_vms ? parent_folder_id(@record) : params[:id])
+    self.x_node = (@record.present? ? parent_folder_id(@record) : params[:id])
     replace_right_cell
   end
 
@@ -980,11 +968,11 @@ module VmCommon
     add_nodes
   end
 
-  # if node is VM or Template and hide_vms is true - select parent node in explorer tree but show info of Vm/Template
+  # if node is VM or Template is true - select parent node in explorer tree but show info of Vm/Template
   def resolve_node_info(id)
     nodetype, id = id.split("-")
 
-    if hide_vms && (nodetype == 'v' || nodetype == 't')
+    if nodetype == 'v' || nodetype == 't'
       @vm = VmOrTemplate.find(id)
       self.x_node = parent_folder_id(@vm)
     else
@@ -998,7 +986,7 @@ module VmCommon
   def get_node_info(treenodeid, show_list = true)
     # resetting action that was stored during edit to determine what is being edited
     @sb[:action] = nil
-    @nodetype, id = if (treenodeid.split('-')[0] == 'v' || treenodeid.split('-')[0] == 't') && hide_vms
+    @nodetype, id = if treenodeid.split('-')[0] == 'v' || treenodeid.split('-')[0] == 't'
                       @sb[@sb[:active_accord]] = treenodeid
                       parse_nodetype_and_id(treenodeid)
                     else
@@ -1141,7 +1129,7 @@ module VmCommon
     end
 
     if !@in_a_form && !@sb[:action]
-      id = @record.present? && hide_vms ? TreeBuilder.build_node_cid(@record) : x_node
+      id = @record.present? ? TreeBuilder.build_node_cid(@record) : x_node
       id = @sb[@sb[:active_accord]] if @sb[@sb[:active_accord]].present? && params[:action] != 'tree_select'
       get_node_info(id)
       type, _id = parse_nodetype_and_id(id)
@@ -1167,6 +1155,8 @@ module VmCommon
       c_tb = build_toolbar("drifts_center_tb") # Use vm or template tb
     elsif @sb[:action] == 'snapshot_info'
       c_tb = build_toolbar("x_vm_snapshot_center_tb")
+    elsif @sb[:action] == 'right_size'
+      v_tb = build_toolbar("right_size_view_tb")
     elsif @sb[:action] == 'vmtree_info'
       c_tb = build_toolbar("x_vm_vmtree_center_tb")
     end
@@ -1209,7 +1199,7 @@ module VmCommon
         locals[:submit_button]   = @sb[:action] != 'miq_request_new' # need submit button on the screen
         locals[:continue_button] = @sb[:action] == 'miq_request_new' # need continue button on the screen
         update_buttons(locals) if @edit && @edit[:buttons].present?
-        presenter[:clear_tree_cookies] = "prov_trees"
+        presenter[:clear_tree_cookies] = "all_tags_tree"
       end
 
       if ['snapshot_add'].include?(@sb[:action])
@@ -1302,6 +1292,9 @@ module VmCommon
         presenter.update(:form_buttons_div, '') if action == "retire" || hide_x_edit_buttons(action)
 
         presenter.remove_paging.show(:form_buttons_div)
+
+        # evm_relationship_update uses React form and buttons
+        presenter.hide(:form_buttons_div) if action == "evm_relationship_update"
       end
       presenter.show(:paging_div)
     else
@@ -1325,6 +1318,8 @@ module VmCommon
     presenter.hide(:blocker_div) unless @edit && @edit[:adv_search_open]
     presenter[:hide_modal] = true
     presenter[:lock_sidebar] = @in_a_form && @edit
+
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
 
     render :json => presenter.for_render
   end

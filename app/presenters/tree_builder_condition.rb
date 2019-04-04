@@ -1,13 +1,8 @@
 class TreeBuilderCondition < TreeBuilder
   private
 
-  def tree_init_options(_tree_name)
-    {:full_ids => true}
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:autoload => true)
+  def tree_init_options
+    {:full_ids => true, :lazy => true}
   end
 
   # level 0 - root
@@ -51,7 +46,6 @@ class TreeBuilderCondition < TreeBuilder
 
   # level 2 - conditions
   def x_get_tree_custom_kids(parent, count_only, options)
-    assert_type(options[:type], :condition)
     towhat = parent[:id].camelize
     return super unless MiqPolicyController::UI_FOLDERS.collect(&:name).include?(towhat)
 

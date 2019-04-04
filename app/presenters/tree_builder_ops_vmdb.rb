@@ -1,18 +1,10 @@
-class TreeBuilderOpsVmdb < TreeBuilderOps
-  has_kids_for VmdbTableEvm, [:x_get_tree_vmdb_table_kids]
+class TreeBuilderOpsVmdb < TreeBuilder
+  has_kids_for VmdbTableEvm, %i(x_get_tree_vmdb_table_kids options)
 
   private
 
-  def tree_init_options(_tree_name)
-    {
-      :open_all => false,
-      :leaf     => "VmdbTable",
-    }
-  end
-
-  def set_locals_for_render
-    locals = super
-    locals.merge!(:autoload => true)
+  def tree_init_options
+    {:open_all => false, :lazy => true}
   end
 
   def root_options
@@ -36,12 +28,12 @@ class TreeBuilderOpsVmdb < TreeBuilderOps
     count_only_or_objects(count_only, vmdb_indexes, "name")
   end
 
-  def x_get_tree_vmdb_table_kids(object, count_only)
+  def x_get_tree_vmdb_table_kids(object, count_only, options)
     if count_only
       1 # each table has any index
     else
       # load this node expanded on autoload
-      @tree_state.x_tree(@name)[:open_nodes].push("xx-#{object.id}") unless @tree_state.x_tree(@name)[:open_nodes].include?("xx-#{object.id}")
+      options[:open_nodes].push("xx-#{object.id}") unless options[:open_nodes].include?("xx-#{object.id}")
       [
         {
           :id            => object.id.to_s,

@@ -119,6 +119,12 @@ module ApplicationController::PolicySupport
     replace_main_div(:partial => "layouts/policy_sim")
   end
 
+  # Cancel policy simulation, add flash message and redirect
+  def policy_sim_cancel
+    flash_to_session(_("Edit policy simulation was cancelled by the user"))
+    redirect_to(previous_breadcrumb_url)
+  end
+
   def profile_build
     @catinfo ||= {}
     session[:assignments] = session[:protect_item].get_policies
@@ -179,7 +185,7 @@ module ApplicationController::PolicySupport
   def protect_build_tree
     @edit[:controller_name] = controller_name
     @edit[:pol_items] = session[:pol_items]
-    @protect_tree = TreeBuilderProtect.new(:protect, :protect_tree, @sb, true, @edit)
+    @protect_tree = TreeBuilderProtect.new(:protect, :protect_tree, @sb, true, :data => @edit)
   end
 
   # Create policy assignment audit record

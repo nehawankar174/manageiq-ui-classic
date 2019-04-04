@@ -23,24 +23,26 @@ describe TreeBuilderTags do
                                        :edit => edit, :filters => @filters, :group => @group)
     end
     it 'set init options correctly' do
-      tree_options = @tags_tree.send(:tree_init_options, :tags)
-      expect(tree_options).to eq(:full_ids => true, :add_root => false, :lazy => false)
+      tree_options = @tags_tree.send(:tree_init_options)
+      expect(tree_options).to eq(
+        :full_ids   => true,
+        :checkboxes => true,
+        :check_url  => "/ops/rbac_group_field_changed/#{@group.id}___",
+        :oncheck    => nil
+      )
     end
     it 'set locals for render correctly' do
       locals = @tags_tree.send(:set_locals_for_render)
       expect(locals[:checkboxes]).to eq(true)
       expect(locals[:check_url]).to eq("/ops/rbac_group_field_changed/#{@group.id}___")
-      expect(locals[:highlight_changes]).to eq(true)
       expect(locals[:oncheck]).to eq(nil)
-      expect(locals[:selectable]).to eq(false)
     end
     it 'set info about selected kids correctly' do
       expect(@tags_tree.send(:contain_selected_kid, @folder_selected)).to eq(true)
       expect(@tags_tree.send(:contain_selected_kid, @folder_not_selected)).to eq(false)
     end
     it 'sets root to nothing' do
-      roots = @tags_tree.send(:root_options)
-      expect(roots).to eq({})
+      expect { @tags_tree.send(:root_options) }.to raise_error(NoMethodError)
     end
     it 'sets first level nodes correctly' do
       roots = @tags_tree.send(:x_get_tree_roots, false, nil)
@@ -78,9 +80,7 @@ describe TreeBuilderTags do
       locals = @tags_tree.send(:set_locals_for_render)
       expect(locals[:checkboxes]).to eq(true)
       expect(locals[:check_url]).to eq("/ops/rbac_group_field_changed/new___")
-      expect(locals[:highlight_changes]).to eq(true)
       expect(locals[:oncheck]).to eq("miqOnCheckUserFilters")
-      expect(locals[:selectable]).to eq(false)
     end
     it 'sets second level nodes correctly' do
       selected_kid = @tags_tree.send(:x_get_classification_kids, @folder_selected, false)

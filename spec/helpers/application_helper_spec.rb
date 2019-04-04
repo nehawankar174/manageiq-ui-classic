@@ -897,7 +897,6 @@ describe ApplicationHelper do
         expect(@sb[:trees][:vm_filter_tree]).to eq(:tree       => :vm_filter_tree,
                                                    :type       => :vm_filter,
                                                    :leaf       => "Vm",
-                                                   :add_root   => true,
                                                    :open_nodes => [])
       end
     end
@@ -1350,6 +1349,49 @@ describe ApplicationHelper do
       @lastaction = "show"
       @display = "container_projects"
       expect(calculate_toolbars).to include("center_tb" => "container_projects_center")
+    end
+  end
+
+  describe '#provider_paused?' do
+    subject { send(:provider_paused?, record) }
+
+    context 'record is a provider' do
+      let(:record) { FactoryBot.create(:ems_infra) }
+
+      it "true if provider paused" do
+        record.pause!
+        expect(subject).to be_truthy
+      end
+
+      it "false if provider paused" do
+        expect(subject).to be_falsey
+      end
+    end
+
+    context 'record is a VM' do
+      let(:record) { FactoryBot.create(:vm, :ext_management_system => FactoryBot.create(:ems_infra)) }
+
+      it "true if provider paused" do
+        record.ext_management_system.pause!
+        expect(subject).to be_truthy
+      end
+
+      it "false if provider paused" do
+        expect(subject).to be_falsey
+      end
+    end
+
+    context 'record is a configured_system_foreman' do
+      let(:record) { FactoryBot.create(:configured_system_foreman, :manager => FactoryBot.create(:configuration_manager_foreman)) }
+
+      it "true if provider paused" do
+        record.manager.pause!
+        expect(subject).to be_truthy
+      end
+
+      it "false if provider paused" do
+        expect(subject).to be_falsey
+      end
     end
   end
 end

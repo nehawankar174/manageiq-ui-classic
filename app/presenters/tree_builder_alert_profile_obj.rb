@@ -1,32 +1,24 @@
 class TreeBuilderAlertProfileObj < TreeBuilder
-  def initialize(name, type, sandbox, build = true, assign_to: nil, cat: nil, selected: nil)
-    @assign_to = assign_to
-    @cat = cat
-    @selected = selected
+  def initialize(name, type, sandbox, build = true, **params)
+    @assign_to = params[:assign_to]
+    @cat = params[:cat]
+    @selected = params[:selected_nodes]
     @cat_tree = @assign_to.ends_with?("-tags")
-    super(name, type, sandbox, build)
+    super(name, type, sandbox, build, **params)
   end
 
   def override(node, object, _pid, _options)
     node[:text] = (object.name.presence || object.description) unless object.kind_of?(MiddlewareServer)
     node[:hideCheckbox] = false
-    node[:select] = @selected.include?(object.id)
+    node[:select] = @selected.try(:include?, object.id)
   end
 
-  def tree_init_options(_tree_name)
+  def tree_init_options
     {
-      :expand => true
-    }
-  end
-
-  def set_locals_for_render
-    super.merge!(
-      :oncheck    => "miqOnCheckGeneric",
-      :check_url  => "/miq_policy/alert_profile_assign_changed/",
       :checkboxes => true,
-      :selectable => false,
-      :onclick    => false
-    )
+      :oncheck    => "miqOnCheckGeneric",
+      :check_url  => "/miq_policy/alert_profile_assign_changed/"
+    }
   end
 
   def root_options

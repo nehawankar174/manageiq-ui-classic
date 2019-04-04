@@ -59,35 +59,30 @@ describe TreeBuilderBelongsToHac do
                         :hac_tree,
                         {:trees => {}},
                         true,
-                        :edit     => edit,
-                        :filters  => {},
-                        :group    => nil,
-                        :selected => {})
+                        :edit           => edit,
+                        :filters        => {},
+                        :group          => nil,
+                        :selected_nodes => {})
   end
 
   describe '#tree_init_options' do
     it 'sets init options correctly' do
-      expect(subject.send(:tree_init_options, :hac)).to eq(:full_ids             => true,
-                                                           :add_root             => false,
-                                                           :lazy                 => false,
-                                                           :checkable_checkboxes => edit.present?,
-                                                           :selected             => {})
+      expect(subject.send(:tree_init_options)).to eq(:full_ids   => true,
+                                                     :checkboxes => true,
+                                                     :oncheck    => nil,
+                                                     :check_url  => "/ops/rbac_group_field_changed/new___")
     end
   end
 
   describe '#set_locals_for_render' do
     it 'sets locals correctly' do
-      expect(subject.send(:set_locals_for_render)).to include(:onclick           => false,
-                                                              :checkboxes        => true,
-                                                              :check_url         => "/ops/rbac_group_field_changed/new___",
-                                                              :oncheck           => nil,
-                                                              :highlight_changes => true)
+      expect(subject.send(:set_locals_for_render)).to include(:check_url => "/ops/rbac_group_field_changed/new___")
     end
   end
 
   describe '#root_options' do
     it 'sets root to empty one' do
-      expect(subject.send(:root_options)).to eq({})
+      expect { subject.send(:root_options) }.to raise_error(NoMethodError)
     end
   end
 

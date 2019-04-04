@@ -128,6 +128,7 @@ describe EmsCloudController do
         "zone"             => zone.name,
         "default_userid"   => "foo",
         "default_password" => "[FILTERED]",
+        "default_url"      => "http://abc.test/path"
       }
 
       expect(response.status).to eq(200)
@@ -339,7 +340,7 @@ describe EmsCloudController do
         let(:compute_service) { {:service => "compute"} }
 
         it "queues the correct number of arguments" do
-          expected_validate_args = [project, MiqPassword.encrypt(service_account), compute_service, nil, true]
+          expected_validate_args = [project, ManageIQ::Password.encrypt(service_account), compute_service, nil, true]
           expect(mocked_class).to receive(:validate_credentials_task).with(expected_validate_args, nil, nil)
           controller.send(:create_ems_button_validate)
         end
@@ -395,12 +396,6 @@ describe EmsCloudController do
       ems = FactoryBot.create(:ems_amazon)
       post :button, :params => { :id => ems.id, :pressed => "ems_cloud_refresh" }
       expect(response.status).to eq(200)
-    end
-
-    it "discover cloud providers" do
-      get :discover, :params => { :discover_type => "ems" }
-      expect(response.status).to eq(200)
-      expect(response).to render_template('ems_cloud/discover')
     end
 
     it 'edit selected cloud provider' do

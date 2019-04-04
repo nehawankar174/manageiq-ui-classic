@@ -19,12 +19,17 @@ describe TreeBuilderProtect do
       @edit = {:controller_name => 'name'}
       @edit[:new] = @edit[:current] = {set1[:id] => 1}
       @edit[:pol_items] = [101]
-      @protect_tree = TreeBuilderProtect.new(:protect, :protect_tree, {}, true, @edit)
+      @protect_tree = TreeBuilderProtect.new(:protect, :protect_tree, {}, true, :data => @edit)
     end
 
     it 'set init options correctly' do
-      tree_options = @protect_tree.send(:tree_init_options, :protect)
-      expect(tree_options).to eq(:full_ids => false, :add_root => false, :lazy => false)
+      tree_options = @protect_tree.send(:tree_init_options)
+      expect(tree_options).to eq(
+        :full_ids   => false,
+        :checkboxes => true,
+        :check_url  => "/name/protect/",
+        :oncheck    => "miqOnCheckProtect"
+      )
     end
 
     it 'set locals for render correctly' do

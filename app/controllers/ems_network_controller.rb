@@ -1,9 +1,10 @@
 class EmsNetworkController < ApplicationController
   include Mixins::GenericListMixin
   include Mixins::GenericShowMixin
-  include EmsCommon
-  include Mixins::EmsCommonAngular
+  include Mixins::EmsCommon
+  include Mixins::EmsCommon::Angular
   include Mixins::GenericSessionMixin
+  include Mixins::BreadcrumbsMixin
 
   before_action :check_privileges
   before_action :get_session_data
@@ -40,6 +41,17 @@ class EmsNetworkController < ApplicationController
     when :edit
       :ems_network_new
     end
+  end
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Networks")},
+        {:title => _("Providers")},
+        {:url   => controller_url, :title => _("Network Managers")},
+      ],
+      :record_info => @ems,
+    }.compact
   end
 
   menu_section :net

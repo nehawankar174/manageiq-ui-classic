@@ -7,6 +7,7 @@ class GenericObjectDefinitionController < ApplicationController
 
   include Mixins::GenericSessionMixin
   include Mixins::GenericShowMixin
+  include Mixins::BreadcrumbsMixin
 
   menu_section :automate
 
@@ -38,7 +39,7 @@ class GenericObjectDefinitionController < ApplicationController
   end
 
   def build_tree
-    @tree = TreeBuilderGenericObjectDefinition.new(:generic_object_definitions_tree, :generic_object_definitions_tree, @sb)
+    @tree = TreeBuilderGenericObjectDefinition.new(:generic_object_definitions_tree, :generic_object_definitions, @sb)
   end
 
   def button
@@ -136,9 +137,6 @@ class GenericObjectDefinitionController < ApplicationController
 
   def add_button_in_group
     custom_button_set = CustomButtonSet.find(params[:id])
-    members = custom_button_set.members
-    members.push(CustomButton.find(params[:button_id]))
-    custom_button_set.replace_children(members)
     custom_button_set.set_data[:button_order] ||= []
     custom_button_set.set_data[:button_order].push(CustomButton.last.id)
     custom_button_set.save!
@@ -273,6 +271,7 @@ class GenericObjectDefinitionController < ApplicationController
 
     presenter.reload_toolbars(:history => h_tb, :center => c_tb, :view => v_tb)
     presenter.set_visibility(true, :toolbar)
+    presenter.update(:breadcrumbs, r[:partial => 'layouts/breadcrumbs_new'])
 
     presenter[:osf_node] = x_node
     presenter[:record_id] = @record.try(:id)
@@ -286,4 +285,24 @@ class GenericObjectDefinitionController < ApplicationController
   end
 
   helper_method :textual_group_list
+
+  def breadcrumbs_options
+    {
+      :breadcrumbs => [
+        {:title => _("Automation")},
+        {:title => _("Automate")},
+        {:title => _("Generic Objects")},
+      ],
+      :record_info => @generic_object_definition,
+    }
+  end
+
+  def build_breadcrumbs_from_tree
+    breadcrumbs = []
+    tree = build_tree if @tree.nil?
+    if x_node && tree
+      breadcrumbs = current_tree_path(JSON.parse(tree.bs_tree).first, x_node)
+    end
+    breadcrumbs
+  end
 end

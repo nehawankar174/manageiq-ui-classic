@@ -21,12 +21,12 @@ describe TreeBuilderMiqActionCategory do
   let!(:tree_name) { :action_tags }
 
   subject do
-    described_class.new(:action_tags_tree, :action_tags, {}, true, tenant)
+    described_class.new(:action_tags_tree, :action_tags, {}, true, :root => tenant)
   end
 
   describe '#tree_init_options' do
     it 'set init options correctly' do
-      expect(subject.send(:tree_init_options, tree_name)).to eq(:expand => true, :lazy => false)
+      expect(subject.send(:tree_init_options)[:lazy]).not_to be_truthy
     end
   end
 
