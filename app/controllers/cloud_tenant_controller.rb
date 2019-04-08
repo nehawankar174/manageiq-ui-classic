@@ -66,6 +66,26 @@ class CloudTenantController < ApplicationController
         @ems_choices[tenant_choice_name] = tenant_choice_id
       end
     end
+    Rbac::Filterer.filtered(ManageIQ::Providers::Telefonica::CloudManager).each do |ems|
+      @ems_choices[ems.name] = ems.id
+      # keystone v3 allows for hierarchical tenants
+      next unless ems.api_version == "v3"
+      Rbac::Filterer.filtered(ems.cloud_tenants).each do |ems_cloud_tenant|
+        tenant_choice_name = ems.name + " (" + ems_cloud_tenant.name + ")"
+        tenant_choice_id = ems.id.to_s + ":" + ems_cloud_tenant.id.to_s
+        @ems_choices[tenant_choice_name] = tenant_choice_id
+      end
+    end
+    Rbac::Filterer.filtered(ManageIQ::Providers::Orange::CloudManager).each do |ems|
+      @ems_choices[ems.name] = ems.id
+      # keystone v3 allows for hierarchical tenants
+      next unless ems.api_version == "v3"
+      Rbac::Filterer.filtered(ems.cloud_tenants).each do |ems_cloud_tenant|
+        tenant_choice_name = ems.name + " (" + ems_cloud_tenant.name + ")"
+        tenant_choice_id = ems.id.to_s + ":" + ems_cloud_tenant.id.to_s
+        @ems_choices[tenant_choice_name] = tenant_choice_id
+      end
+    end
     drop_breadcrumb(
       :name => _("Add New Cloud Tenant"),
       :url  => "/cloud_tenant/new"
