@@ -98,7 +98,7 @@ class EmsClusterController < ApplicationController
   def textual_group_list
     [
       %i(relationships),
-      %i(host_totals vm_totals configuration tags openstack_status)
+      %i(host_totals vm_totals configuration tags openstack_status telefonica_status orange_status)
     ]
   end
   helper_method :textual_group_list
