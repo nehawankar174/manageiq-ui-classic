@@ -58,7 +58,7 @@ module ApplicationController::PolicySupport
         @sb[:action] = nil
       end
       if @edit[:explorer]
-        @edit = nil if %w(cancel save).include?(params[:button])
+        @edit = nil if %w[cancel save].include?(params[:button])
         replace_right_cell
       else
         @edit = nil                                       # Clear out the session :edit hash
@@ -125,15 +125,6 @@ module ApplicationController::PolicySupport
     redirect_to(previous_breadcrumb_url)
   end
 
-  def profile_build
-    @catinfo ||= {}
-    session[:assignments] = session[:protect_item].get_policies
-    session[:assignments].each do |policy|
-      cat = policy["description"]
-      @catinfo[cat] = true unless @catinfo.key?(cat)
-    end
-  end
-
   private ############################
 
   # Assign policies to selected records of db
@@ -149,8 +140,8 @@ module ApplicationController::PolicySupport
       javascript_redirect(:action => 'protect', :db => db) # redirect to build policy screen
     end
   end
-  %w(image instance vm miq_template container container_replicator container_group
-     container_node container_image ems_container container_project).each do |old_name|
+  %w[image instance vm miq_template container container_replicator container_group
+     container_node container_image ems_container container_project].each do |old_name|
     alias_method "#{old_name}_protect".to_sym, :assign_policies
   end
 

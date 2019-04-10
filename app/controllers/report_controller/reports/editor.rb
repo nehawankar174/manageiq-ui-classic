@@ -131,11 +131,24 @@ module ReportController::Reports::Editor
     replace_right_cell
   end
 
+  # Get string with unavailable fields while adding/editing report
+  def unavailable_fields_for_model(model)
+    case model
+    when 'ChargebackVm'
+      _('* Caution: CPU Cores Allocated Metric, CPU Cores Used Metric are not supported for Chargeback for Vms.')
+    when 'ChargebackContainerImage'
+      _('* Caution: CPU Allocated Metric, CPU Used Metric, Disk I/O Used Metric, Fixed Storage Metric, Storage Allocated Metric, Storage Used Metric are not supported for Chargeback for Images.')
+    when 'ChargebackContainerProject'
+      _('* Caution: CPU Allocated Metric, CPU Used Metric, CPU Cores Allocated Metric, Disk I/O Used Metric, Memory Allocated Metric, Fixed Storage Metric, Storage Allocated Metric, Storage Used Metric are not supported for Chargeback for Projects.')
+    end
+  end
+
   # AJAX driven routine to check for changes in ANY field on the form
   def form_field_changed
     return unless load_edit("report_edit__#{params[:id]}", "replace_cell__explorer")
     get_form_vars
     build_edit_screen
+    @unavailable_fields = unavailable_fields_for_model(@edit[:new][:model])
     @changed = (@edit[:new] != @edit[:current])
     render :update do |page|
       page << javascript_prologue
@@ -199,7 +212,7 @@ module ReportController::Reports::Editor
     when "3" # Filter
       # Build record filter expression
       if @edit[:miq_exp] || # Is this stored as an MiqExp object
-         %w(new copy create).include?(request.parameters["action"]) # or it's a new condition
+         %w[new copy create].include?(request.parameters["action"]) # or it's a new condition
 
         new_record_filter = @edit[:new][:record_filter]
         @edit[:record_filter][:expression] = copy_hash(new_record_filter) if new_record_filter.present?
@@ -268,7 +281,7 @@ module ReportController::Reports::Editor
     end
 
     @in_a_form = true
-    @gtl_url = %w(new copy create).include?(request.parameters["action"]) ? '/new' : '/edit'
+    @gtl_url = %w[new copy create].include?(request.parameters["action"]) ? '/new' : '/edit'
   end
 
   def reportable_models
@@ -327,11 +340,11 @@ module ReportController::Reports::Editor
 
   def build_tabs
     tab_indexes = if @edit[:new][:model] == ApplicationController::TREND_MODEL
-                    %w(edit_1 edit_3 edit_7)
+                    %w[edit_1 edit_3 edit_7]
                   elsif Chargeback.db_is_chargeback?(@edit[:new][:model].to_s)
-                    %w(edit_1 edit_2 edit_3 edit_7)
+                    %w[edit_1 edit_2 edit_3 edit_7]
                   else
-                    %w(edit_1 edit_8 edit_2 edit_9 edit_3 edit_4 edit_5 edit_6 edit_7)
+                    %w[edit_1 edit_8 edit_2 edit_9 edit_3 edit_4 edit_5 edit_6 edit_7]
                   end
 
     @tabs = TAB_TITLES.slice(*tab_indexes).transform_values! { |value| _(value) }.to_a
@@ -420,7 +433,7 @@ module ReportController::Reports::Editor
 
         ovs = case field_data_type
               when :boolean
-                %w(DEFAULT true)
+                %w[DEFAULT true]
               when :integer, :float
                 ["DEFAULT", "", MiqExpression::FORMAT_SUB_TYPES.fetch_path(field_sub_type, :units) ? MiqExpression::FORMAT_SUB_TYPES.fetch_path(field_sub_type, :units).first : nil]
               else
@@ -446,7 +459,7 @@ module ReportController::Reports::Editor
         end
       elsif value.include?("NIL") || value.include?("EMPTY")
         @edit[:new][:col_options][field_name][:style][s_idx].delete(:value) # Remove value key
-      elsif %i(datetime date).include?(field_data_type)
+      elsif %i[datetime date].include?(field_data_type)
         @edit[:new][:col_options][field_name][:style][s_idx][:value] = ApplicationController::Filter::EXP_TODAY # Set default date value
       elsif [:boolean].include?(field_data_type)
         @edit[:new][:col_options][field_name][:style][s_idx][:value] = true # Set default boolean value
@@ -491,7 +504,7 @@ module ReportController::Reports::Editor
       @edit[:new][:model] = params[:chosen_model]
       @edit[:new][:perf_interval] = nil                         # Clear performance interval setting
       @edit[:new][:tz] = nil
-      if %i(performance trend).include?(model_report_type(@edit[:new][:model]))
+      if %i[performance trend].include?(model_report_type(@edit[:new][:model]))
         @edit[:new][:perf_interval] ||= "daily"                 # Default to Daily
         @edit[:new][:perf_avgs] ||= "time_interval"
         @edit[:new][:tz] = session[:user_tz]
@@ -1249,7 +1262,7 @@ module ReportController::Reports::Editor
 
     @edit[:cb_cats] = categories_hash
 
-    if %i(performance trend).include?(model_report_type(@rpt.db))
+    if %i[performance trend].include?(model_report_type(@rpt.db))
       @edit[:new][:perf_interval] = @rpt.db_options[:interval]
       @edit[:new][:perf_avgs] = @rpt.db_options[:calc_avgs_by]
       @edit[:new][:perf_end] = @rpt.db_options[:end_offset].to_s
@@ -1305,7 +1318,7 @@ module ReportController::Reports::Editor
       @edit[:limit_cols] = VimPerformanceTrend.trend_limit_cols(@edit[:new][:perf_trend_db], @edit[:new][:perf_trend_col], @edit[:new][:perf_interval])
     end
 
-    if %i(performance trend).include?(model_report_type(@rpt.db))
+    if %i[performance trend].include?(model_report_type(@rpt.db))
       ensure_perf_interval_defaults
     end
 
@@ -1392,7 +1405,7 @@ module ReportController::Reports::Editor
       end
     end
 
-    @edit[:current] = %w(copy new).include?(params[:action]) ? {} : copy_hash(@edit[:new])
+    @edit[:current] = %w[copy new].include?(params[:action]) ? {} : copy_hash(@edit[:new])
     @edit[:new][:name] = "Copy of #{@rpt.name}" if params[:pressed] == "miq_report_copy"
 
     # For trend reports, check for percent field chosen
@@ -1687,7 +1700,7 @@ module ReportController::Reports::Editor
   def valid_chargeback_fields
     is_valid = false
     # There are valid show typ fields
-    if %w(owner tenant tag entity).include?(@edit[:new][:cb_show_typ])
+    if %w[owner tenant tag entity].include?(@edit[:new][:cb_show_typ])
       is_valid = case @edit[:new][:cb_show_typ]
                  when 'owner' then @edit[:new][:cb_owner_id]
                  when 'tenant' then @edit[:new][:cb_tenant_id]
