@@ -100,6 +100,7 @@ module OpsController::Settings::Schedules
       @openstack_region     = depot.try(:openstack_region)
       @telefonica_region    = depot.try(:telefonica_region)
       @orange_region        = depot.try(:orange_region)
+      @project_name        = depot.try(:project_name)
       @keystone_api_version = depot.try(:keystone_api_version)
       @v3_domain_ident      = depot.try(:v3_domain_ident)
       @swift_api_port       = full_uri.blank? ? nil : URI(full_uri).port
@@ -135,6 +136,7 @@ module OpsController::Settings::Schedules
       openstack_region     = depot.try(:openstack_region)
       telefonica_region    = depot.try(:telefonica_region)
       orange_region        = depot.try(:orange_region)
+      project_name         = depot.try(:project_name)
       keystone_api_version = depot.try(:keystone_api_version)
       v3_domain_ident      = depot.try(:v3_domain_ident)
       swift_api_port       = full_uri.blank? ? 5000 : URI(full_uri).port
@@ -179,6 +181,7 @@ module OpsController::Settings::Schedules
       :openstack_region     => openstack_region ? openstack_region : "",
       :telefonica_region    => telefonica_region ? telefonica_region : "",
       :orange_region        => orange_region ? orange_region : "",
+      :project_name         => project_name ? project_name : "",
       :keystone_api_version => keystone_api_version,
       :v3_domain_ident      => v3_domain_ident ? v3_domain_ident : "",
       :swift_api_port       => swift_api_port ? swift_api_port : 5000,
@@ -759,6 +762,7 @@ module OpsController::Settings::Schedules
     uri_settings[:openstack_region]     = params[:openstack_region]
     uri_settings[:telefonica_region]    = params[:telefonica_region]
     uri_settings[:orange_region]        = params[:orange_region]
+    uri_settings[:project_name]         = params[:project_name]
     uri_settings[:keystone_api_version] = params[:keystone_api_version]
     uri_settings[:v3_domain_ident]      = params[:v3_domain_ident]
     uri_settings[:security_protocol]    = params[:security_protocol]

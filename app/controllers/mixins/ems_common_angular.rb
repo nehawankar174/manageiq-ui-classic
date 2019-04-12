@@ -856,6 +856,7 @@ module Mixins
       @edit[:current] = {
         :name                  => ems.name,
         :provider_region       => ems.provider_region,
+        :project_name          => ems.project_name,
         :hostname              => ems.hostname,
         :azure_tenant_id       => azure_tenant_id,
         :keystone_v3_domain_id => ems.respond_to?(:keystone_v3_domain_id) ? ems.keystone_v3_domain_id : nil,
@@ -871,6 +872,7 @@ module Mixins
 
       @edit[:new] = {:name                  => params[:name],
                      :provider_region       => params[:provider_region],
+                     :project_name          => params[:project_name],
                      :hostname              => params[:hostname],
                      :azure_tenant_id       => params[:azure_tenant_id],
                      :keystone_v3_domain_id => params[:keystone_v3_domain_id],

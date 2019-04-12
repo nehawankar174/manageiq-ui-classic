@@ -12,6 +12,9 @@ ManageIQ.angular.app.controller('diagnosticsDatabaseFormController', ['$http', '
       log_password: '',
       log_aws_region: '',
       openstack_region: '',
+      telefonica_region: '',
+      orange_region: '',
+      project_name: '',
       keystone_api_version: '',
       v3_domain_ident: '',
       swift_api_port: 5000,
@@ -42,6 +45,9 @@ ManageIQ.angular.app.controller('diagnosticsDatabaseFormController', ['$http', '
       vm.diagnosticsDatabaseModel.log_protocol = '';
       vm.diagnosticsDatabaseModel.log_aws_region = '';
       vm.diagnosticsDatabaseModel.openstack_region = '';
+      vm.diagnosticsDatabaseModel.telefonica_region = '';
+      vm.diagnosticsDatabaseModel.orange_region = '';
+      vm.diagnosticsDatabaseModel.project_name = '';
       vm.diagnosticsDatabaseModel.keystone_api_version = '';
       vm.diagnosticsDatabaseModel.v3_domain_ident = '';
       vm.diagnosticsDatabaseModel.swift_api_port = 5000;
@@ -143,6 +149,9 @@ ManageIQ.angular.app.controller('diagnosticsDatabaseFormController', ['$http', '
       vm.diagnosticsDatabaseModel.log_aws_region = data.log_aws_region;
     } else if (vm.diagnosticsDatabaseModel.uri_prefix === 'swift') {
       vm.diagnosticsDatabaseModel.openstack_region     = data.openstack_region;
+      vm.diagnosticsDatabaseModel.telefonica_region     = data.telefonica_region;
+      vm.diagnosticsDatabaseModel.orange_region         = data.orange_region;
+      vm.diagnosticsDatabaseModel.project_name         = data.project_name;
       vm.diagnosticsDatabaseModel.keystone_api_version = data.keystone_api_version;
       vm.diagnosticsDatabaseModel.v3_domain_ident      = data.v3_domain_ident;
       vm.diagnosticsDatabaseModel.security_protocol    = data.security_protocol;

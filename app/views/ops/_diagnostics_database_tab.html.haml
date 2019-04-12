@@ -183,6 +183,20 @@
         %span.help-block{"ng-show" => "angularForm.orange_region.$invalid"}
           = _("Required")
 
+  %projectname{'ng-if' => 'vm.swiftSecurityProtocolSelect()'}
+    .form-group{"ng-class" => "{'has-error': angularForm.project_name.$invalid}"}
+      %label.col-md-2.control-label{"for" => "ems_project_name"}
+        = _('Project Name')
+      .col-md-4
+        %input.form-control{"type"                    => "text",
+                            "id"                      => "project_name",
+                            "name"                    => "project_name",
+                            "ng-model"                => "vm.diagnosticsDatabaseModel.project_name",
+                            "required"                => true,
+                            "checkchange"             => ""}
+        %span.help-block{"ng-show" => "angularForm.project_name.$invalid"}
+          = _("Required")
+
   %region{'ng-if' => 'vm.regionSelect()'}
     .form-group{"ng-class" => "{'has-error': angularForm.log_aws_region.$invalid}"}
       %label.col-md-2.control-label

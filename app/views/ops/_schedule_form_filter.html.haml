@@ -200,6 +200,20 @@
             %span.help-block{"ng-show" => "angularForm.orange_region.$invalid"}
               = _("Required")
 
+        .form-group{"ng-class" => "{'has-error': angularForm.project_name.$invalid}",
+                    "ng-if"    => 'swiftSecurityProtocolSelect()'}
+          %label.col-md-2.control-label{"for" => "ems_project_name"}
+            = _('Project Name')
+          .col-md-4
+            %input.form-control{"type"                    => "text",
+                                "id"                      => "project_name",
+                                "name"                    => "project_name",
+                                "ng-model"                => "scheduleModel.project_name",
+                                "required"                => true,
+                                "checkchange"             => ""}
+            %span.help-block{"ng-show" => "angularForm.project_name.$invalid"}
+              = _("Required")
+
         %region{'ng-if' => 'regionSelect()'}
           .form-group{"ng-class" => "{'has-error': angularForm.log_aws_region.$invalid}"}
             %label.col-md-2.control-label

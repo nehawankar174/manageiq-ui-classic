@@ -408,6 +408,7 @@ module Mixins
                            :default_security_protocol       => default_security_protocol,
                            :amqp_security_protocol          => amqp_security_protocol,
                            :provider_region                 => @ems.provider_region,
+                           :project_name                    => @ems.project_name,
                            :openstack_infra_providers_exist => retrieve_openstack_infra_providers.length.positive?,
                            :default_userid                  => @ems.authentication_userid.to_s,
                            :amqp_userid                     => amqp_userid,
@@ -497,6 +498,7 @@ module Mixins
                            :default_security_protocol           => default_security_protocol,
                            :default_tls_ca_certs                => default_tls_ca_certs,
                            :provider_region                     => @ems.provider_region,
+                           :project_name                        => @ems.project_name,
                            :default_userid                      => @ems.authentication_userid.to_s,
                            :service_account                     => service_account.to_s,
                            :bearer_token_exists                 => !@ems.authentication_token(:bearer).nil?,
@@ -558,6 +560,7 @@ module Mixins
       def set_ems_record_vars(ems, mode = nil)
         ems.name                   = params[:name].strip if params[:name]
         ems.provider_region        = params[:provider_region] if params[:provider_region]
+        ems.project_name           = params[:project_name] if params[:project_name]
         ems.api_version            = params[:api_version].strip if params[:api_version]
         ems.provider_id            = params[:provider_id]
         ems.zone                   = Zone.find_by(:name => params[:zone]) if params[:zone]
@@ -865,6 +868,7 @@ module Mixins
         @edit[:current] = {
           :name                  => ems.name,
           :provider_region       => ems.provider_region,
+          :project_name          => ems.project_name,
           :hostname              => ems.hostname,
           :azure_tenant_id       => azure_tenant_id,
           :keystone_v3_domain_id => ems.respond_to?(:keystone_v3_domain_id) ? ems.keystone_v3_domain_id : nil,
@@ -880,6 +884,7 @@ module Mixins
 
         @edit[:new] = {:name                  => params[:name],
                        :provider_region       => params[:provider_region],
+                       :project_name          => params[:project_name],
                        :hostname              => params[:hostname],
                        :azure_tenant_id       => params[:azure_tenant_id],
                        :keystone_v3_domain_id => params[:keystone_v3_domain_id],
