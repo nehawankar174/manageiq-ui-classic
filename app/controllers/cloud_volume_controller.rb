@@ -566,7 +566,7 @@ class CloudVolumeController < ApplicationController
     # Click2Cloud: Added telefonica as one of the storage manager type to collect required form params.
     # Click2Cloud: Added orange as one of the storage manager type to collect required form params.
     case params[:emstype]
-    when "ManageIQ::Providers::StorageManager::CinderManager", "ManageIQ::Providers::Openstack::StorageManager::CinderManager",  "ManageIQ::Providers::Telefonica::StorageManager::CinderManager" ,  "ManageIQ::Providers::Orange::StorageManager::CinderManager"
+    when "ManageIQ::Providers::StorageManager::CinderManager", "ManageIQ::Providers::Openstack::StorageManager::CinderManager",  "ManageIQ::Providers::Telefonica::StorageManager::CinderManager",  "ManageIQ::Providers::Huawei::StorageManager::CinderManager" ,  "ManageIQ::Providers::Orange::StorageManager::CinderManager"
       options.merge!(cinder_manager_options)
     when "ManageIQ::Providers::Amazon::StorageManager::Ebs"
       options.merge!(aws_ebs_options)

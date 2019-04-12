@@ -151,6 +151,39 @@ module HostHelper::TextualSummary
     end
   end
 
+  def textual_generate_huawei_status
+    @record.host_service_group_huaweis.collect do |x|
+      running_count       = x.running_system_services.count
+      failed_count        = x.failed_system_services.count
+      all_count           = x.system_services.count
+      configuration_count = x.filesystems.count
+
+      running = {:title => _("Show list of running %{name}") % {:name => x.name},
+                 :value => _("Running (%{number})") % {:number => running_count},
+                 :icon  => failed_count.zero? && running_count.positive? ? 'pficon pficon-ok' : nil,
+                 :link  => running_count.positive? ? host_service_link(x, 'host_services', :running) : nil}
+
+      failed = {:title => _("Show list of failed %{name}") % {:name => x.name},
+                :value => _("Failed (%{number})") % {:number => failed_count},
+                :icon  => failed_count.positive? ? 'pficon pficon-error-circle-o' : nil,
+                :link  => failed_count.positive? ? host_service_link(x, 'host_services', :failed) : nil}
+
+      all = {:title => _("Show list of all %{name}") % {:name => x.name},
+             :value => _("All (%{number})") % {:number => all_count},
+             :icon  => 'pficon pficon-service',
+             :link  => all_count.positive? ? host_service_link(x, 'host_services', :all) : nil}
+
+      configuration = {:title => _("Show list of configuration files of %{name}") % {:name => x.name},
+                       :icon  => 'fa fa-file-o',
+                       :value => _("Configuration (%{number})") % {:number => configuration_count},
+                       :link  => configuration_count.positive? ? host_service_link(x, 'filesystems') : nil}
+
+      sub_items = [running, failed, all, configuration]
+
+      {:value => x.name, :sub_items => sub_items}
+    end
+  end
+
   def textual_generate_orange_status
     @record.host_service_group_oranges.collect do |x|
       running_count       = x.running_system_services.count

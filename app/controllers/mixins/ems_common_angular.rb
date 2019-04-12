@@ -141,6 +141,13 @@ module Mixins
         when 'amqp'
           [ManageIQ::Password.encrypt(params[:amqp_password]), params.to_hash.symbolize_keys.slice(*TELEFONICA_AMQP_PARAMS)]
         end
+      when 'ManageIQ::Providers::Huawei::CloudManager'
+        case params[:cred_type]
+        when 'default'
+          [password, params.to_hash.symbolize_keys.slice(*HUAWEI_PARAMS)]
+        when 'amqp'
+          [ManageIQ::Password.encrypt(params[:amqp_password]), params.to_hash.symbolize_keys.slice(*HUAWEI_AMQP_PARAMS)]
+        end
       when 'ManageIQ::Providers::Orange::CloudManager'
         case params[:cred_type]
         when 'default'
@@ -588,7 +595,7 @@ module Mixins
       prometheus_alerts_endpoint = {}
       kubevirt_endpoint = {}
 
-      if ems.kind_of?(ManageIQ::Providers::Openstack::CloudManager) || ems.kind_of?(ManageIQ::Providers::Telefonica::CloudManager) || ems.kind_of?(ManageIQ::Providers::Orange::CloudManager) || ems.kind_of?(ManageIQ::Providers::Openstack::InfraManager)
+      if ems.kind_of?(ManageIQ::Providers::Openstack::CloudManager) || ems.kind_of?(ManageIQ::Providers::Telefonica::CloudManager) || ems.kind_of?(ManageIQ::Providers::Huawei::CloudManager) || ems.kind_of?(ManageIQ::Providers::Orange::CloudManager) || ems.kind_of?(ManageIQ::Providers::Openstack::InfraManager)
         default_endpoint = {:role => :default, :hostname => hostname, :port => port, :security_protocol => ems.security_protocol}
         ems.keystone_v3_domain_id = params[:keystone_v3_domain_id]
         if params[:event_stream_selection] == "amqp"
@@ -598,7 +605,7 @@ module Mixins
         end
       end
 
-      if ems.kind_of?(ManageIQ::Providers::Openstack::CloudManager) || ems.kind_of?(ManageIQ::Providers::Telefonica::CloudManager) || ems.kind_of?(ManageIQ::Providers::Orange::CloudManager) || ems.kind_of?(ManageIQ::Providers::Openstack::InfraManager) || ems.kind_of?(ManageIQ::Providers::Redhat::InfraManager)
+      if ems.kind_of?(ManageIQ::Providers::Openstack::CloudManager) || ems.kind_of?(ManageIQ::Providers::Telefonica::CloudManager) || ems.kind_of?(ManageIQ::Providers::Huawei::CloudManager) || ems.kind_of?(ManageIQ::Providers::Orange::CloudManager) || ems.kind_of?(ManageIQ::Providers::Openstack::InfraManager) || ems.kind_of?(ManageIQ::Providers::Redhat::InfraManager)
         ssh_keypair_endpoint = {:role => :ssh_keypair}
       end
 
@@ -794,6 +801,7 @@ module Mixins
       if (ems.kind_of?(ManageIQ::Providers::Openstack::InfraManager) ||
           ems.kind_of?(ManageIQ::Providers::Openstack::CloudManager) ||
           ems.kind_of?(ManageIQ::Providers::Telefonica::CloudManager) ||
+          ems.kind_of?(ManageIQ::Providers::Huawei::CloudManager) ||
           ems.kind_of?(ManageIQ::Providers::Orange::CloudManager) ||
           ems.kind_of?(ManageIQ::Providers::Redhat::InfraManager)) &&
          ems.supports_authentication?(:ssh_keypair) && params[:ssh_keypair_userid]
@@ -847,7 +855,7 @@ module Mixins
     def retrieve_event_stream_selection
       return 'amqp' if @ems.connection_configurations.amqp&.endpoint&.hostname&.present?
       return 'ceilometer' if @ems.connection_configurations.ceilometer&.endpoint&.hostname&.present?
-      @ems.kind_of?(ManageIQ::Providers::Openstack::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Telefonica::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Orange::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Openstack::InfraManager) ? 'ceilometer' : 'none'
+      @ems.kind_of?(ManageIQ::Providers::Openstack::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Telefonica::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Huawei::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Orange::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Openstack::InfraManager) ? 'ceilometer' : 'none'
     end
 
     def construct_edit_for_audit(ems)

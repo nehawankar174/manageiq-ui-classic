@@ -8,6 +8,7 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
       log_aws_region: '',
       openstack_region: '',
       telefonica_region: '',
+      huawei_region: '',
       orange_region: '',
       project_name: '',
       keystone_api_version: '',
@@ -93,6 +94,7 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
       $scope.scheduleModel.log_aws_region       = data.log_aws_region;
       $scope.scheduleModel.openstack_region     = data.openstack_region;
       $scope.scheduleModel.telefonica_region     = data.telefonica_region;
+      $scope.scheduleModel.huawei_region         = data.huawei_region;
       $scope.scheduleModel.orange_region        = data.orange_region;
       $scope.scheduleModel.project_name        = data.project_name;
       $scope.scheduleModel.keystone_api_version = data.keystone_api_version;

@@ -545,6 +545,7 @@ module Mixins
       @openstack_infra_providers = retrieve_openstack_infra_providers
       @openstack_security_protocols = retrieve_openstack_security_protocols
       @telefonica_security_protocols = retrieve_telefonica_security_protocols
+      @huawei_security_protocols = retrieve_huawei_security_protocols
       @orange_security_protocols = retrieve_orange_security_protocols
       @amqp_security_protocols = retrieve_amqp_security_protocols
       @nuage_security_protocols = retrieve_nuage_security_protocols
@@ -552,6 +553,7 @@ module Mixins
       @scvmm_security_protocols = [[_('Basic (SSL)'), 'ssl'], ['Kerberos', 'kerberos']]
       @openstack_api_versions = retrieve_openstack_api_versions
       @telefonica_api_versions = retrieve_telefonica_api_versions
+      @huawei_api_versions = retrieve_huawei_api_versions
       @orange_api_versions = retrieve_orange_api_versions
       @vmware_cloud_api_versions = retrieve_vmware_cloud_api_versions
       @emstype_display = model.supported_types_and_descriptions_hash[@ems.emstype]
@@ -584,6 +586,10 @@ module Mixins
 
     def retrieve_telefonica_api_versions
       [['Keystone v2', 'v2'], ['Keystone v3', 'v3']]
+      end
+
+    def retrieve_huawei_api_versions
+      [['Keystone v2', 'v2'], ['Keystone v3', 'v3']]
     end
 
     def retrieve_orange_api_versions
@@ -607,6 +613,10 @@ module Mixins
     end
 
     def retrieve_telefonica_security_protocols
+      retrieve_security_protocols
+      end
+
+    def retrieve_huawei_security_protocols
       retrieve_security_protocols
     end
 
