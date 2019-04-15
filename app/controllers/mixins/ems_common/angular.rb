@@ -153,7 +153,7 @@ module Mixins
             end
         when 'ManageIQ::Providers::Huawei::CloudManager'
           case params[:cred_type]
-          when 'default'``
+          when 'default'
             [password, params.to_hash.symbolize_keys.slice(*HUAWEI_PARAMS)]
           when 'amqp'
             [ManageIQ::Password.encrypt(params[:amqp_password]), params.to_hash.symbolize_keys.slice(*HUAWEI_AMQP_PARAMS)]
@@ -870,7 +870,7 @@ module Mixins
       def retrieve_event_stream_selection
         return 'amqp' if @ems.connection_configurations.amqp&.endpoint&.hostname&.present?
         return 'ceilometer' if @ems.connection_configurations.ceilometer&.endpoint&.hostname&.present?
-        @ems.kind_of?(ManageIQ::Providers::Openstack::CloudManager) || (ManageIQ::Providers::Telefonica::CloudManager) || (ManageIQ::Providers::Huawei::CloudManager) || (ManageIQ::Providers::Orange::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Openstack::InfraManager) ? 'ceilometer' : 'none'
+        @ems.kind_of?(ManageIQ::Providers::Openstack::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Telefonica::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Huawei::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Orange::CloudManager) || @ems.kind_of?(ManageIQ::Providers::Openstack::InfraManager) ? 'ceilometer' : 'none'
       end
 
       def construct_edit_for_audit(ems)
