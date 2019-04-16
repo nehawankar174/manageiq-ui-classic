@@ -531,7 +531,8 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
       $scope.emsCommonModel.api_version = "v3";
       if ($scope.emsCommonModel.emstype === 'orange') {
         $scope.emsCommonModel.tenant_mapping_enabled = false;
-      } else if ($scope.emsCommonModel.emstype === 'huawei') {
+      }
+    }  else if ($scope.emsCommonModel.emstype === 'huawei') {
       $scope.emsCommonModel.default_api_port = $scope.getDefaultApiPort($scope.emsCommonModel.emstype);
       $scope.emsCommonModel.event_stream_selection = "ceilometer";
       $scope.emsCommonModel.amqp_security_protocol = 'non-ssl';
