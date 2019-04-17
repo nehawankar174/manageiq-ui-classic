@@ -3,6 +3,7 @@ module ApplicationHelper
     DTYPES = {
       'azure'           => _('Azure'),
       'ec2'             => _('Amazon'),
+      'huawei'          => _('Huawei'),
       'esx'             => _('ESX'),
       'hyperv'          => _('Hyper-V'),
       'ipmi'            => _('IPMI'),
