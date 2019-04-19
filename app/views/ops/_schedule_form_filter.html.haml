@@ -128,6 +128,18 @@
             %label.col-md-2.control-label
               = _("API Version")
             .col-md-8
+              = select_tag('keystone_api_version', options_for_select(@huawei_api_versions_options_for_select),
+                           "ng-model"                    => "scheduleModel.keystone_api_version",
+                           "ng-required"                 => "swiftSecurityProtocolRequired()",
+                           "checkchange"                 => "",
+                           "selectpicker-for-select-tag" => "")
+              %span.help-block{"ng-show" => "angularForm.keystone_api_version.$invalid"}
+
+        %apiversion{'ng-if' => 'swiftSecurityProtocolSelect()'}
+          .form-group{"ng-class" => "{'has-error': angularForm.keystone_api_version.$invalid}"}
+            %label.col-md-2.control-label
+              = _("API Version")
+            .col-md-8
               = select_tag('keystone_api_version', options_for_select(@orange_api_versions_options_for_select),
                            "ng-model"                    => "scheduleModel.keystone_api_version",
                            "ng-required"                 => "swiftSecurityProtocolRequired()",
@@ -184,6 +196,20 @@
                                 "required"                => true,
                                 "checkchange"             => ""}
             %span.help-block{"ng-show" => "angularForm.telefonica_region.$invalid"}
+              = _("Required")
+
+        .form-group{"ng-class" => "{'has-error': angularForm.huawei_region.$invalid}",
+                    "ng-if"    => 'swiftSecurityProtocolSelect()'}
+          %label.col-md-2.control-label{"for" => "ems_region_input"}
+            = _('Region')
+          .col-md-4
+            %input.form-control{"type"                    => "text",
+                                "id"                      => "huawei_region",
+                                "name"                    => "huawei_region",
+                                "ng-model"                => "scheduleModel.huawei_region",
+                                "required"                => true,
+                                "checkchange"             => ""}
+            %span.help-block{"ng-show" => "angularForm.huawei_region.$invalid"}
               = _("Required")
 
         .form-group{"ng-class" => "{'has-error': angularForm.orange_region.$invalid}",

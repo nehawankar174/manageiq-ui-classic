@@ -281,7 +281,7 @@ module HostHelper::TextualSummary
   end
 
   def textual_storage_adapters
-    return nil if @record.openstack_host? || @record.telefonica_host? || @record.orange_host?
+    return nil if @record.openstack_host? || @record.telefonica_host? || @record.huawei_host? || @record.orange_host?
     num = @record.hardware.nil? ? 0 : @record.hardware.number_of(:storage_adapters)
     h = {:label => _("Storage Adapters"), :icon => "ff ff-network-card", :value => num}
     if num.positive?
@@ -292,7 +292,7 @@ module HostHelper::TextualSummary
   end
 
   def textual_network
-    return nil if @record.openstack_host? || @record.telefonica_host? || @record.orange_host?
+    return nil if @record.openstack_host? || @record.telefonica_host? || @record.huawei_host? || @record.orange_host?
     num = @record.number_of(:switches)
     h = {:label => _("Network"), :icon => "pficon pficon-network", :value => (num.zero? ? _("N/A") : _("Available"))}
     if num.positive?
@@ -375,12 +375,12 @@ module HostHelper::TextualSummary
   end
 
   def textual_storages
-    return nil if @record.openstack_host? || @record.telefonica_host? || @record.orange_host?
+    return nil if @record.openstack_host? || @record.telefonica_host? || @record.huawei_host? || @record.orange_host?
     textual_link(@record.storages)
   end
 
   def textual_resource_pools
-    return nil if @record.openstack_host? || @record.telefonica_host? || @record.orange_host?
+    return nil if @record.openstack_host? || @record.telefonica_host? || @record.huawei_host? || @record.orange_host?
     textual_link(@record.resource_pools,
                  :as   => ResourcePool,
                  :link => url_for_only_path(:action => 'show', :id => @record, :display => 'resource_pools'))
@@ -399,7 +399,7 @@ module HostHelper::TextualSummary
   end
 
   def textual_availability_zone
-    return nil unless @record.openstack_host? || @record.telefonica_host? || @record.orange_host?
+    return nil unless @record.openstack_host? || @record.telefonica_host? || @record.huawei_host? || @record.orange_host?
     availability_zone = @record.availability_zone
     h = {:label => _('Availability Zone'),
          :icon  => "pficon pficon-zone",
@@ -412,7 +412,7 @@ module HostHelper::TextualSummary
   end
 
   def textual_used_tenants
-    return nil unless @record.openstack_host? || @record.telefonica_host? || @record.orange_host?
+    return nil unless @record.openstack_host? || @record.telefonica_host? || @record.huawei_host? || @record.orange_host?
     textual_link(@record.cloud_tenants,
                  :as   => CloudTenant,
                  :link => url_for_only_path(:action => 'show', :id => @record, :display => 'cloud_tenants'))
@@ -430,7 +430,7 @@ module HostHelper::TextualSummary
   end
 
   def textual_templates
-    return nil if @record.openstack_host? || @record.telefonica_host? || @record.orange_host?
+    return nil if @record.openstack_host? || @record.telefonica_host? || @record.huawei_host? || @record.orange_host?
     textual_link(@record.miq_templates, :label => _('Templates'))
   end
 
@@ -580,6 +580,14 @@ module HostHelper::TextualSummary
   end
 
   def telefonica_nova_scheduler_value
+    return _("Not available. Did you assigned Cloud Provider and run SSA?") if @record.cloud_services.empty?
+    "%{enabled_cnt} Enabled / %{disabled_cnt} Disabled " % {
+      :enabled_cnt  => @record.cloud_services.where(:scheduling_disabled => false).count,
+      :disabled_cnt => @record.cloud_services.where(:scheduling_disabled => true).count
+    }
+    end
+
+  def huawei_nova_scheduler_value
     return _("Not available. Did you assigned Cloud Provider and run SSA?") if @record.cloud_services.empty?
     "%{enabled_cnt} Enabled / %{disabled_cnt} Disabled " % {
       :enabled_cnt  => @record.cloud_services.where(:scheduling_disabled => false).count,
