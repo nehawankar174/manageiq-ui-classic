@@ -570,6 +570,8 @@ class CloudVolumeController < ApplicationController
       options.merge!(cinder_manager_options)
     when "ManageIQ::Providers::Amazon::StorageManager::Ebs"
       options.merge!(aws_ebs_options)
+    when "ManageIQ::Providers::Alibaba::StorageManager::Ebs"
+      options.merge!(aliyun_ebs_options)
     end
     options
   end
@@ -592,6 +594,22 @@ class CloudVolumeController < ApplicationController
     options[:availability_zone] = params[:aws_availability_zone_id] if params[:aws_availability_zone_id]
     options[:snapshot_id] = params[:aws_base_snapshot_id] if params[:aws_base_snapshot_id]
     options[:encrypted] = params[:aws_encryption]
+
+    # Get the storage manager.
+    storage_manager_id = params[:storage_manager_id] if params[:storage_manager_id]
+    options[:ems] = find_record_with_rbac(ExtManagementSystem, storage_manager_id)
+    options
+  end
+
+  def aliyun_ebs_options
+    options = {}
+    options[:volume_type] = params[:volume_type] if params[:volume_type]
+    # Only set IOPS if io1 (provisioned IOPS) and IOPS available
+    #options[:iops] = params[:aws_iops] if options[:volume_type] == 'io1' && params[:aws_iops]
+    options[:availability_zone] = params[:aliyun_availability_zone_id] if params[:aliyun_availability_zone_id]
+    options[:snapshot_id] = params[:aliyun_base_snapshot_id] if params[:aliyun_base_snapshot_id]
+    options[:encrypted] = params[:aliyun_encryption]
+
 
     # Get the storage manager.
     storage_manager_id = params[:storage_manager_id] if params[:storage_manager_id]

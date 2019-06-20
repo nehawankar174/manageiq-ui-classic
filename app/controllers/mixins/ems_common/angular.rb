@@ -168,6 +168,9 @@ module Mixins
         when 'ManageIQ::Providers::Amazon::CloudManager'
           uri = URI.parse(WEBrick::HTTPUtils.escape(params[:default_url]))
           [user, password, :EC2, params[:provider_region], ems.http_proxy_uri, true, uri]
+        when 'ManageIQ::Providers::Alibaba::CloudManager'
+          uri = URI.parse(WEBrick::HTTPUtils.escape(params[:default_url]))
+          [user, password, :ECS, params[:provider_region], ems.http_proxy_uri, true, uri]
         when 'ManageIQ::Providers::Azure::CloudManager'
           uri = URI.parse(WEBrick::HTTPUtils.escape(params[:default_url]))
           [user, password, params[:azure_tenant_id], params[:subscription], ems.http_proxy_uri, params[:provider_region], uri]

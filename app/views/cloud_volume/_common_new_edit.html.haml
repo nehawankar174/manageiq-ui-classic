@@ -49,6 +49,22 @@
     %span.help-block{"ng-show" => "angularForm.aws_availability_zone_id.$error.required"}
       = _("Required")
 
+.form-group{"ng-class" => "{'has-error': angularForm.aliyun_availability_zone_id.$invalid}",
+            "ng-if"    => "vm.cloudVolumeModel.emstype == 'ManageIQ::Providers::Alibaba::StorageManager::Ebs'"}
+  %label.col-md-2.control-label
+    = _('Availability Zone')
+  .col-md-8
+    %select{"name"        => "aliyun_availability_zone_id",
+            "ng-model"    => "vm.cloudVolumeModel.aliyun_availability_zone_id",
+            "ng-options"  => "az.ems_ref as az.name for az in vm.availabilityZoneChoices",
+            "required"    => "",
+            "ng-disabled" => "!vm.newRecord",
+            :checkchange  => true,
+            "miq-select"  => true}
+      %option{"value" => "", "disabled" => ""}
+        = "<#{_('Choose')}>"
+    %span.help-block{"ng-show" => "angularForm.aliyun_availability_zone_id.$error.required"}
+      = _("Required")
 .form-group{"ng-class" => "{'has-error': angularForm.name.$invalid}"}
   %label.col-md-2.control-label
     = _('Volume Name')
@@ -71,6 +87,24 @@
             "ng-model"    => "vm.cloudVolumeModel.volume_type",
             "ng-options"  => "voltype.type as voltype.name for voltype in vm.volumeTypes",
             "ng-change"   => "vm.awsVolumeTypeChanged(vm.cloudVolumeModel.volume_type)",
+            "ng-disabled" => "!vm.newRecord && vm.cloudVolumeModel.volume_type == 'standard'",
+            "required"    => "",
+            :checkchange  => true,
+            "miq-select"  => true}
+      %option{"value" => "", "disabled" => ""}
+        = "<#{_('Choose')}>"
+    %span.help-block{"ng-show" => "angularForm.volume_type.$error.required"}
+      = _("Required")
+
+.form-group{"ng-class" => "{'has-error': angularForm.volume_type.$invalid}",
+            "ng-if"    => "vm.cloudVolumeModel.emstype == 'ManageIQ::Providers::Alibaba::StorageManager::Ebs'"}
+  %label.col-md-2.control-label
+    = _('Cloud Volume Type')
+  .col-md-8
+    %select{"name"        => "volume_type",
+            "ng-model"    => "vm.cloudVolumeModel.volume_type",
+            "ng-options"  => "voltype.type as voltype.name for voltype in vm.volumeTypes",
+            "ng-change"   => "vm.aliyunVolumeTypeChanged(vm.cloudVolumeModel.volume_type)",
             "ng-disabled" => "!vm.newRecord && vm.cloudVolumeModel.volume_type == 'standard'",
             "required"    => "",
             :checkchange  => true,
@@ -147,6 +181,48 @@
                         :type             => "checkbox",
                         :name             => "aws_encryption",
                         'ng-model'        => "vm.cloudVolumeModel.aws_encryption",
+                        'switch-readonly' => "{{!vm.newRecord || vm.encryptionDisabled}}",
+                        'ng-disabled'     => "!vm.newRecord || vm.encryptionDisabled",
+                        :checkchange      => ""}
+.form-group{"ng-class" => "{'has-error': angularForm.aliyun_iops.$invalid}",
+            "ng-if"    => "vm.cloudVolumeModel.emstype == 'ManageIQ::Providers::Alibaba::StorageManager::Ebs'"}
+  %label.col-md-2.control-label
+    = _('IOPS')
+  .col-md-8
+    %input.form-control{:type          => "text",
+                        :name          => "aliyun_iops",
+                        'ng-model'     => "vm.cloudVolumeModel.aliyun_iops",
+                        'ng-maxlength' => 50,
+                        'ng-disabled'  => "vm.cloudVolumeModel.volume_type != 'io1'",
+                        "ng-required"  => "vm.cloudVolumeModel.volume_type == 'io1'",
+                        :checkchange   => true}
+    %span.help-block{"ng-show" => "vm.cloudVolumeModel.volume_type == 'io1' && angularForm.aliyun_iops.$error.required"}
+      = _("Required")
+
+.form-group{"ng-if" => "vm.cloudVolumeModel.emstype == 'ManageIQ::Providers::Alibaba::StorageManager::Ebs'"}
+  %label.col-md-2.control-label
+    = _('Base Snapshot')
+  .col-md-8
+    %select{"name"             => "aliyun_base_snapshot_id",
+            "ng-model"         => "vm.cloudVolumeModel.aliyun_base_snapshot_id",
+            "ng-change"        => "vm.aliyunBaseSnapshotChanged(vm.cloudVolumeModel.aliyun_base_snapshot_id)",
+            "ng-options"       => "vs.ems_ref as vs.name for vs in vm.baseSnapshotChoices",
+            "ng-disabled"      => "!vm.newRecord",
+            :checkchange       => true,
+            "data-live-search" => "true",
+            "miq-select"       => true}
+      %option{"value" => "", "enabled" => ""}
+        = _('No snapshot')
+
+.form-group{"ng-if" => "vm.cloudVolumeModel.emstype == 'ManageIQ::Providers::Alibaba::StorageManager::Ebs'"}
+  %label.col-md-2.control-label
+    = _('Encryption')
+  .col-md-8
+    %input.form-control{"bs-switch"       => "",
+                        :data             => {:on_text => _('Yes'), :off_text => _('No'), :size => 'mini'},
+                        :type             => "checkbox",
+                        :name             => "aliyun_encryption",
+                        'ng-model'        => "vm.cloudVolumeModel.aliyun_encryption",
                         'switch-readonly' => "{{!vm.newRecord || vm.encryptionDisabled}}",
                         'ng-disabled'     => "!vm.newRecord || vm.encryptionDisabled",
                         :checkchange      => ""}

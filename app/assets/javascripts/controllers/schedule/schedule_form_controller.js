@@ -6,6 +6,7 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
       filter_typ: '',
       log_userid: '',
       log_aws_region: '',
+      log_aliyun_region: '',
       openstack_region: '',
       telefonica_region: '',
       huawei_region: '',
@@ -92,6 +93,7 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
       $scope.scheduleModel.target_id       = data.target_id;
       $scope.scheduleModel.ui_attrs        = data.ui_attrs;
       $scope.scheduleModel.log_aws_region       = data.log_aws_region;
+      $scope.scheduleModel.log_aliyun_region       = data.log_aliyun_region;
       $scope.scheduleModel.openstack_region     = data.openstack_region;
       $scope.scheduleModel.telefonica_region     = data.telefonica_region;
       $scope.scheduleModel.huawei_region         = data.huawei_region;
@@ -116,7 +118,7 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
       }
 
       if (data.filter_type === null &&
-        (data.protocol !== undefined && data.protocol !== null && data.protocol !== 'Samba' && data.protocol !== 'AWS S3' && data.protocol !== 'OpenStack Swift')) {
+        (data.protocol !== undefined && data.protocol !== null && data.protocol !== 'Samba' && data.protocol !== 'AWS S3' && data.protocol !== 'Aliyun OSS' && data.protocol !== 'OpenStack Swift')) {
         $scope.scheduleModel.filter_typ = 'all';
       }
 
@@ -220,11 +222,15 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
   };
 
   $scope.credsProtocol = function() {
-    return $scope.dbBackup() && ($scope.scheduleModel.log_protocol === 'Samba' || $scope.scheduleModel.log_protocol === 'AWS S3' || $scope.scheduleModel.log_protocol === 'OpenStack Swift');
+    return $scope.dbBackup() && ($scope.scheduleModel.log_protocol === 'Samba' || $scope.scheduleModel.log_protocol === 'AWS S3' || $scope.scheduleModel.log_protocol === 'Aliyun OSS' || $scope.scheduleModel.log_protocol === 'OpenStack Swift');
   };
 
   $scope.s3Backup = function() {
     return $scope.dbBackup() && $scope.scheduleModel.log_protocol === 'AWS S3';
+  };
+
+  $scope.s3Backup = function() {
+    return $scope.dbBackup() && $scope.scheduleModel.log_protocol === 'Aliyun OSS';
   };
 
   $scope.swiftBackup = function() {
@@ -318,6 +324,11 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
     if ($scope.scheduleModel.log_protocol === 'AWS S3') {
       $scope.updateLogProtocol('s3');
     }
+
+    if ($scope.scheduleModel.log_protocol === 'Aliyun OSS') {
+      $scope.updateLogProtocol('oss');
+    }
+
     if ($scope.scheduleModel.log_protocol === 'OpenStack Swift') {
       $scope.updateLogProtocol('swift');
     }
@@ -405,8 +416,16 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
     return $scope.scheduleModel.log_protocol === 'AWS S3';
   };
 
+  $scope.regionSelect = function() {
+    return $scope.scheduleModel.log_protocol === 'Aliyun OSS';
+  };
+
   $scope.regionRequired = function() {
     return ($scope.s3Backup() && $scope.scheduleModel.log_aws_region === '');
+  };
+
+  $scope.aliyunRegionRequired = function() {
+    return ($scope.ossBackup() && $scope.scheduleModel.log_aliyun_region === '');
   };
 
   $scope.swiftSecurityProtocolSelect = function() {

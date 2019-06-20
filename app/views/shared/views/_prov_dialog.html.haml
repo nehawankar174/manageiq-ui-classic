@@ -78,7 +78,7 @@
         :prefix                     => "/miq_request/",
         :keys                       => keys})
   - when :environment
-    - keys = [:placement_auto]
+    - keys = wf.kind_of?(ManageIQ::Providers::Alibaba::CloudManager::ProvisionWorkflow) ? [:placement_auto, :placement_start] :[:placement_auto]
     = render(:partial => "/miq_request/prov_dialog_fieldset",
       :locals         => {:workflow => wf,
         :dialog                     => dialog,

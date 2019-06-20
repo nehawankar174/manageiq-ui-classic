@@ -711,6 +711,10 @@ module OpsController::Settings::Schedules
     ManageIQ::Providers::Amazon::Regions::REGIONS.collect { |region| [region[1][:name]] }
   end
 
+  def retrieve_aliyun_regions
+    ManageIQ::Providers::Alibaba::Regions::REGIONS.collect { |region| [region[1][:name]] }
+  end
+
   def retrieve_openstack_api_versions
     [['Keystone v2', 'v2'], ['Keystone v3', 'v3']]
   end

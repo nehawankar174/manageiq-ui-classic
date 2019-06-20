@@ -313,7 +313,7 @@ ManageIQ.angular.app.controller('emsCommonFormController', ['$http', '$scope', '
 
   $scope.isBasicInfoValid = function() {
     if (($scope.currentTab === 'default' && $scope.emsCommonModel.emstype !== 'azure') &&
-      ($scope.emsCommonModel.emstype === 'ec2' ||
+      ($scope.emsCommonModel.emstype === 'ec2' || $scope.emsCommonModel.emstype === 'alibaba' ||
        ['kubevirt', 'nuage_network', 'openstack', 'openstack_infra', 'rhevm', 'scvmm', 'vmwarews', 'vmware_cloud', 'telefonica', 'huawei', 'orange'].includes($scope.emsCommonModel.emstype) &&
        $scope.emsCommonModel.default_hostname) &&
       ($scope.emsCommonModel.default_userid !== '' && $scope.angularForm.default_userid !== undefined && $scope.angularForm.default_userid.$valid &&

@@ -209,6 +209,22 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     }, 0);
   };
 
+  vm.alibabaBaseSnapshotChanged = function(baseSnapshotId) {
+    vm.encryptionDisabled = false;
+    $timeout(function() {
+      if (baseSnapshotId) {
+        for (var i = 0; i < vm.baseSnapshotChoices.length; i++) {
+          if (vm.baseSnapshotChoices[i].ems_ref === baseSnapshotId) {
+            vm.cloudVolumeModel.alibaba_encryption = vm.baseSnapshotChoices[i].encrypted === true;
+            vm.encryptionDisabled = true;
+          }
+        }
+      } else {
+        vm.cloudVolumeModel.alibaba_encryption = false;
+      }
+    }, 0);
+  };
+
   function setForm() {
     if (vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Amazon::StorageManager::Ebs') {
       loadEBSVolumeTypes();
@@ -242,6 +258,23 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     }
   };
 
+  var loadAlibabaEBSVolumeTypes = function() {
+    // This ia a fixed list of available cloud volume types for Alibaba EBS.
+    vm.volumeTypes = [
+      { type: 'cloud', name: __('Cloud') },
+      { type: 'cloud_ssd', name: __('Cloud SSD') },
+      { type: 'cloud_efficiency', name: __('Cloud Efficiency') },
+    ];
+
+    // Standard volume type is available only when creating new volume or editing
+    // an existing standard volume. In the latter case, it is only available so
+    // that the "Magnetic (standard)" option can be picked in the select that is
+    // otherwise disabled.
+    // if (vm.newRecord || vm.cloudVolumeModel.volume_type === 'standard') {
+    //   vm.volumeTypes.push({ type: 'standard', name: __('Magnetic') });
+    // }
+  };
+
   var getStorageManagers = function(data) {
     // Can handle list of all managers or a single manager.
     vm.storageManagers = data.resources ? data.resources : [data];
@@ -259,6 +292,8 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     vm.cloudVolumeModel.aws_availability_zone_id = data.availability_zone.ems_ref;
     vm.cloudVolumeModel.aws_encryption = data.encrypted;
     vm.cloudVolumeModel.aws_iops = data.iops;
+    vm.cloudVolumeModel.alibaba_availability_zone_id = data.availability_zone.ems_ref;
+    vm.cloudVolumeModel.alibaba_encryption = data.encrypted;
 
     // If volume was created from snapshot and this snapshot still exists
     if (data.base_snapshot) {
@@ -282,6 +317,8 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
       vm.volumeTypes = data.parent_manager.cloud_volume_types;
     } else if (vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Amazon::StorageManager::Ebs') {
       loadEBSVolumeTypes();
+    } else if (vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Alibaba::StorageManager::Ebs') {
+      loadAlibabaEBSVolumeTypes();
     }
     miqService.sparkleOff();
   };

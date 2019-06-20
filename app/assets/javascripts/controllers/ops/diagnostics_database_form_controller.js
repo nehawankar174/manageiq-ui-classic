@@ -137,6 +137,10 @@ ManageIQ.angular.app.controller('diagnosticsDatabaseFormController', ['$http', '
     return miqDBBackupService.awsRegionRequired(vm.diagnosticsDatabaseModel, value);
   };
 
+  vm.alibabaRegionRequired = function(value) {
+    return miqDBBackupService.alibabaRegionRequired(vm.diagnosticsDatabaseModel, value);
+  };
+
   function postdiagnosticsDatabaseFormData(response) {
     var data = response.data;
 

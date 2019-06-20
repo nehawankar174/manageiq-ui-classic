@@ -236,6 +236,18 @@
                      "selectpicker-for-select-tag" => "")
         %span.help-block{"ng-show" => "angularForm.log_aws_region.$invalid"}
           = _("Required")
+  %region{'ng-if' => 'vm.regionSelect()'}
+    .form-group{"ng-class" => "{'has-error': angularForm.log_aliyun_region.$invalid}"}
+      %label.col-md-2.control-label
+        = _("Aliyun Region")
+      .col-md-8
+        - default_option = [_("<Choose>"), '']
+        = select_tag('log_aliyun_region', options_for_select([default_option] + @aliyun_regions_options_for_select),
+                     "ng-model"                    => "vm.diagnosticsDatabaseModel.log_aliyun_region",
+                     "ng-required"                 => "vm.aliyunRegionRequired()",
+                     "selectpicker-for-select-tag" => "")
+        %span.help-block{"ng-show" => "angularForm.log_aliyun_region.$invalid"}
+          = _("Required")
   %protocol{'ng-if' => 'vm.swiftSecurityProtocolSelect()'}
     .form-group{"ng-class" => "{'has-error': angularForm.security_protocol.$invalid}"}
       %label.col-md-2.control-label

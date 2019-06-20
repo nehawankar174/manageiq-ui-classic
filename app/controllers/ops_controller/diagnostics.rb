@@ -276,6 +276,7 @@ module OpsController::Diagnostics
       :uri_prefix           => uri_prefix,
       :log_userid           => depot.try(:authentication_userid),
       :log_aws_region       => depot.try(:aws_region),
+      :log_aliyun_region       => depot.try(:aliyun_region),
       :openstack_region     => depot.try(:openstack_region),
       :telefonica_region     => depot.try(:telefonica_region),
       :huawei_region         => depot.try(:huawei_region),
@@ -897,7 +898,7 @@ module OpsController::Diagnostics
   def build_supported_depots_for_select
     depots_for_select = FileDepot.supported_depots.values.sort
     # S3 and Swift not currently supported for Log Collection
-    not_supported_depots = ["AWS S3", "OpenStack Swift"]
+    not_supported_depots = ["AWS S3", "Aliyun OSS", "OpenStack Swift"]
     @supported_depots_for_select = depots_for_select - not_supported_depots
   end
 
