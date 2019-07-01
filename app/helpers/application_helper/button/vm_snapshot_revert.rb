@@ -2,8 +2,8 @@ class ApplicationHelper::Button::VmSnapshotRevert < ApplicationHelper::Button::B
   needs :@record, :@active
 
   def visible?
-    # Click2Cloud: Added telefonica, huawei and orange cloudmanager condition
-    return false if @record.kind_of?(ManageIQ::Providers::Openstack::CloudManager::Vm) || @record.kind_of?(ManageIQ::Providers::Telefonica::CloudManager::Vm) || @record.kind_of?(ManageIQ::Providers::Huawei::CloudManager::Vm) || @record.kind_of?(ManageIQ::Providers::Orange::CloudManager::Vm)
+    # Click2Cloud: Added telefonica, huawei, otc and orange cloudmanager condition
+    return false if @record.kind_of?(ManageIQ::Providers::Openstack::CloudManager::Vm) || @record.kind_of?(ManageIQ::Providers::Telefonica::CloudManager::Vm) || @record.kind_of?(ManageIQ::Providers::Huawei::CloudManager::Vm) || @record.kind_of?(ManageIQ::Providers::Otc::CloudManager::Vm) || @record.kind_of?(ManageIQ::Providers::Orange::CloudManager::Vm)
     super
   end
 

@@ -14,6 +14,7 @@ ManageIQ.angular.app.controller('diagnosticsDatabaseFormController', ['$http', '
       openstack_region: '',
       telefonica_region: '',
       huawei_region: '',
+      otc_region: '',
       orange_region: '',
       project_name: '',
       keystone_api_version: '',
@@ -48,6 +49,7 @@ ManageIQ.angular.app.controller('diagnosticsDatabaseFormController', ['$http', '
       vm.diagnosticsDatabaseModel.openstack_region = '';
       vm.diagnosticsDatabaseModel.telefonica_region = '';
       vm.diagnosticsDatabaseModel.huawei_region = '';
+      vm.diagnosticsDatabaseModel.otc_region = '';
       vm.diagnosticsDatabaseModel.orange_region = '';
       vm.diagnosticsDatabaseModel.project_name = '';
       vm.diagnosticsDatabaseModel.keystone_api_version = '';
@@ -157,6 +159,7 @@ ManageIQ.angular.app.controller('diagnosticsDatabaseFormController', ['$http', '
       vm.diagnosticsDatabaseModel.openstack_region     = data.openstack_region;
       vm.diagnosticsDatabaseModel.telefonica_region     = data.telefonica_region;
       vm.diagnosticsDatabaseModel.huawei_region         = data.huawei_region;
+      vm.diagnosticsDatabaseModel.otc_region         = data.otc_region;
       vm.diagnosticsDatabaseModel.orange_region         = data.orange_region;
       vm.diagnosticsDatabaseModel.project_name         = data.project_name;
       vm.diagnosticsDatabaseModel.keystone_api_version = data.keystone_api_version;

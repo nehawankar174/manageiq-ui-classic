@@ -1,8 +1,8 @@
 class ApplicationHelper::Button::InstanceDetach < ApplicationHelper::Button::Basic
   def visible?
     # FIXME: feature for attach/detach is missing, testing class for now
-    # Click2Cloud: Added telefonica, huawei and orange cloudmanager condition
-    @record.kind_of?(ManageIQ::Providers::Openstack::CloudManager::Vm || ManageIQ::Providers::Telefonica::CloudManager::Vm || ManageIQ::Providers::Huawei::CloudManager::Vm || ManageIQ::Providers::Orange::CloudManager::Vm)
+    # Click2Cloud: Added telefonica, huawei, otc and orange cloudmanager condition
+    @record.kind_of?(ManageIQ::Providers::Openstack::CloudManager::Vm || ManageIQ::Providers::Telefonica::CloudManager::Vm || ManageIQ::Providers::Huawei::CloudManager::Vm || ManageIQ::Providers::Otc::CloudManager::Vm || ManageIQ::Providers::Orange::CloudManager::Vm)
   end
 
   def disabled?

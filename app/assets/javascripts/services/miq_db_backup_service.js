@@ -83,6 +83,7 @@ ManageIQ.angular.app.service('miqDBBackupService', function() {
     model.openstack_region = null;
     model.telefonica_region = null;
     model.huawei_region = null;
+    model.otc_region = null;
     model.orange_region = null;
     model.project_name = null;
     model.keystone_api_version = null;

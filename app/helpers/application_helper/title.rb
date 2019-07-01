@@ -123,7 +123,7 @@ module ApplicationHelper
       title_for_host(true)
     end
 
-    # Click2Cloud: Added telefonica/orange/huawei condition for host title
+    # Click2Cloud: Added telefonica/orange/huawei/otc condition for host title
     def title_for_host(plural = false)
       case Host.node_types
       when :non_openstack
@@ -135,6 +135,8 @@ module ApplicationHelper
       when :orange
         plural ? _("Nodes") : _("Node")
       when :huawei
+        plural ? _("Nodes") : _("Node")
+      when :otc
         plural ? _("Nodes") : _("Node")
       else
         plural ? _("Hosts / Nodes") : _("Host / Node")
@@ -155,6 +157,8 @@ module ApplicationHelper
       when :telefonica
         plural ? _("Deployment Roles") : _("Deployment Role")
       when :huawei
+        plural ? _("Deployment Roles") : _("Deployment Role")
+      when :otc
         plural ? _("Deployment Roles") : _("Deployment Role")
       when :orange
         plural ? _("Deployment Roles") : _("Deployment Role")

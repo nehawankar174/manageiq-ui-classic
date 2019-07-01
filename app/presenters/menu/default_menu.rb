@@ -96,7 +96,7 @@ module Menu
         ])
       end
 
-      # Click2Cloud: Added telefonica/orange/huawei hybrid name
+      # Click2Cloud: Added telefonica/orange/huawei/otc hybrid name
       def hybrid_name(klass, name1, name2, name3)
         lambda do
           case klass.node_types
@@ -104,6 +104,7 @@ module Menu
           when :openstack     then name2
           when :telefonica     then name2
           when :huawei         then name2
+          when :otc         then name2
           when :orange         then name2
           else                     name3
           end
