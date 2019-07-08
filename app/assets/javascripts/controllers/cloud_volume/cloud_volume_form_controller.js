@@ -7,6 +7,7 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     vm.cloudVolumeModel = {
       name: '',
       aws_encryption: false,
+      aliyun_encryption: false,
       incremental: false,
       force: false,
       storage_manager_id: storageManagerId,
@@ -154,6 +155,19 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
         }
       }
     }
+
+    if (vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Alibaba::StorageManager::Ebs') {
+      // Dynamically update the Alibaba IOPS only if Cloud SSD volume type is selected.
+      if (vm.cloudVolumeModel.volume_type === 'cloud_ssd') {
+        var volumeSize = parseInt(size, 10);
+
+        if (isNaN(volumeSize)) {
+          vm.cloudVolumeModel.aliyun_iops = null;
+        } else {
+          vm.cloudVolumeModel.aliyun_iops = Math.max(100, Math.min(volumeSize * 3, 10000));
+        }
+      }
+    }
   };
 
   vm.awsVolumeTypeChanged = function(voltype) {
@@ -183,14 +197,41 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     }
   };
 
+  vm.aliyunVolumeTypeChanged = function(voltype) {
+    // The requested number of I/O operations per second that the volume can
+    // support. For Provisioned IOPS (SSD) volumes, you can provision up to 50
+    // IOPS per GiB. For General Purpose (SSD) volumes, baseline performance is
+    // 3 IOPS per GiB, with a minimum of 100 IOPS and a maximum of 10000 IOPS.
+    // General Purpose (SSD) volumes under 1000 GiB can burst up to 3000 IOPS
+
+    switch (voltype) {
+      case 'cloud_ssd':
+      case 'cloud_efficiency':
+        var volumeSize = parseInt(vm.cloudVolumeModel.size, 10);
+        if (isNaN(volumeSize)) {
+          vm.cloudVolumeModel.aliyun_iops = '';
+        } else if (voltype === 'cloud_ssd') {
+          vm.cloudVolumeModel.aliyun_iops = Math.max(100, Math.min(volumeSize * 3, 10000));
+        } else {
+          // Default ratio is 50 IOPS per 1 GiB. 20000 IOPS is the max.
+          vm.cloudVolumeModel.aliyun_iops = Math.min(volumeSize * 50, 20000);
+        }
+        break;
+
+      default:
+        vm.cloudVolumeModel.aliyun_iops = __('Not Applicable');
+        break;
+    }
+  };
+
   vm.canModifyVolumeSize = function() {
     // Volume size can be modified when adding a new cloud volume or when
     // editin Amazon EBS volume whose type is not magnetic (all other volume types
     // can be resized on the fly).
     return vm.newRecord ||
-      (vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Amazon::StorageManager::Ebs' &&
+      ((vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Amazon::StorageManager::Ebs' || vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Alibaba::StorageManager::Ebs') &&
         vm.cloudVolumeModel.volume_type !== 'standard') ||
-        vm.supportsVolumeResizing;
+      vm.supportsVolumeResizing;
   };
 
   vm.awsBaseSnapshotChanged = function(baseSnapshotId) {
@@ -230,6 +271,11 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
       loadEBSVolumeTypes();
     }
 
+    if (vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Alibaba::StorageManager::Ebs') {
+      loadAlibabaEBSVolumeTypes();
+      loadAlibabaEBSVolumeCategory();
+    }
+
     vm.modelCopy = angular.copy(vm.cloudVolumeModel);
     vm.afterGet = true;
     miqService.sparkleOff();
@@ -261,8 +307,8 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
   var loadAlibabaEBSVolumeTypes = function() {
     // This ia a fixed list of available cloud volume types for Alibaba EBS.
     vm.volumeTypes = [
-      { type: 'cloud_ssd', name: __('Cloud SSD') },
-      { type: 'cloud_efficiency', name: __('Cloud Efficiency') },
+      { type: 'data', name: __('Data') },
+      { type: 'system', name: __('System') },
     ];
 
     // Standard volume type is available only when creating new volume or editing
@@ -273,6 +319,14 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     //   vm.volumeTypes.push({ type: 'standard', name: __('Magnetic') });
     // }
   };
+
+  var loadAlibabaEBSVolumeCategory = function() {
+    vm.volumeCategory = [
+      { type: 'cloud_ssd', name: __('Cloud SSD') },
+      { type: 'cloud_efficiency', name: __('Cloud Efficiency') },
+    ];
+  };
+
 
   var getStorageManagers = function(data) {
     // Can handle list of all managers or a single manager.
@@ -286,21 +340,28 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     vm.cloudVolumeModel.size = data.size / 1073741824;
     vm.cloudVolumeModel.cloud_tenant_id = data.cloud_tenant_id;
     vm.cloudVolumeModel.volume_type = data.volume_type;
+    vm.cloudVolumeModel.volume_category = data.volume_category;
     // Currently, this is only relevant for AWS volumes so we are prefixing the
     // model attribute with AWS.
     vm.cloudVolumeModel.aws_availability_zone_id = data.availability_zone.ems_ref;
     vm.cloudVolumeModel.aws_encryption = data.encrypted;
     vm.cloudVolumeModel.aws_iops = data.iops;
+    vm.cloudVolumeModel.aliyun_iops = data.iops;
     vm.cloudVolumeModel.aliyun_availability_zone_id = data.availability_zone.ems_ref;
     vm.cloudVolumeModel.aliyun_encryption = data.encrypted;
 
     // If volume was created from snapshot and this snapshot still exists
     if (data.base_snapshot) {
       vm.cloudVolumeModel.aws_base_snapshot_id = data.base_snapshot.ems_ref;
+      vm.cloudVolumeModel.aliyun_base_snapshot_id = data.base_snapshot.ems_ref;
     }
 
     // Update the IOPS based on the current volume size.
     if (angular.isUndefined(vm.cloudVolumeModel.aws_iops)) {
+      vm.sizeChanged(vm.cloudVolumeModel.size);
+    }
+
+    if (angular.isUndefined(vm.cloudVolumeModel.aliyun_iops)) {
       vm.sizeChanged(vm.cloudVolumeModel.size);
     }
   };
@@ -318,6 +379,7 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
       loadEBSVolumeTypes();
     } else if (vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Alibaba::StorageManager::Ebs') {
       loadAlibabaEBSVolumeTypes();
+      loadAlibabaEBSVolumeCategory();
     }
     miqService.sparkleOff();
   };

@@ -9,7 +9,6 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
       log_aliyun_region: '',
       openstack_region: '',
       telefonica_region: '',
-      huawei_region: '',
       otc_region: '',
       orange_region: '',
       project_name: '',
@@ -97,8 +96,7 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
       $scope.scheduleModel.log_aliyun_region       = data.log_aliyun_region;
       $scope.scheduleModel.openstack_region     = data.openstack_region;
       $scope.scheduleModel.telefonica_region     = data.telefonica_region;
-      $scope.scheduleModel.huawei_region         = data.huawei_region;
-      $scope.scheduleModel.otc_region         = data.otc_region;
+      $scope.scheduleModel.otc_region           = data.otc_region;
       $scope.scheduleModel.orange_region        = data.orange_region;
       $scope.scheduleModel.project_name        = data.project_name;
       $scope.scheduleModel.keystone_api_version = data.keystone_api_version;
@@ -231,7 +229,7 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
     return $scope.dbBackup() && $scope.scheduleModel.log_protocol === 'AWS S3';
   };
 
-  $scope.s3Backup = function() {
+  $scope.ossBackup = function() {
     return $scope.dbBackup() && $scope.scheduleModel.log_protocol === 'Aliyun OSS';
   };
 
@@ -442,6 +440,10 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
     return $scope.s3Backup() && !value;
   };
 
+  $scope.ossRequired = function(value) {
+    return $scope.ossBackup() && !value;
+  };
+
   $scope.isBasicInfoValid = function() {
     return ($scope.angularForm.depot_name.$valid &&
       $scope.angularForm.uri.$valid &&
@@ -471,9 +473,9 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
 
   $scope.validateFieldsDirty = function() {
     return ($scope.angularForm.depot_name.$dirty ||
-        $scope.angularForm.uri.$dirty ||
-        $scope.angularForm.log_userid.$dirty ||
-        $scope.angularForm.log_password.$dirty);
+      $scope.angularForm.uri.$dirty ||
+      $scope.angularForm.log_userid.$dirty ||
+      $scope.angularForm.log_password.$dirty);
   };
 
   $scope.setInstanceName = function(instanceName) {
