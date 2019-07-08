@@ -261,7 +261,6 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
   var loadAlibabaEBSVolumeTypes = function() {
     // This ia a fixed list of available cloud volume types for Alibaba EBS.
     vm.volumeTypes = [
-      { type: 'cloud', name: __('Cloud') },
       { type: 'cloud_ssd', name: __('Cloud SSD') },
       { type: 'cloud_efficiency', name: __('Cloud Efficiency') },
     ];
@@ -292,8 +291,8 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     vm.cloudVolumeModel.aws_availability_zone_id = data.availability_zone.ems_ref;
     vm.cloudVolumeModel.aws_encryption = data.encrypted;
     vm.cloudVolumeModel.aws_iops = data.iops;
-    vm.cloudVolumeModel.alibaba_availability_zone_id = data.availability_zone.ems_ref;
-    vm.cloudVolumeModel.alibaba_encryption = data.encrypted;
+    vm.cloudVolumeModel.aliyun_availability_zone_id = data.availability_zone.ems_ref;
+    vm.cloudVolumeModel.aliyun_encryption = data.encrypted;
 
     // If volume was created from snapshot and this snapshot still exists
     if (data.base_snapshot) {
