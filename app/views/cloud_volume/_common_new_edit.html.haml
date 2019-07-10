@@ -105,7 +105,7 @@
             "ng-model"    => "vm.cloudVolumeModel.volume_type",
             "ng-options"  => "voltype.type as voltype.name for voltype in vm.volumeTypes",
             "ng-change"   => "vm.aliyunVolumeTypeChanged(vm.cloudVolumeModel.volume_type)",
-            "disabled"    => @storage_manager.present? || @volume.try(:id).present?,
+            "disabled"    => (@storage_manager.present? || @volume.try(:id).present?) ? true : false,
             "required"    => "",
             :checkchange  => true,
             "miq-select"  => true}
@@ -125,7 +125,7 @@
             "ng-options"  => "volcategory.name as volcategory.name for volcategory in vm.volumeCategory",
             "ng-change"   => "vm.loadAlibabaEBSVolumeCategory(vm.cloudVolumeModel.volume_category)",
             "ng-disabled" => "!vm.newRecord",
-            "required"    => "",
+            "required"    => (@storage_manager.present? || @volume.try(:id).present?) ? false : true,
             :checkchange  => true,
             "miq-select"  => true}
       %option{"value" => "", "disabled" => ""}
