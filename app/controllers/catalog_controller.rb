@@ -1125,7 +1125,7 @@ class CatalogController < ApplicationController
       ManageIQ::Providers::Otc::CloudManager::OrchestrationTemplate
       ManageIQ::Providers::Orange::CloudManager::OrchestrationTemplate
       ManageIQ::Providers::Amazon::CloudManager::OrchestrationTemplate
-        ManageIQ::Providers::Alibaba::CloudManager::OrchestrationTemplate
+      ManageIQ::Providers::Alibaba::CloudManager::OrchestrationTemplate
       ManageIQ::Providers::Azure::CloudManager::OrchestrationTemplate
       ManageIQ::Providers::Openstack::CloudManager::VnfdTemplate
       ManageIQ::Providers::Telefonica::CloudManager::VnfdTemplate

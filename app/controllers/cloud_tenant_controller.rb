@@ -75,7 +75,7 @@ class CloudTenantController < ApplicationController
         tenant_choice_id = ems.id.to_s + ":" + ems_cloud_tenant.id.to_s
         @ems_choices[tenant_choice_name] = tenant_choice_id
       end
-      end
+    end
     Rbac::Filterer.filtered(ManageIQ::Providers::Huawei::CloudManager).each do |ems|
       @ems_choices[ems.name] = ems.id
       # keystone v3 allows for hierarchical tenants
