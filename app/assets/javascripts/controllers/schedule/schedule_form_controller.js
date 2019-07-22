@@ -229,7 +229,7 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
     return $scope.dbBackup() && $scope.scheduleModel.log_protocol === 'AWS S3';
   };
 
-  $scope.s3Backup = function() {
+  $scope.ossBackup = function() {
     return $scope.dbBackup() && $scope.scheduleModel.log_protocol === 'Aliyun OSS';
   };
 
@@ -439,12 +439,16 @@ ManageIQ.angular.app.controller('scheduleFormController', ['$http', '$scope', 's
   $scope.s3Required = function(value) {
     return $scope.s3Backup() && !value;
   };
+  
+  $scope.ossRequired = function(value) {
+    return $scope.ossBackup() && !value;
+  };
 
   $scope.isBasicInfoValid = function() {
     return ($scope.angularForm.depot_name.$valid &&
-      $scope.angularForm.uri.$valid &&
-      $scope.angularForm.log_userid.$valid &&
-      $scope.angularForm.log_password.$valid);
+     $scope.angularForm.uri.$valid &&
+     $scope.angularForm.log_userid.$valid &&
+     $scope.angularForm.log_password.$valid);
   };
 
   $scope.setTimerType = function() {
