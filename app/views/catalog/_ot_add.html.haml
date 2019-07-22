@@ -33,6 +33,7 @@
         .col-md-8
           = select_tag("type",
                        options_for_select({"Amazon CloudFormation" => "ManageIQ::Providers::Amazon::CloudManager::OrchestrationTemplate",
+                                           "Alibaba CloudFormation"=> "ManageIQ::Providers::Alibaba::CloudManager::OrchestrationTemplate",
                                            "OpenStack Heat"        => "ManageIQ::Providers::Openstack::CloudManager::OrchestrationTemplate",
                                            "Telefonica Heat"       => "ManageIQ::Providers::Telefonica::CloudManager::OrchestrationTemplate",
                                            "Huawei Heat"           => "ManageIQ::Providers::Huawei::CloudManager::OrchestrationTemplate",
