@@ -700,6 +700,7 @@ module OpsController::Settings::Schedules
     DatabaseBackup.supported_depots.each { |depot| @protocols_arr.push(depot[1]) }
     @database_backup_options_for_select = @protocols_arr.sort
     @regions_options_for_select = retrieve_aws_regions
+    @regions_options_for_select = retrieve_aliyun_regions
     @api_versions_options_for_select = retrieve_openstack_api_versions
     @telefonica_api_versions_options_for_select = retrieve_telefonica_api_versions
     @huawei_api_versions_options_for_select = retrieve_huawei_api_versions
