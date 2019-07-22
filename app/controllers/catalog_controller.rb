@@ -52,6 +52,7 @@ class CatalogController < ApplicationController
 # Click2Cloud: Added orange orchestration and vnfd template
   ORCHESTRATION_TEMPLATES_NODES = {
     'ManageIQ::Providers::Amazon::CloudManager::OrchestrationTemplate'    => "otcfn",
+    'ManageIQ::Providers::Alibaba::CloudManager::OrchestrationTemplate'    => "otcfn",
     'ManageIQ::Providers::Openstack::CloudManager::OrchestrationTemplate' => "othot",
     'ManageIQ::Providers::Telefonica::CloudManager::OrchestrationTemplate' => "otthot",
     'ManageIQ::Providers::Huawei::CloudManager::OrchestrationTemplate'     => "ohthot",
@@ -1120,6 +1121,7 @@ class CatalogController < ApplicationController
       ManageIQ::Providers::Huawei::CloudManager::OrchestrationTemplate
       ManageIQ::Providers::Orange::CloudManager::OrchestrationTemplate
       ManageIQ::Providers::Amazon::CloudManager::OrchestrationTemplate
+      ManageIQ::Providers::Alibaba::CloudManager::OrchestrationTemplate
       ManageIQ::Providers::Azure::CloudManager::OrchestrationTemplate
       ManageIQ::Providers::Openstack::CloudManager::VnfdTemplate
       ManageIQ::Providers::Telefonica::CloudManager::VnfdTemplate
