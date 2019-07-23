@@ -3301,6 +3301,35 @@ Rails.application.routes.draw do
                pre_prov_post +
                snap_post
     },
+
+
+    :firmware_registry => {
+      :get => %w[
+        download_data
+        download_summary_pdf
+        show
+        show_list
+      ],
+      :post => %w[
+        show_list
+      ]
+    },
+
+    :firmware_binary => {
+      :get => %w[
+        download_data
+        download_summary_pdf
+        show
+      ]
+    },
+
+    :firmware_target => {
+      :get => %w[
+        download_data
+        download_summary_pdf
+        show
+      ]
+    },
   }
 
   if Rails.env.development?
