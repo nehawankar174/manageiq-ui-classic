@@ -527,6 +527,7 @@ class TreeBuilder
   # Click2Cloud: Added telefonica cloudmanager templates prefix
   # Click2Cloud: Added orange cloudmanager templates prefix
   # Click2Cloud: Added huawei cloudmanager templates prefix
+  # Click2Cloud: Added otc cloudmanager templates prefix
   # Tree node prefixes for generic explorers
   X_TREE_NODE_PREFIXES = {
     "a"    => "MiqAction",
@@ -573,6 +574,7 @@ class TreeBuilder
     "hot"  => "ManageIQ::Providers::Openstack::CloudManager::OrchestrationTemplate",
     "thot"  => "ManageIQ::Providers::Telefonica::CloudManager::OrchestrationTemplate",
     "hhot"  => "ManageIQ::Providers::Huawei::CloudManager::OrchestrationTemplate",
+    "chot"  => "ManageIQ::Providers::Otc::CloudManager::OrchestrationTemplate",
     "ohot"  => "ManageIQ::Providers::Orange::CloudManager::OrchestrationTemplate",
     "isd"  => "IsoDatastore",
     "isi"  => "IsoImage",
@@ -615,6 +617,7 @@ class TreeBuilder
     "vnf"  => "ManageIQ::Providers::Openstack::CloudManager::VnfdTemplate",
     "tvnf"  => "ManageIQ::Providers::Telefonica::CloudManager::VnfdTemplate",
     "hvnf"  => "ManageIQ::Providers::Huawei::CloudManager::VnfdTemplate",
+    "cvnf"  => "ManageIQ::Providers::Otc::CloudManager::VnfdTemplate",
     "ovnf"  => "ManageIQ::Providers::Orange::CloudManager::VnfdTemplate",
     "wi"   => "WindowsImage",
     "xx"   => "Hash", # For custom (non-CI) nodes, specific to each tree

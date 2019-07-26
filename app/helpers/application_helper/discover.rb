@@ -5,6 +5,7 @@ module ApplicationHelper
       'ec2'             => _('Amazon'),
       'alibaba'         => _('Alibaba'),
       'huawei'          => _('Huawei'),
+      'otc'             => _('Otc'),
       'esx'             => _('ESX'),
       'hyperv'          => _('Hyper-V'),
       'ipmi'            => _('IPMI'),

@@ -280,6 +280,7 @@ module OpsController::Diagnostics
       :openstack_region     => depot.try(:openstack_region),
       :telefonica_region     => depot.try(:telefonica_region),
       :huawei_region         => depot.try(:huawei_region),
+      :otc_region            => depot.try(:otc_region),
       :orange_region         => depot.try(:orange_region),
       :project_name         => depot.try(:project_name),
       :keystone_api_version => depot.try(:keystone_api_version),

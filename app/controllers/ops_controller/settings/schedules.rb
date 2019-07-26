@@ -100,6 +100,7 @@ module OpsController::Settings::Schedules
       @openstack_region     = depot.try(:openstack_region)
       @telefonica_region    = depot.try(:telefonica_region)
       @huawei_region        = depot.try(:huawei_region)
+      @otc_region           = depot.try(:otc_region)
       @orange_region        = depot.try(:orange_region)
       @project_name        = depot.try(:project_name)
       @keystone_api_version = depot.try(:keystone_api_version)
@@ -137,6 +138,7 @@ module OpsController::Settings::Schedules
       openstack_region     = depot.try(:openstack_region)
       telefonica_region    = depot.try(:telefonica_region)
       huawei_region        = depot.try(:huawei_region)
+      otc_region           = depot.try(:otc_region)
       orange_region        = depot.try(:orange_region)
       project_name         = depot.try(:project_name)
       keystone_api_version = depot.try(:keystone_api_version)
@@ -183,6 +185,7 @@ module OpsController::Settings::Schedules
       :openstack_region     => openstack_region ? openstack_region : "",
       :telefonica_region    => telefonica_region ? telefonica_region : "",
       :huawei_region        => huawei_region ? huawei_region : "",
+      :otc_region           => otc_region ? otc_region : "",
       :orange_region        => orange_region ? orange_region : "",
       :project_name         => project_name ? project_name : "",
       :keystone_api_version => keystone_api_version,
@@ -700,10 +703,11 @@ module OpsController::Settings::Schedules
     DatabaseBackup.supported_depots.each { |depot| @protocols_arr.push(depot[1]) }
     @database_backup_options_for_select = @protocols_arr.sort
     @regions_options_for_select = retrieve_aws_regions
-    @regions_options_for_select = retrieve_aliyun_regions
+    @aliyun_regions_options_for_select = retrieve_aliyun_regions
     @api_versions_options_for_select = retrieve_openstack_api_versions
     @telefonica_api_versions_options_for_select = retrieve_telefonica_api_versions
     @huawei_api_versions_options_for_select = retrieve_huawei_api_versions
+    @otc_api_versions_options_for_select = retrieve_otc_api_versions
     @orange_api_versions_options_for_select = retrieve_orange_api_versions
     @security_protocols_options_for_select = retrieve_security_protocols
   end
@@ -725,6 +729,10 @@ module OpsController::Settings::Schedules
   end
 
   def retrieve_huawei_api_versions
+    [['Keystone v2', 'v2'], ['Keystone v3', 'v3']]
+    end
+
+  def retrieve_otc_api_versions
     [['Keystone v2', 'v2'], ['Keystone v3', 'v3']]
   end
 
@@ -775,6 +783,7 @@ module OpsController::Settings::Schedules
     uri_settings[:openstack_region]     = params[:openstack_region]
     uri_settings[:telefonica_region]    = params[:telefonica_region]
     uri_settings[:huawei_region]        = params[:huawei_region]
+    uri_settings[:otc_region]           = params[:otc_region]
     uri_settings[:orange_region]        = params[:orange_region]
     uri_settings[:project_name]         = params[:project_name]
     uri_settings[:keystone_api_version] = params[:keystone_api_version]

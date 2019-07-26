@@ -173,7 +173,7 @@
           :dialog                     => dialog,
           :prefix                     => "/miq_request/",
           :keys                       => keys})
-    - if wf.kind_of?(ManageIQ::Providers::Telefonica::CloudManager::ProvisionWorkflow) || wf.kind_of?(ManageIQ::Providers::Huawei::CloudManager::ProvisionWorkflow) || wf.kind_of?(ManageIQ::Providers::Orange::CloudManager::ProvisionWorkflow)
+    - if wf.kind_of?(ManageIQ::Providers::Telefonica::CloudManager::ProvisionWorkflow) || wf.kind_of?(ManageIQ::Providers::Huawei::CloudManager::ProvisionWorkflow) || wf.kind_of?(ManageIQ::Providers::Otc::CloudManager::ProvisionWorkflow) || wf.kind_of?(ManageIQ::Providers::Orange::CloudManager::ProvisionWorkflow)
       = render(:partial => "/miq_request/prov_dialog_cloud_quota",
         :locals         => {:workflow => wf,
           :dialog                     => dialog,

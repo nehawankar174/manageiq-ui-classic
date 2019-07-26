@@ -155,7 +155,7 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
         }
       }
     }
-    
+
     if (vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Alibaba::StorageManager::Ebs') {
       // Dynamically update the Alibaba IOPS only if Cloud SSD volume type is selected.
       if (vm.cloudVolumeModel.volume_type === 'cloud_ssd') {
@@ -196,7 +196,7 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
         break;
     }
   };
-  
+
   vm.aliyunVolumeTypeChanged = function(voltype) {
     // The requested number of I/O operations per second that the volume can
     // support. For Provisioned IOPS (SSD) volumes, you can provision up to 50
@@ -231,7 +231,7 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     return vm.newRecord ||
       ((vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Amazon::StorageManager::Ebs' || vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Alibaba::StorageManager::Ebs') &&
         vm.cloudVolumeModel.volume_type !== 'standard') ||
-        vm.supportsVolumeResizing;
+      vm.supportsVolumeResizing;
   };
 
   vm.awsBaseSnapshotChanged = function(baseSnapshotId) {
@@ -270,7 +270,7 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     if (vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Amazon::StorageManager::Ebs') {
       loadEBSVolumeTypes();
     }
-    
+
     if (vm.cloudVolumeModel.emstype === 'ManageIQ::Providers::Alibaba::StorageManager::Ebs') {
       loadAlibabaEBSVolumeTypes();
       loadAlibabaEBSVolumeCategory();
@@ -319,13 +319,14 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     //   vm.volumeTypes.push({ type: 'standard', name: __('Magnetic') });
     // }
   };
-  
+
   var loadAlibabaEBSVolumeCategory = function() {
     vm.volumeCategory = [
       { type: 'cloud_ssd', name: __('Cloud SSD') },
       { type: 'cloud_efficiency', name: __('Cloud Efficiency') },
     ];
   };
+
 
   var getStorageManagers = function(data) {
     // Can handle list of all managers or a single manager.
@@ -346,8 +347,8 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     vm.cloudVolumeModel.aws_encryption = data.encrypted;
     vm.cloudVolumeModel.aws_iops = data.iops;
     vm.cloudVolumeModel.aliyun_iops = data.iops;
-    vm.cloudVolumeModel.aliyun_availability_zone_id  = data.availability_zone.ems_ref;
-    vm.cloudVolumeModel.aliyun_encryption  = data.encrypted;
+    vm.cloudVolumeModel.aliyun_availability_zone_id = data.availability_zone.ems_ref;
+    vm.cloudVolumeModel.aliyun_encryption = data.encrypted;
 
     // If volume was created from snapshot and this snapshot still exists
     if (data.base_snapshot) {
@@ -359,7 +360,7 @@ ManageIQ.angular.app.controller('cloudVolumeFormController', ['miqService', 'API
     if (angular.isUndefined(vm.cloudVolumeModel.aws_iops)) {
       vm.sizeChanged(vm.cloudVolumeModel.size);
     }
-    
+
     if (angular.isUndefined(vm.cloudVolumeModel.aliyun_iops)) {
       vm.sizeChanged(vm.cloudVolumeModel.size);
     }

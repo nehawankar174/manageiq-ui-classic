@@ -127,8 +127,6 @@
     = render :partial => "service_retire_show"
   - elsif @miq_request.type == "AutomationRequest"
     = render :partial => "ae_prov_show"
-  - elsif @miq_request.type == "PhysicalServerFirmwareUpdateRequest"
-    = render :partial => "physical_server_firmware_update_show"
   - else
     = render :partial => "reconfigure_show"
 

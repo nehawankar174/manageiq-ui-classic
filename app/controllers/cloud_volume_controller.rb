@@ -567,7 +567,7 @@ class CloudVolumeController < ApplicationController
     # Click2Cloud: Added telefonica as one of the storage manager type to collect required form params.
     # Click2Cloud: Added orange as one of the storage manager type to collect required form params.
     case params[:emstype]
-    when "ManageIQ::Providers::StorageManager::CinderManager", "ManageIQ::Providers::Openstack::StorageManager::CinderManager",  "ManageIQ::Providers::Telefonica::StorageManager::CinderManager",  "ManageIQ::Providers::Huawei::StorageManager::CinderManager" ,  "ManageIQ::Providers::Orange::StorageManager::CinderManager"
+    when "ManageIQ::Providers::StorageManager::CinderManager", "ManageIQ::Providers::Openstack::StorageManager::CinderManager",  "ManageIQ::Providers::Telefonica::StorageManager::CinderManager",  "ManageIQ::Providers::Huawei::StorageManager::CinderManager" , "ManageIQ::Providers::Otc::StorageManager::CinderManager" ,  "ManageIQ::Providers::Orange::StorageManager::CinderManager"
       options.merge!(cinder_manager_options)
     when "ManageIQ::Providers::Amazon::StorageManager::Ebs"
       options.merge!(aws_ebs_options)
@@ -607,7 +607,7 @@ class CloudVolumeController < ApplicationController
     options[:volume_type] = params[:volume_type] if params[:volume_type]
     # Only set IOPS if io1 (provisioned IOPS) and IOPS available
     #options[:iops] = params[:aws_iops] if options[:volume_type] == 'io1' && params[:aws_iops]
-    #options[:iops] = params[:aliyun_iops] if options[:volume_type] == 'io1' && params[:aliyun_iops]
+    #     #options[:iops] = params[:aliyun_iops] if options[:volume_type] == 'io1' && params[:aliyun_iops]
     options[:availability_zone] = params[:aliyun_availability_zone_id] if params[:aliyun_availability_zone_id]
     options[:snapshot_id] = params[:aliyun_base_snapshot_id] if params[:aliyun_base_snapshot_id]
     options[:encrypted] = params[:aliyun_encryption]
