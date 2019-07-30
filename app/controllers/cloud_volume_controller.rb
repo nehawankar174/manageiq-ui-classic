@@ -552,6 +552,7 @@ class CloudVolumeController < ApplicationController
   def form_params
     options = copy_params_if_set({}, params, %i[name size cloud_tenant_id vm_id device_path])
     options[:volume_type] = params[:volume_type] if params[:volume_type]
+    options[:volume_category] = params[:volume_category] if params[:volume_category]
     # Only set IOPS if io1 (provisioned IOPS) and IOPS available
     options[:iops] = params[:aws_iops] if options[:volume_type] == 'io1' && params[:aws_iops]
     options[:iops] = params[:aliyun_iops] if options[:volume_type] == 'io1' && params[:aliyun_iops]
@@ -605,6 +606,7 @@ class CloudVolumeController < ApplicationController
   def aliyun_ebs_options
     options = {}
     options[:volume_type] = params[:volume_type] if params[:volume_type]
+    options[:volume_category] = params[:volume_category] if params[:volume_category]
     # Only set IOPS if io1 (provisioned IOPS) and IOPS available
     #options[:iops] = params[:aws_iops] if options[:volume_type] == 'io1' && params[:aws_iops]
     #options[:iops] = params[:aliyun_iops] if options[:volume_type] == 'io1' && params[:aliyun_iops]
