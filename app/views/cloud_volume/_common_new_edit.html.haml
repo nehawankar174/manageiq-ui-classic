@@ -105,8 +105,8 @@
             "ng-model"    => "vm.cloudVolumeModel.volume_type",
             "ng-options"  => "voltype.type as voltype.name for voltype in vm.volumeTypes",
             "ng-change"   => "vm.aliyunVolumeTypeChanged(vm.cloudVolumeModel.volume_type)",
-            "disabled"    => false,
-            "required"    => "",
+			      "ng-disabled" => "!vm.newRecord",
+			      "required"    => "",
             :checkchange  => true,
             "miq-select"  => true}
       %option{"value" => "", "disabled" => ""}
@@ -115,7 +115,7 @@
       = _("Required")
 
 .form-group{"ng-class" => "{'has-error': angularForm.volume_category.$invalid}",
-            "ng-if"    => "vm.cloudVolumeModel.emstype == 'ManageIQ::Providers::Alibaba::StorageManager::Ebs'"}
+            "ng-if"    => "vm.newRecord && vm.cloudVolumeModel.emstype == 'ManageIQ::Providers::Alibaba::StorageManager::Ebs'"}
   %label.col-md-2.control-label
     = _('Cloud Volume Category')
   .col-md-8
@@ -123,8 +123,7 @@
             "ng-model"    => "vm.cloudVolumeModel.volume_category",
             "ng-options"  => "volcategory.type as volcategory.name for volcategory in vm.volumeCategory",
             "ng-change"   => "vm.loadAlibabaEBSVolumeCategory(vm.cloudVolumeModel.volume_category)",
-            "ng-disabled" => "!vm.newRecord",
-            "required"    => (@storage_manager.present? || @volume.try(:id).present?) ? false : true,
+            "required"    => "",
             :checkchange  => true,
             "miq-select"  => true}
       %option{"value" => "", "disabled" => ""}
