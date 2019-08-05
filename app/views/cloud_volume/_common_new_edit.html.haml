@@ -105,7 +105,7 @@
             "ng-model"    => "vm.cloudVolumeModel.volume_type",
             "ng-options"  => "voltype.type as voltype.name for voltype in vm.volumeTypes",
             "ng-change"   => "vm.aliyunVolumeTypeChanged(vm.cloudVolumeModel.volume_type)",
-            "disabled"    => (@storage_manager.present? || @volume.try(:id).present?) ? true : false,
+            "disabled"    => false,
             "required"    => "",
             :checkchange  => true,
             "miq-select"  => true}
@@ -114,15 +114,14 @@
     %span.help-block{"ng-show" => "angularForm.volume_type.$error.required"}
       = _("Required")
 
-.form-group{"ng-class" => "{'has-error': angularForm.volume_type.$invalid}",
-            "ng-if"    => "vm.cloudVolumeModel.emstype == 'ManageIQ::Providers::Alibaba::StorageManager::Ebs'",
-            "ng-hide"     => @storage_manager.present? || @volume.try(:id).present?}
+.form-group{"ng-class" => "{'has-error': angularForm.volume_category.$invalid}",
+            "ng-if"    => "vm.cloudVolumeModel.emstype == 'ManageIQ::Providers::Alibaba::StorageManager::Ebs'"}
   %label.col-md-2.control-label
     = _('Cloud Volume Category')
   .col-md-8
     %select{"name"        => "volume_category",
             "ng-model"    => "vm.cloudVolumeModel.volume_category",
-            "ng-options"  => "volcategory.name as volcategory.name for volcategory in vm.volumeCategory",
+            "ng-options"  => "volcategory.type as volcategory.name for volcategory in vm.volumeCategory",
             "ng-change"   => "vm.loadAlibabaEBSVolumeCategory(vm.cloudVolumeModel.volume_category)",
             "ng-disabled" => "!vm.newRecord",
             "required"    => (@storage_manager.present? || @volume.try(:id).present?) ? false : true,
@@ -130,7 +129,7 @@
             "miq-select"  => true}
       %option{"value" => "", "disabled" => ""}
         = "<#{_('Choose')}>"
-    %span.help-block{"ng-show" => "angularForm.volume_type.$error.required"}
+    %span.help-block{"ng-show" => "angularForm.volume_category.$error.required"}
       = _("Required")
 
 .form-group{"ng-class" => "{'has-error': angularForm.volume_type.$invalid}",
