@@ -342,7 +342,11 @@ class CloudVolumeController < ApplicationController
         add_flash(_("Cloud Volume \"%{name}\" cannot be removed because it is attached to one or more Instances") %
           {:name => volume.name}, :warning)
       else
-        valid_delete = volume.validate_delete_volume
+        if volume.type.include?("Alibaba")
+          valid_delete = volume.validate_delete_volume(volume[:status])
+        else
+          valid_delete = volume.validate_delete_volume
+        end
         if valid_delete[:available]
           volumes_to_delete.push(volume)
         else
