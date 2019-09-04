@@ -30,10 +30,11 @@
 
   = render :partial => "common_new_edit"
 
-  .form-horizontal
-    .form-group{"ng-if" => "vm.securityGroupModel.ems_id", "ng-class" => "{'has-error': angularForm.cloud_tenant_id.$invalid}"}
-      %h3
-        = _('Placement')
+  .form-horizontal{"ng-if" => "(vm.securityGroupModel.emstype == 'ManageIQ::Providers::Openstack::NetworkManager') || (vm.securityGroupModel.emstype == 'ManageIQ::Providers::Telefonica::NetworkManager') || (vm.securityGroupModel.emstype == 'ManageIQ::Providers::Huawei::NetworkManager') || (vm.securityGroupModel.emstype == 'ManageIQ::Providers::Otc::NetworkManager') || (vm.securityGroupModel.emstype == 'ManageIQ::Providers::Orange::NetworkManager') "}
+    %h3
+      = _('Placement')
+    .form-group{"ng-class" => "{'has-error': angularForm.cloud_tenant_id.$invalid}"}
+
       %label.col-md-2.control-label
         = _('Cloud Tenant')
       .col-md-8
@@ -46,7 +47,27 @@
           %option{"value" => ""}
             = "<#{_('Choose')}>"
         %span.help-block{"ng-show" => "angularForm.cloud_tenant_id.$error.required"}
-        = _("Required")
+          = _("Required")
+
+
+  .form-horizontal{"ng-if" => "vm.securityGroupModel.emstype == 'ManageIQ::Providers::Alibaba::NetworkManager'"}
+    %h3
+      = _('Placement')
+    .form-group{"ng-class" => "{'has-error': angularForm.network_id.$invalid}"}
+      %label.col-md-2.control-label
+        = _('VPC')
+      .col-md-8
+        %select{"name"                         => "network_id",
+                "ng-model"                    => "vm.securityGroupModel.network_id",
+                "ng-options"                  => "network.ems_ref as network.name for network in vm.available_networks",
+                "miq-select"                  => true,
+                "required"                    => '',
+                "selectpicker-for-select-tag" => ""}
+          %option{"value" => ""}
+            = "<#{_('Choose')}>"
+        %span.help-block{"ng-show" => "angularForm.network_id.$error.required"}
+          = _("Required")
+
 
   = render :partial => "layouts/angular/generic_form_buttons"
 

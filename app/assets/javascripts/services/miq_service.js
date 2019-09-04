@@ -205,6 +205,25 @@ ManageIQ.angular.app.service('miqService', ['$q', 'API', '$window', function($q,
     }
   };
 
+  this.getProviderAttributes = function(callback) {
+    return function(id) {
+      if (!id) {
+        callback([]);
+        return;
+      }
+      miqService.sparkleOn();
+
+      API.get('/api/providers/' + id + '?attributes=type,parent_manager.availability_zones')
+        .then(getAttributessByEms)
+        .catch(miqService.handleFailure);
+    };
+
+    function getAttributessByEms(data) {
+      callback(data);
+      miqService.sparkleOff();
+    }
+  };
+
   this.redirectBack = function(message, flashType, redirectUrl) {
     miqFlashLater({message: message, level: flashType});
 

@@ -112,9 +112,21 @@ ManageIQ.angular.app.controller('securityGroupFormController', ['securityGroupFo
     miqService.miqFlash('warn', __('All changes have been reset'));
   };
 
-  vm.filterNetworkManagerChanged = miqService.getProviderTenants(function(data) {
-    vm.available_tenants = data.resources;
-  });
+  vm.filterNetworkManagerChanged = function(id) {
+    if (id) {
+      API.get('/api/cloud_networks?expand=resources&attributes=name,ems_ref&filter[]=ems_id=' + id).then(function(data) {
+        vm.available_networks = data.resources;
+      }).catch(miqService.handleFailure);
+
+      miqService.getProviderAttributes(function(data) {
+        vm.securityGroupModel.emstype = data.type;
+      })(id);
+
+      miqService.getProviderTenants(function(data) {
+        vm.available_tenants = data.resources;
+      })(id);
+    }
+  };
 
   init();
 }]);
