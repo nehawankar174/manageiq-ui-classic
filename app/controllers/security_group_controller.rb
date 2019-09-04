@@ -177,14 +177,16 @@ class SecurityGroupController < ApplicationController
           end
         end
 
-        params["firewall_rules"].each do |_key, rule|
-          if rule["id"] && rule["id"].empty?
-            create_rule(rule)
-          elsif rule["deleted"]
-            delete_rule(rule["ems_ref"])
-          elsif rule_changed?(rule)
-            delete_rule(rule["ems_ref"])
-            create_rule(rule)
+        if @security_group.type != "ManageIQ::Providers::Alibaba::NetworkManager::SecurityGroup"
+          params["firewall_rules"].each do |_key, rule|
+            if rule["id"] && rule["id"].empty?
+              create_rule(rule)
+            elsif rule["deleted"]
+              delete_rule(rule["ems_ref"])
+            elsif rule_changed?(rule)
+              delete_rule(rule["ems_ref"])
+              create_rule(rule)
+            end
           end
         end
         task = @tasks.shift
@@ -288,6 +290,7 @@ class SecurityGroupController < ApplicationController
     options[:name] = params[:name] if params[:name]
     options[:description] = params[:description] if params[:description]
     options[:ems_id] = params[:ems_id] if params[:ems_id]
+    options[:network_id] = params[:network_id] if params[:network_id]
     options[:cloud_tenant] = find_record_with_rbac(CloudTenant, params[:cloud_tenant_id]) if params[:cloud_tenant_id]
     options
   end
