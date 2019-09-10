@@ -5,7 +5,6 @@
                'model-copy'    => "vm.modelCopy",
                'ng-cloak'      => "",
                'ng-show'       => "vm.afterGet"}
-
   %h3
     = _('Network Provider')
   .form-horizontal
@@ -31,7 +30,8 @@
                             'ng-model'     => "vm.cloudNetworkModel.ext_management_system.name",
                             'ng-disabled'  => true}
     %h3
-  .form-horizontal{'ng-if' => "vm.cloudNetworkModel.ems_id"}
+  .form-horizontal{'ng-if' => "vm.cloudNetworkModel.ems_id && (vm.cloudNetworkModel.emstype != 'ManageIQ::Providers::Alibaba::NetworkManager')",
+                   'ng-hide' =>"vm.cloudNetworkModel.ext_management_system.type == 'ManageIQ::Providers::Alibaba::NetworkManager'"}
     %h3
       = _('Placement')
     .form-group
@@ -48,13 +48,13 @@
             = "<#{_('Choose')}>"
         %span.help-block{'ng-show' => "angularForm.cloud_tenant_id.$error.required"}
           = _("Required")
-      .col-md-8{'ng-if' => "!vm.newRecord"}
+      .col-md-8{'ng-if' => "!vm.newRecord "}
         %input.form-control{'type'         => "text",
                             'name'         => "cloud_tenant_name",
                             'maxlength'    => 128,
                             'ng-model'     => "vm.cloudNetworkModel.cloud_tenant.name",
                             'ng-disabled'  => true}
-  .form-horizontal{'ng-if' => "vm.cloudNetworkModel.cloud_tenant.id"}
+  .form-horizontal{'ng-if' => "vm.cloudNetworkModel.cloud_tenant.id && (vm.cloudNetworkModel.emstype != 'ManageIQ::Providers::Alibaba::NetworkManager')"}
     %h3
       = _('Network Provider Information')
     .form-group
@@ -96,6 +96,19 @@
   %h3
     = _('Network Information')
   .form-horizontal
+    .form-group{'ng-class' => "{'has-error': angularForm.ems_ref.$invalid}",
+                'ng-if'=> "!vm.newRecord"}
+      %label.col-md-2.control-label
+        = _('Network Id')
+      .col-md-8
+        %input.form-control{'type'         => "text",
+                            'name'         => "ems_ref",
+                            'ng-disabled'  => true,
+                            'ng-model'     => "vm.cloudNetworkModel.ems_ref",
+                            'maxlength'    => 128,
+                            }
+        %span.help-block{"ng-show" => "angularForm.ems_ref.$error.required"}
+          = _("Required")
     .form-group{'ng-class' => "{'has-error': angularForm.name.$invalid}"}
       %label.col-md-2.control-label
         = _('Network Name')
@@ -107,7 +120,38 @@
                             'required'     => ""}
         %span.help-block{"ng-show" => "angularForm.name.$error.required"}
           = _("Required")
-    .form-group
+    .form-group{'ng-class' => "{'has-error': angularForm.cidr.$invalid}",
+                'ng-if' => "vm.cloudNetworkModel.emstype=='ManageIQ::Providers::Alibaba::NetworkManager'" }
+      %label.col-md-2.control-label
+        = _('CIDR Block')
+      .col-md-8{'ng-class' => "{'has-error': angularForm.cidr.$invalid}", 'ng-if' => "vm.newRecord"}
+        %select{'name'                        => "cidr",
+                'ng-model'                    => "vm.cloudNetworkModel.cidr",
+                'ng-options'                  => "type as key for (key, type) in vm.cidrBlock",
+                'miq-select'                  => true,
+                'required'                    => "",
+                'selectpicker-for-select-tag' => ""}
+          %option{'value' => ""}
+            = "<#{_('Choose')}>"
+        %span.help-block{'ng-show' => 'angularForm.cidr.$error.required'}
+          = _('Required')
+    .form-group{'ng-if'    => "vm.custom_cidr.test(vm.cloudNetworkModel.cidr)",
+                'ng-class' => "{'has-error': angularForm.customcidr.$invalid}"}
+      %label.control-label.col-md-2
+        = _('Custom CIDR')
+      .col-md-8
+        %input.form-control{'type'         => "text",
+                            'id'           => "customcidr_id",
+                            'name'         => "customcidr",
+                            'ng-disabled'  => "!vm.newRecord",
+                            'ng-model'     => "vm.cloudNetworkModel.customcidr",
+                            'ng-required'  => "vm.is_custom_cidr_required.test(vm.cloudNetworkModel.cidr)",
+                            'require'      => "",
+                            'maxlength'    => 20,}
+        %span.help-block{'ng-show' => 'angularForm.customcidr.$error.required'}
+          = _('Required')
+    .form-group{'ng-if' => "vm.cloudNetworkModel.emstype!='ManageIQ::Providers::Alibaba::NetworkManager'",
+                'ng-hide' =>"vm.cloudNetworkModel.ext_management_system.type == 'ManageIQ::Providers::Alibaba::NetworkManager'"}
       %label.control-label.col-md-2{"for" => "cloud_network_external_facing"}
         = _('External Router')
       .col-md-8
@@ -117,7 +161,8 @@
                'id'          => "cloud_network_external_facing",
                'name'        => "external_facing",
                'ng-model'    => "vm.cloudNetworkModel.external_facing"}
-    .form-group
+    .form-group{'ng-if' => "vm.cloudNetworkModel.emstype!='ManageIQ::Providers::Alibaba::NetworkManager'",
+                'ng-hide' =>"vm.cloudNetworkModel.ext_management_system.type == 'ManageIQ::Providers::Alibaba::NetworkManager'"}
       %label.control-label.col-md-2{"for" => "cloud_network_enabled"}
         = _('Administrative State')
       .col-md-8
@@ -127,8 +172,9 @@
                'id'          => "cloud_network_enabled",
                'name'        => "enabled",
                'ng-model'    => "vm.cloudNetworkModel.enabled"}
-    .form-group
-      %label.control-label.col-md-2{"for" => "cloud_network_shared"}
+    .form-group{'ng-if' => "vm.cloudNetworkModel.emstype!='ManageIQ::Providers::Alibaba::NetworkManager'",
+                'ng-hide' =>"vm.cloudNetworkModel.ext_management_system.type == 'ManageIQ::Providers::Alibaba::NetworkManager'" }
+      %label.control-label.col-md-2
         = _('Shared')
       .col-md-8
         %input{'bs-switch'   => "",
@@ -137,5 +183,4 @@
                'id'          => "cloud_network_shared",
                'name'        => "shared",
                'ng-model'    => "vm.cloudNetworkModel.shared"}
-
   = render :partial => "layouts/angular/generic_form_buttons"
