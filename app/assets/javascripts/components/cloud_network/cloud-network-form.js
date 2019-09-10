@@ -11,11 +11,18 @@ cloudNetworkFormController.$inject = ['API', 'miqService'];
 
 function cloudNetworkFormController(API, miqService) {
   var vm = this;
-
   this.$onInit = function() {
-    vm.afterGet = false;
 
+    vm.afterGet = false;
     vm.cloudNetworkModel = { name: '' };
+
+    vm.cidrBlock = {
+      '192.168.0.0/16':'192.168.0.0/16',
+      '172.16.0.0/12':'172.16.0.0/12',
+      '10.0.0.0/8':'10.0.0.0/8',
+      'Custom':'custom_cidr',
+    };
+
     vm.providers_network_types = {
       'None': '',
       'Local': 'local',
@@ -26,10 +33,12 @@ function cloudNetworkFormController(API, miqService) {
     };
 
     vm.ems = [];
+    vm.custom_cidr = /custom_cidr/;
     vm.network_types_for_segmentation = /vlan|vxlan|gre/;
     vm.network_types_for_physical_network = /vlan|flat/;
     vm.is_subscription_id_required = /gre|vlan/;
     vm.is_physical_network_required = /flat|vlan/;
+    vm.is_custom_cidr_required = /custom_cidr/;
     vm.formId = vm.cloudNetworkFormId;
     vm.model = 'cloudNetworkModel';
     ManageIQ.angular.scope = vm;
@@ -52,7 +61,7 @@ function cloudNetworkFormController(API, miqService) {
           miqService.sparkleOff();
         });
     } else {
-      API.get('/api/cloud_networks/' + vm.cloudNetworkFormId + '?attributes=cloud_tenant.id,cloud_tenant.name,ext_management_system.name').then(function(data) {
+      API.get('/api/cloud_networks/' + vm.cloudNetworkFormId + '?attributes=cloud_tenant.id,cloud_tenant.name,ext_management_system.name,ext_management_system.type,ext_management_system.cidr').then(function(data) {
         Object.assign(vm.cloudNetworkModel, data);
         vm.afterGet = true;
         vm.modelCopy = angular.copy( vm.cloudNetworkModel );
@@ -62,9 +71,24 @@ function cloudNetworkFormController(API, miqService) {
   };
 
   vm.addClicked = function() {
-    var url = 'create/new?button=add';
-    miqService.miqAjaxButton(url, vm.cloudNetworkModel, { complete: false });
+    var cidrObj = document.getElementById("customcidr_id");
+    if(cidrObj != null){
+      if (((!/^[0-9//.//]+$/.test(cidrObj.value)))){
+        alert("Please only Valid CIDR Block ! (Allowed input:0-9, . and /) e.g. 192.168.0.0/16");
+      }
+      else{
+        addVpc();
+      }
+    }
+    else{
+      addVpc();
+    }
   };
+
+  function addVpc(){
+    var url = 'create/new?button=add';
+    miqService.miqAjaxButton(url, vm.cloudNetworkModel, {complete: false});
+  }
 
   vm.cancelClicked = function() {
     var url;
@@ -88,8 +112,14 @@ function cloudNetworkFormController(API, miqService) {
   };
 
   vm.filterNetworkManagerChanged = function(id) {
-    miqService.getProviderTenants(function(data) {
-      vm.available_tenants = data.resources;
-    })(id);
+    if (id) {
+      miqService.getProviderAttributes(function(data) {
+        vm.cloudNetworkModel.emstype = data.type;
+      })(id);
+
+      miqService.getProviderTenants(function(data) {
+        vm.available_tenants = data.resources;
+      })(id);
+    }
   };
 }
