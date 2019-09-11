@@ -74,7 +74,7 @@ function cloudNetworkFormController(API, miqService) {
     var cidrObj = document.getElementById("customcidr_id");
     if(cidrObj != null){
       if (((!/^[0-9//.//]+$/.test(cidrObj.value)))){
-        alert("Please only Valid CIDR Block ! (Allowed input:0-9, . and /) e.g. 192.168.0.0/16");
+        alert("Please enter a Valid CIDR Block only! (Allowed input:0-9, . and /) e.g. 192.168.0.0/16");
       }
       else{
         addVpc();
