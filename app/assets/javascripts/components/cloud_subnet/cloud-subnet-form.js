@@ -38,32 +38,34 @@ function cloudSubnetFormController(API, miqService) {
         miqService.sparkleOff();
       }).catch(miqService.handleFailure);
     } else {
-      API.get('/api/cloud_subnets/' + vm.cloudSubnetFormId + '?expand=resources&attributes=ext_management_system.name,cloud_tenant.name,cloud_network.name').then(function(data) {
+      API.get('/api/cloud_subnets/' + vm.cloudSubnetFormId + '?expand=resources&attributes=ext_management_system.name,ext_management_system.type,cloud_tenant.name,cloud_network.name').then(function(data) {
         Object.assign(vm.cloudSubnetModel, _.pick(data, 'name', 'ext_management_system', 'cloud_network', 'cloud_tenant', 'network_protocol', 'cidr', 'dhcp_enabled', 'gateway', 'extra_attributes', 'dns_nameservers'));
         vm.cloudSubnetModel.allocation_pools = "";
         vm.cloudSubnetModel.host_routes = "";
-        if (vm.cloudSubnetModel.extra_attributes !== undefined) {
-          if (vm.cloudSubnetModel.extra_attributes.allocation_pools !== undefined) {
-            vm.cloudSubnetModel.extra_attributes.allocation_pools.forEach(function(val, i) {
-              if (i > 0) {
-                vm.cloudSubnetModel.allocation_pools += "\n";
-              }
-              vm.cloudSubnetModel.allocation_pools += val["start"] + "," + val["end"];
-            });
+        if (vm.cloudSubnetModel.ext_management_system.type !== "ManageIQ::Providers::Alibaba::NetworkManager"){
+          if (vm.cloudSubnetModel.extra_attributes !== undefined) {
+            if (vm.cloudSubnetModel.extra_attributes.allocation_pools !== undefined) {
+              vm.cloudSubnetModel.extra_attributes.allocation_pools.forEach(function(val, i) {
+                if (i > 0) {
+                  vm.cloudSubnetModel.allocation_pools += "\n";
+                }
+                vm.cloudSubnetModel.allocation_pools += val["start"] + "," + val["end"];
+              });
+            }
+            if (vm.cloudSubnetModel.extra_attributes.host_routes !== undefined) {
+              vm.cloudSubnetModel.extra_attributes.host_routes.forEach(function(val, i) {
+                if (i > 0) {
+                  vm.cloudSubnetModel.host_routes += "\n";
+                }
+                vm.cloudSubnetModel.host_routes += val["destination"] + "," + val["nexthop"];
+              });
+            }
           }
-          if (vm.cloudSubnetModel.extra_attributes.host_routes !== undefined) {
-            vm.cloudSubnetModel.extra_attributes.host_routes.forEach(function(val, i) {
-              if (i > 0) {
-                vm.cloudSubnetModel.host_routes += "\n";
-              }
-              vm.cloudSubnetModel.host_routes += val["destination"] + "," + val["nexthop"];
-            });
+          if (vm.cloudSubnetModel.dns_nameservers !== undefined) {
+            vm.cloudSubnetModel.dns_nameservers = vm.cloudSubnetModel.dns_nameservers.join("\n");
+          } else {
+            vm.cloudSubnetModel.dns_nameservers = "";
           }
-        }
-        if (vm.cloudSubnetModel.dns_nameservers !== undefined) {
-          vm.cloudSubnetModel.dns_nameservers = vm.cloudSubnetModel.dns_nameservers.join("\n");
-        } else {
-          vm.cloudSubnetModel.dns_nameservers = "";
         }
         vm.afterGet = true;
         vm.modelCopy = angular.copy( vm.cloudSubnetModel );
@@ -103,6 +105,12 @@ function cloudSubnetFormController(API, miqService) {
       API.get('/api/cloud_networks?expand=resources&attributes=name,ems_ref&filter[]=ems_id=' + id).then(function(data) {
         vm.available_networks = data.resources;
       }).catch(miqService.handleFailure);
+
+      miqService.getProviderAttributes(function(data) {
+        vm.cloudSubnetModel.emstype = data.type;
+        vm.availabilityZoneChoices = data.parent_manager.availability_zones;
+      })(id);
+
       miqService.getProviderTenants(function(data) {
         vm.available_tenants = data.resources;
       })(id);

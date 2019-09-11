@@ -31,7 +31,8 @@
                             'maxlength' => 128,
                             'ng-model'  => 'vm.cloudSubnetModel.ext_management_system.name'}
     .form-group{'ng-class' => '{"has-error": angularForm.cloud_tenant_id.$invalid}',
-                'ng-if' => 'vm.cloudSubnetModel.ems_id'}
+                'ng-if' => 'vm.cloudSubnetModel.ems_id && vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager"',
+                'ng-hide' => 'vm.cloudSubnetModel.ext_management_system.type == "ManageIQ::Providers::Alibaba::NetworkManager"'}
       %label.col-md-2.control-label
         = _('Cloud Tenant Placement')
       .col-md-8{'ng-if' => 'vm.newRecord'}
@@ -51,6 +52,23 @@
                             'maxlength' => 128,
                             'ng-model'  => 'vm.cloudSubnetModel.cloud_tenant.name',
                             'disabled'  => true}
+
+    .form-group{'ng-class' => '{"has-error": angularForm.aliyun_availability_zone_id.$invalid}',
+                'ng-if' => 'vm.cloudSubnetModel.ems_id && vm.cloudSubnetModel.emstype == "ManageIQ::Providers::Alibaba::NetworkManager"'}
+      %label.col-md-2.control-label
+        = _('Availability Zone')
+      .col-md-8{'ng-if' => 'vm.newRecord'}
+        %select{'name'                        => 'aliyun_availability_zone_id',
+                'ng-model'                    => 'vm.cloudSubnetModel.aliyun_availability_zone_id',
+                'ng-options'                  => 'az.ems_ref as az.name for az in vm.availabilityZoneChoices',
+                'miq-select'                  => true,
+                'required'                    => '',
+                'selectpicker-for-select-tag' => ''}
+          %option{'value' => ''}
+            = "<#{_('Choose')}>"
+        %span.help-block{'ng-show' => "angularForm.aliyun_availability_zone_id.$error.required"}
+          = _('Required')
+
   %h3
     = _('Cloud Subnet details')
   .form-horizontal
@@ -83,7 +101,8 @@
                             'name'      => 'name',
                             'ng-model'  => 'vm.cloudSubnetModel.name',
                             'maxlength' => 128}
-    .form-group
+    .form-group{'ng-if' => 'vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager" ',
+    'ng-hide' => 'vm.cloudSubnetModel.ext_management_system.type == "ManageIQ::Providers::Alibaba::NetworkManager"' }
       %label.col-md-2.control-label
         = _('Gateway')
       .col-md-8
@@ -91,7 +110,8 @@
                             'name'      => 'gateway_ip',
                             'ng-model'  => 'vm.cloudSubnetModel.gateway',
                             'maxlength' => 20}
-    .form-group
+    .form-group{'ng-if' => 'vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager" ',
+    'ng-hide' => 'vm.cloudSubnetModel.ext_management_system.type == "ManageIQ::Providers::Alibaba::NetworkManager"' }
       %label.control-label.col-md-2{'for' => 'dhcp'}
         = _('DHCP')
       .col-md-8
@@ -100,7 +120,9 @@
                'bs-switch'   => '',
                'data'        => {:on_text => _('Enabled'), :off_text => _('Disabled'), :size => 'mini'},
                'ng-model'    => 'vm.cloudSubnetModel.dhcp_enabled'}
-    .form-group{'ng-class' => '{"has-error": angularForm.network_protocol.$invalid}'}
+    .form-group{'ng-class' => '{"has-error": angularForm.network_protocol.$invalid}, ',
+    'ng-if' => 'vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager" ',
+    'ng-hide' => 'vm.cloudSubnetModel.ext_management_system.type == "ManageIQ::Providers::Alibaba::NetworkManager"' }
       %label.col-md-2.control-label
         = _('IP Version')
       .col-md-8
@@ -109,7 +131,7 @@
                 'ng-disabled'                 => '!vm.newRecord',
                 'ng-options'                  => 'protocol as protocol for protocol in vm.networkProtocols',
                 'miq-select'                  => true,
-                'required'                    => '',
+                'required'                    => false,
                 'selectpicker-for-select-tag' => ''}
         %span.help-block{'ng-show' => 'angularForm.network_protocol.$error.required'}
           = _('Required')
@@ -126,7 +148,8 @@
                             'required'    => ''}
         %span.help-block{'ng-show' => 'angularForm.cidr.$error.required'}
           = _('Required')
-    .form-group
+    .form-group{'ng-if' => 'vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager" ',
+    'ng-hide' => 'vm.cloudSubnetModel.ext_management_system.type == "ManageIQ::Providers::Alibaba::NetworkManager"' }
       %label.col-md-2.control-label
         = _('Allocation Pools')
       .col-md-8
@@ -134,7 +157,8 @@
                                'name'     => 'allocation_pools',
                                'ng-model' => 'vm.cloudSubnetModel.allocation_pools',
                                'rows'     => 4}
-    .form-group
+    .form-group{'ng-if' => 'vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager" ',
+    'ng-hide' => 'vm.cloudSubnetModel.ext_management_system.type == "ManageIQ::Providers::Alibaba::NetworkManager"' }
       %label.col-md-2.control-label
         = _('DNS Name Servers')
       .col-md-8
@@ -142,7 +166,8 @@
                                'name'     => 'dns_nameservers',
                                'ng-model' => 'vm.cloudSubnetModel.dns_nameservers',
                                'rows'     => 4}
-    .form-group
+    .form-group{'ng-if' => 'vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager" ',
+    'ng-hide' => 'vm.cloudSubnetModel.ext_management_system.type == "ManageIQ::Providers::Alibaba::NetworkManager"' }
       %label.col-md-2.control-label
         = _('Host Routes')
       .col-md-8

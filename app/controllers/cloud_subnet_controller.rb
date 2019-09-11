@@ -101,7 +101,7 @@ class CloudSubnetController < ApplicationController
       add_flash(_("Cloud Subnet \"%{name}\" created") % {:name => subnet_name})
     else
       add_flash(_("Unable to create Cloud Subnet: %{details}") %
-                { :name => subnet_name, :details => task.message }, :error)
+                  { :name => subnet_name, :details => task.message }, :error)
     end
 
     @breadcrumbs&.pop
@@ -294,6 +294,7 @@ class CloudSubnetController < ApplicationController
     options[:network_id] = params[:network_id] if params[:network_id]
     options[:enable_dhcp] = params[:dhcp_enabled]
     # TODO: Add dns_nameservers, allocation_pools, host_routes
+    options[:availability_zone] = params[:aliyun_availability_zone_id] if params[:aliyun_availability_zone_id]
     options[:availability_zone_id] = params[:availability_zone_id] if params[:availability_zone_id]
     if params[:ipv6_router_advertisement_mode]
       options[:ipv6_router_advertisement_mode] = params[:ipv6_router_advertisement_mode]
