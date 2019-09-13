@@ -93,7 +93,7 @@
                             'ng-model'  => 'vm.cloudSubnetModel.cloud_network.name',
                             'disabled'  => true}
   .form-horizontal
-    .form-group
+    .form-group{'ng-if' => 'vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager" '}
       %label.col-md-2.control-label
         = _('Subnet Name')
       .col-md-8
@@ -101,6 +101,18 @@
                             'name'      => 'name',
                             'ng-model'  => 'vm.cloudSubnetModel.name',
                             'maxlength' => 128}
+    .form-group{'ng-class' => "{'has-error': angularForm.name.$invalid}",
+    'ng-if' => 'vm.cloudSubnetModel.ems_id && vm.cloudSubnetModel.emstype == "ManageIQ::Providers::Alibaba::NetworkManager"'}
+      %label.col-md-2.control-label
+        = _('Subnet Name')
+      .col-md-8
+        %input.form-control{'type'      => 'text',
+                            'name'      => 'name',
+                            'ng-model'  => 'vm.cloudSubnetModel.name',
+                            'required'  => '',
+                            'maxlength' => 128}
+        %span.help-block{'ng-show' => 'angularForm.name.$error.required'}
+          = _('Required')
     .form-group{'ng-if' => 'vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager" ',
     'ng-hide' => 'vm.cloudSubnetModel.ext_management_system.type == "ManageIQ::Providers::Alibaba::NetworkManager"' }
       %label.col-md-2.control-label
@@ -120,7 +132,7 @@
                'bs-switch'   => '',
                'data'        => {:on_text => _('Enabled'), :off_text => _('Disabled'), :size => 'mini'},
                'ng-model'    => 'vm.cloudSubnetModel.dhcp_enabled'}
-    .form-group{'ng-class' => '{"has-error": angularForm.network_protocol.$invalid}, ',
+    .form-group{'ng-class' => '{"has-error": angularForm.network_protocol.$invalid} ',
     'ng-if' => 'vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager" ',
     'ng-hide' => 'vm.cloudSubnetModel.ext_management_system.type == "ManageIQ::Providers::Alibaba::NetworkManager"' }
       %label.col-md-2.control-label
@@ -135,8 +147,8 @@
                 'selectpicker-for-select-tag' => ''}
         %span.help-block{'ng-show' => 'angularForm.network_protocol.$error.required'}
           = _('Required')
-
-    .form-group{'ng-class' => "{'has-error': angularForm.cidr.$invalid}"}
+    .form-group{'ng-class' => "{'has-error': angularForm.cidr.$invalid}",
+    'ng-if' => 'vm.cloudSubnetModel.emstype !== "ManageIQ::Providers::Alibaba::NetworkManager" '}
       %label.col-md-2.control-label
         = _('Subnet CIDR')
       .col-md-8
@@ -145,6 +157,21 @@
                             'ng-disabled' => '!vm.newRecord',
                             'ng-model'    => 'vm.cloudSubnetModel.cidr',
                             'maxlength'   => 20,
+                            'required'    => ''}
+        %span.help-block{'ng-show' => 'angularForm.cidr.$error.required'}
+          = _('Required')
+    .form-group{'ng-class' => "{'has-error': angularForm.cidr.$invalid}",
+    'ng-if' => 'vm.cloudSubnetModel.emstype == "ManageIQ::Providers::Alibaba::NetworkManager" '}
+      %label.col-md-2.control-label
+        = _('Subnet CIDR')
+      .col-md-8
+        %input.form-control{'type'        => 'text',
+                            'name'        => 'cidr',
+                            'ng-disabled' => '!vm.newRecord',
+                            'ng-model'    => 'vm.cloudSubnetModel.cidr',
+                            'maxlength'   => 20,
+                            'ng-pattern' =>"/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[7-9]|2[0-9]))+$/",
+                            'placeholder' => 'ex: 192.168.0.0/17',
                             'required'    => ''}
         %span.help-block{'ng-show' => 'angularForm.cidr.$error.required'}
           = _('Required')
