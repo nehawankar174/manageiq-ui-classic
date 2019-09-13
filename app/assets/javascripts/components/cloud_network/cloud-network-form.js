@@ -71,21 +71,6 @@ function cloudNetworkFormController(API, miqService) {
   };
 
   vm.addClicked = function() {
-    var cidrObj = document.getElementById("customcidr_id");
-    if(cidrObj != null){
-      if (((!/^[0-9//.//]+$/.test(cidrObj.value)))){
-        alert("Please enter a Valid CIDR Block only! (Allowed input:0-9, . and /) e.g. 192.168.0.0/16");
-      }
-      else{
-        addVpc();
-      }
-    }
-    else{
-      addVpc();
-    }
-  };
-
-  function addVpc(){
     var url = 'create/new?button=add';
     miqService.miqAjaxButton(url, vm.cloudNetworkModel, {complete: false});
   }
