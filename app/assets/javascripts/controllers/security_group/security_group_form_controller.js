@@ -43,7 +43,7 @@ ManageIQ.angular.app.controller('securityGroupFormController', ['securityGroupFo
   };
 
   function getSecurityGroup(id) {
-    return API.get('/api/security_groups/' + id + '?attributes=name,ext_management_system.name,description,cloud_tenant.name,firewall_rules,ems_id')
+    return API.get('/api/security_groups/' + id + '?attributes=name,ext_management_system.name,ext_management_system.type,description,cloud_tenant.name,firewall_rules,ems_id')
       .then(function(data) {
         Object.assign(vm.securityGroupModel, data);
         vm.securityGroupModel.firewall_rules_delete = false;

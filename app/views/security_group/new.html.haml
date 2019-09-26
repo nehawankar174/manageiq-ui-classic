@@ -30,11 +30,10 @@
 
   = render :partial => "common_new_edit"
 
-  .form-horizontal{"ng-if" => "(vm.securityGroupModel.emstype == 'ManageIQ::Providers::Openstack::NetworkManager') || (vm.securityGroupModel.emstype == 'ManageIQ::Providers::Telefonica::NetworkManager') || (vm.securityGroupModel.emstype == 'ManageIQ::Providers::Huawei::NetworkManager') || (vm.securityGroupModel.emstype == 'ManageIQ::Providers::Otc::NetworkManager') || (vm.securityGroupModel.emstype == 'ManageIQ::Providers::Orange::NetworkManager') "}
+  .form-horizontal{"ng-if" => "vm.securityGroupModel.emstype != 'ManageIQ::Providers::Alibaba::NetworkManager'"}
     %h3
       = _('Placement')
     .form-group{"ng-class" => "{'has-error': angularForm.cloud_tenant_id.$invalid}"}
-
       %label.col-md-2.control-label
         = _('Cloud Tenant')
       .col-md-8
@@ -48,7 +47,6 @@
             = "<#{_('Choose')}>"
         %span.help-block{"ng-show" => "angularForm.cloud_tenant_id.$error.required"}
           = _("Required")
-
 
   .form-horizontal{"ng-if" => "vm.securityGroupModel.emstype == 'ManageIQ::Providers::Alibaba::NetworkManager'"}
     %h3
@@ -67,7 +65,6 @@
             = "<#{_('Choose')}>"
         %span.help-block{"ng-show" => "angularForm.network_id.$error.required"}
           = _("Required")
-
 
   = render :partial => "layouts/angular/generic_form_buttons"
 
