@@ -25,9 +25,9 @@
 
   = render :partial => "common_new_edit"
 
-  %h3
+  %h3{'ng-if' => "vm.securityGroupModel.cloud_tenant.name"}
     = _('Placement')
-  .form-horizontal
+  .form-horizontal{'ng-if' => "vm.securityGroupModel.cloud_tenant.name"}
     .form-group
       %label.col-md-2.control-label
         = _('Cloud Tenant')

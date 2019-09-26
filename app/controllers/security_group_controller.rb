@@ -177,16 +177,24 @@ class SecurityGroupController < ApplicationController
           end
         end
 
-        if @security_group.type != "ManageIQ::Providers::Alibaba::NetworkManager::SecurityGroup"
-          params["firewall_rules"].each do |_key, rule|
-            if rule["id"] && rule["id"].empty?
-              create_rule(rule)
-            elsif rule["deleted"]
-              delete_rule(rule["ems_ref"])
-            elsif rule_changed?(rule)
-              delete_rule(rule["ems_ref"])
-              create_rule(rule)
-            end
+        params["firewall_rules"].each do |_key, rule|
+          if@security_group.type == "ManageIQ::Providers::Alibaba::NetworkManager::SecurityGroup"
+             if rule["id"].empty?
+                create_rule(rule)
+             elsif rule["deleted"]
+                delete_rule(rule)
+             elsif rule_changed?(rule)
+                update_rule(rule)
+             end
+          else
+              if rule["id"] && rule["id"].empty?
+                create_rule(rule)
+              elsif rule["deleted"]
+                delete_rule(rule["ems_ref"])
+              elsif rule_changed?(rule)
+                delete_rule(rule["ems_ref"])
+                create_rule(rule)
+              end
           end
         end
         task = @tasks.shift
@@ -238,17 +246,63 @@ class SecurityGroupController < ApplicationController
 
   def create_rule(rule)
     rule_data = @security_group.class.parse_security_group_rule(rule)
-    task_id = @security_group.create_security_group_rule_queue(session[:userid], @security_group.ems_ref,
-                                                               rule["direction"], rule_data)
+    if @security_group.type == "ManageIQ::Providers::Alibaba::NetworkManager::SecurityGroup"
+      task_id = @security_group.create_security_group_rule_queue(session[:userid], @security_group.ems_ref,
+                                                                 rule["source_ip_range"],rule["direction"], rule_data)
+    else
+      task_id = @security_group.create_security_group_rule_queue(session[:userid], @security_group.ems_ref,
+                                                                 rule["direction"], rule_data)
+    end
     if task_started(task_id, "Security Group Rule Create")
       @tasks << {:id => task_id, :resource => "Security Group #{@security_group.name} Update: Rule", :action => :create}
     end
   end
 
-  def delete_rule(id)
-    task_id = @security_group.delete_security_group_rule_queue(session[:userid], id)
+  def delete_rule(rule)
+    if @security_group.type == "ManageIQ::Providers::Alibaba::NetworkManager::SecurityGroup"
+      rule_data = @security_group.class.parse_security_group_rule(rule)
+      task_id = @security_group.delete_security_group_rule_queue(session[:userid], @security_group.ems_ref,
+                                                                 rule["source_ip_range"],rule["direction"], rule_data)
+    else
+      task_id = @security_group.delete_security_group_rule_queue(session[:userid], rule)
+    end
     if task_started(task_id, "Security Group Rule Delete")
       @tasks << {:id => task_id, :resource => "Security Group #{@security_group.name} Update: Rule", :action => :delete}
+    end
+  end
+
+  def update_rule(rule)
+    sg_rule = @security_group.firewall_rules.find(rule["id"])
+    old_sg_rule = {}
+    old_sg_rule["direction"]= sg_rule.direction.to_s
+    old_sg_rule["end_port"]= sg_rule.end_port.to_s
+    old_sg_rule["host_protocol"] = sg_rule.host_protocol.to_s
+    old_sg_rule["network_protocol"] = sg_rule.network_protocol.to_s
+    old_sg_rule["port"] = sg_rule.port.to_s
+    old_sg_rule["source_ip_range"] = sg_rule.source_ip_range.to_s
+    old_sg_rule["source_security_group_id"] = sg_rule.source_security_group_id.to_s
+
+    new_rule = @security_group.class.parse_security_group_rule(rule)
+    old_rule = @security_group.class.parse_security_group_rule(old_sg_rule)
+
+    task_id = update_sg_rule(rule, new_rule, old_sg_rule, old_rule)
+    if task_started(task_id, "Security Group Rule update")
+      @tasks << {:id => task_id, :resource => "Security Group #{@security_group.name} Update: Rule", :action => :update}
+    end
+  end
+
+  def update_sg_rule(rule, new_rule, old_sg_rule, old_rule)
+    if old_sg_rule["direction"] != rule["direction"] ||
+      old_sg_rule["end_port"] != rule["end_port"] ||
+      old_sg_rule["host_protocol"] != rule["host_protocol"] ||
+      old_sg_rule["port"] != rule["port"] ||
+      old_sg_rule["source_ip_range"] != rule["source_ip_range"]
+      @security_group.delete_security_group_rule_queue(session[:userid], @security_group.ems_ref,
+                                                       old_sg_rule["source_ip_range"], old_sg_rule["direction"], old_rule)
+      @security_group.create_security_group_rule_queue(session[:userid], @security_group.ems_ref,
+                                                     rule["source_ip_range"], rule["direction"], new_rule)
+    else
+      return
     end
   end
 
